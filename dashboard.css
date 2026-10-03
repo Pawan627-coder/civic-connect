@@ -1,0 +1,737 @@
+/* ========================================================
+   CIVIC CONNECT - USER DASHBOARD STYLESHEET
+   Stage 4: Personal Citizen Dashboard & Rewards Engine
+   ======================================================== */
+
+/* --------------------------------------------------------
+   1. DASHBOARD WELCOME / HERO BANNER
+   -------------------------------------------------------- */
+.dashboard-welcome-section {
+  padding: 3rem 0 2rem;
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg-body) 100%);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.welcome-box-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+}
+
+.welcome-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.user-avatar-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-teal-dark) 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(7, 84, 107, 0.25);
+  flex-shrink: 0;
+  border: 3px solid #ffffff;
+}
+
+.welcome-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary-teal);
+  background-color: var(--primary-teal-light);
+  padding: 0.22rem 0.65rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 0.35rem;
+}
+
+.welcome-title {
+  font-size: 2.15rem;
+  color: var(--navy-blue);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+  line-height: 1.2;
+}
+
+.welcome-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  line-height: 1.55;
+}
+
+.welcome-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* --------------------------------------------------------
+   2. FOUR SUMMARY STATISTICS CARDS
+   -------------------------------------------------------- */
+.dashboard-stats-section {
+  padding: 2.5rem 0 1.5rem;
+  background-color: var(--bg-body);
+}
+
+.stats-grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.stat-card-box {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.stat-card-box:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-teal);
+}
+
+.stat-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card-box:nth-child(1) .stat-icon-wrapper {
+  background-color: var(--primary-teal-light);
+  color: var(--primary-teal);
+}
+
+.stat-card-box:nth-child(2) .stat-icon-wrapper {
+  background-color: #fffbeb;
+  color: #b45309;
+}
+
+.stat-card-box:nth-child(3) .stat-icon-wrapper {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.stat-card-box:nth-child(4) .stat-icon-wrapper {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.stat-content-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number-value {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--navy-blue);
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+.stat-label-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------
+   3. MY COMPLAINTS SECTION & STATUS STEPPER
+   -------------------------------------------------------- */
+.dashboard-main-content {
+  padding: 1.5rem 0 4.5rem;
+  background-color: var(--bg-body);
+}
+
+.dashboard-layout-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 2.25rem;
+  align-items: flex-start;
+}
+
+.dashboard-panel-block {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.panel-header-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-title-group h2 {
+  font-size: 1.4rem;
+  color: var(--navy-blue);
+  margin-bottom: 0.2rem;
+}
+
+.panel-title-group p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* Filter Tabs (All, Active, Resolved) */
+.filter-tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--bg-surface-alt);
+  padding: 0.3rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.filter-tab-btn {
+  font-family: inherit;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-tab-btn:hover {
+  color: var(--navy-blue);
+}
+
+.filter-tab-btn.active {
+  background-color: #ffffff;
+  color: var(--primary-teal);
+  box-shadow: var(--shadow-sm);
+}
+
+/* User Complaints Cards List */
+.my-complaints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.my-complaint-card {
+  background-color: #ffffff;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.my-complaint-card:hover {
+  border-color: var(--primary-teal);
+  box-shadow: var(--shadow-md);
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.card-id-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--primary-teal);
+  background-color: var(--primary-teal-light);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.card-title-heading {
+  font-size: 1.2rem;
+  color: var(--navy-blue);
+  line-height: 1.35;
+}
+
+.card-meta-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-size: 0.825rem;
+  color: var(--text-muted);
+}
+
+.meta-line-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.meta-line-item svg {
+  color: var(--primary-teal);
+  flex-shrink: 0;
+}
+
+/* Visual Status Progress Tracker */
+.status-tracker-box {
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin: 0.25rem 0;
+}
+
+.tracker-label-caption {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.tracker-stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.tracker-step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  text-align: center;
+}
+
+.step-node-bubble {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.step-title-text {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Completed Step */
+.tracker-step-item.completed .step-node-bubble {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+  color: #ffffff;
+}
+.tracker-step-item.completed .step-title-text {
+  color: var(--accent-green-dark);
+}
+
+/* Active Step */
+.tracker-step-item.active .step-node-bubble {
+  background-color: var(--primary-teal);
+  border-color: var(--primary-teal);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px var(--primary-teal-light);
+}
+.tracker-step-item.active .step-title-text {
+  color: var(--primary-teal);
+  font-weight: 800;
+}
+
+/* Connector Line */
+.tracker-line-segment {
+  flex: 1;
+  height: 2px;
+  background-color: #cbd5e1;
+  transform: translateY(-11px);
+  z-index: 1;
+}
+
+.tracker-line-segment.completed {
+  background-color: var(--accent-green);
+}
+
+.card-bottom-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.card-supporters-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-body);
+}
+
+.card-supporters-badge svg {
+  color: var(--primary-teal);
+}
+
+/* --------------------------------------------------------
+   4. REWARD SYSTEM & REWARD LEVELS
+   -------------------------------------------------------- */
+.rewards-card-block {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+/* Token Rules Flow */
+.token-rules-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.token-rule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+}
+
+.rule-info-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rule-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  color: var(--primary-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.rule-text-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+}
+
+.rule-token-badge {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #065f46;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+}
+
+/* Level Progress Card */
+.level-progress-box {
+  background: linear-gradient(135deg, #f8fafc 0%, var(--primary-teal-light) 100%);
+  border: 1.5px solid rgba(7, 84, 107, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.level-badge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.level-name-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary-teal);
+}
+
+.level-tier-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background-color: var(--primary-teal);
+  color: #ffffff;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+}
+
+.progress-metric-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--navy-blue);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.progress-track-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #e2e8f0;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-teal) 0%, var(--accent-green) 100%);
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-subtext {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* All Levels Tier List */
+.all-tiers-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tier-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.825rem;
+  color: var(--text-body);
+}
+
+.tier-item-row.current-tier {
+  background-color: #ffffff;
+  border: 1px solid var(--primary-teal);
+  font-weight: 700;
+  color: var(--primary-teal);
+}
+
+/* --------------------------------------------------------
+   5. RECENT ACTIVITY TIMELINE
+   -------------------------------------------------------- */
+.activity-timeline-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: relative;
+  padding-left: 1rem;
+  border-left: 2px solid var(--border-color);
+  margin-left: 0.5rem;
+}
+
+.activity-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.activity-node-bullet {
+  position: absolute;
+  left: -1.45rem;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--primary-teal);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px var(--border-color);
+}
+
+.activity-text-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+  line-height: 1.4;
+}
+
+.activity-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.activity-reward-pill {
+  font-weight: 700;
+  color: #065f46;
+  background-color: #ecfdf5;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------
+   6. EMPTY STATES & MODAL
+   -------------------------------------------------------- */
+.empty-complaints-box {
+  text-align: center;
+  padding: 3.5rem 2rem;
+  background-color: #ffffff;
+  border: 1.5px dashed var(--border-color);
+  border-radius: var(--radius-xl);
+}
+
+.empty-complaints-box h3 {
+  font-size: 1.3rem;
+  color: var(--navy-blue);
+  margin-bottom: 0.4rem;
+}
+
+.empty-complaints-box p {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+}
+
+/* Modal details */
+.modal-verification-box {
+  background-color: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+}
+
+.modal-verification-box strong {
+  color: var(--navy-blue);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+/* --------------------------------------------------------
+   7. RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
+   -------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .stats-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-title {
+    font-size: 1.75rem;
+  }
+
+  .welcome-user-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .welcome-actions-group {
+    width: 100%;
+  }
+
+  .welcome-actions-group .btn {
+    width: 100%;
+  }
+
+  .stats-grid-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .panel-header-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-tabs-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-tab-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .tracker-stepper-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .tracker-line-segment {
+    display: none;
+  }
+
+  .tracker-step-item {
+    flex-direction: row;
+    gap: 0.6rem;
+    text-align: left;
+  }
+}

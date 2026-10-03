@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Report a road hazard, pothole, broken streetlight, or civic issue in your neighborhood through Civic Connect.">
+  <title>Report a Problem | Civic Connect</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans for consistent modern typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Base Civic Connect Design System -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Report Problem Specific Stylesheet -->
+  <link rel="stylesheet" href="report-problem.css">
+</head>
+<body>
+
+  <!-- ========================================================
+       1. NAVIGATION BAR
+       Reused from homepage for consistent site-wide branding
+       ======================================================== -->
+  <header class="site-header" id="top">
+    <div class="container nav-container">
+      <!-- Brand Logo & Name -->
+      <a href="index.html" class="brand-link" aria-label="Civic Connect Home">
+        <div class="logo-wrapper">
+          <img 
+            src="assets/logo.png" 
+            alt="Civic Connect Logo" 
+            class="brand-logo"
+            onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+          >
+          <div class="logo-fallback" id="logoFallback">CC</div>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-name">CIVIC CONNECT</span>
+          <span class="brand-tagline">Road Safety & Civic Action</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="index.html#hero" class="nav-link">Home</a></li>
+          <li><a href="report-problem.html" class="nav-link active" aria-current="page">Report Problem</a></li>
+          <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="index.html#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="index.html#about" class="nav-link">About Us</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline-nav">Login</a>
+          <a href="signup.html" class="btn btn-secondary-nav">Sign Up</a>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        type="button" 
+        class="mobile-toggle" 
+        id="mobileMenuToggle" 
+        aria-label="Toggle navigation menu" 
+        aria-expanded="false" 
+        aria-controls="navMenu"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ========================================================
+         2. REPORT HERO / INTRODUCTION BANNER
+         ======================================================== -->
+    <section class="report-hero-section">
+      <div class="container">
+        <div class="report-hero-badge">
+          <span>●</span> Citizen Hazard Reporting
+        </div>
+        <h1 class="report-hero-title">Report a Problem</h1>
+        <p class="report-hero-lead">
+          Notice a dangerous pothole, overflowing drain, or missing road sign? 
+          Share details with your local ward authority so road maintenance teams can inspect and repair hazards quickly.
+        </p>
+        <div class="report-hero-stats">
+          <div class="hero-stat-pill">
+            <span class="pill-dot"></span>
+            <span>Direct Ward Routing</span>
+          </div>
+          <div class="hero-stat-pill">
+            <span class="pill-dot"></span>
+            <span>GPS Geotagged Locations</span>
+          </div>
+          <div class="hero-stat-pill">
+            <span class="pill-dot"></span>
+            <span>Public Progress Tracking</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         3. MAIN REPORT FORM & MAP CONTAINER
+         ======================================================== -->
+    <section class="report-content-section">
+      <div class="container">
+        <form id="reportProblemForm" class="report-problem-form" novalidate>
+          <div class="report-grid-layout">
+            
+            <!-- LEFT COLUMN: Problem Details, Severity & Evidence -->
+            <div class="form-column">
+              
+              <!-- Block 1: Issue Details -->
+              <section class="form-card-block" aria-labelledby="headingIssueDetails">
+                <div class="form-card-header">
+                  <div class="card-step-badge">1</div>
+                  <div class="card-title-group">
+                    <h2 id="headingIssueDetails">Issue Details</h2>
+                    <p>Categorize and describe the road or community problem.</p>
+                  </div>
+                </div>
+
+                <!-- 1. Category Dropdown -->
+                <div class="form-field-group">
+                  <label for="issueCategory" class="form-field-label">
+                    <span>Problem Category <span class="label-required">*</span></span>
+                  </label>
+                  <select id="issueCategory" name="issueCategory" class="form-select" required aria-describedby="categoryError">
+                    <option value="" disabled selected>-- Select an issue category --</option>
+                    <option value="Pothole / Broken Road">Pothole / Broken Road</option>
+                    <option value="Sewage Problem">Sewage Problem</option>
+                    <option value="Garbage">Garbage / Waste Accumulation</option>
+                    <option value="Open Manhole">Open / Damaged Manhole</option>
+                    <option value="Streetlight Not Working">Streetlight Not Working</option>
+                    <option value="Waterlogging">Waterlogging / Blocked Drain</option>
+                    <option value="Damaged Traffic Signal">Damaged Traffic Signal</option>
+                    <option value="Traffic Congestion">Traffic Congestion Hazard</option>
+                    <option value="Accident">Accident Blackspot</option>
+                    <option value="Other">Other Civic Hazard</option>
+                  </select>
+                  <span class="field-validation-msg" id="categoryError" role="alert"></span>
+                </div>
+
+                <!-- 2. Problem Title -->
+                <div class="form-field-group">
+                  <label for="problemTitle" class="form-field-label">
+                    <span>Problem Title <span class="label-required">*</span></span>
+                    <span class="field-helper-text">Max 100 characters</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    id="problemTitle" 
+                    name="problemTitle" 
+                    class="form-input-text" 
+                    placeholder="e.g., Deep cluster of potholes near Metro Pillar 42" 
+                    maxlength="100" 
+                    required 
+                    aria-describedby="titleError"
+                  >
+                  <span class="field-validation-msg" id="titleError" role="alert"></span>
+                </div>
+
+                <!-- 3. Description -->
+                <div class="form-field-group">
+                  <label for="problemDescription" class="form-field-label">
+                    <span>Detailed Description <span class="label-required">*</span></span>
+                  </label>
+                  <textarea 
+                    id="problemDescription" 
+                    name="problemDescription" 
+                    class="form-textarea" 
+                    placeholder="Explain what happened, how traffic or pedestrians are affected, and any specific landmarks nearby..." 
+                    maxlength="500" 
+                    required 
+                    aria-describedby="descError descCharCounter"
+                  ></textarea>
+                  <div class="field-helper-text">
+                    <span>Minimum 20 characters</span>
+                    <span class="char-counter" id="descCharCounter">0 / 500 characters</span>
+                  </div>
+                  <span class="field-validation-msg" id="descError" role="alert"></span>
+                </div>
+              </section>
+
+              <!-- Block 2: Severity Level -->
+              <section class="form-card-block" aria-labelledby="headingSeverity">
+                <div class="form-card-header">
+                  <div class="card-step-badge">2</div>
+                  <div class="card-title-group">
+                    <h2 id="headingSeverity">Estimated Severity</h2>
+                    <p>Help engineering crews understand the risk level of this hazard.</p>
+                  </div>
+                </div>
+
+                <div class="severity-card-grid" role="radiogroup" aria-labelledby="headingSeverity">
+                  
+                  <!-- Low -->
+                  <label class="severity-option" for="sevLow">
+                    <input type="radio" name="severityLevel" id="sevLow" value="low" required>
+                    <div class="severity-card">
+                      <div class="severity-card-top">
+                        <span class="severity-name">Low</span>
+                        <span class="severity-pill low">Minor</span>
+                      </div>
+                      <p class="severity-desc">Minor inconvenience, normal traffic flow, cosmetic road erosion.</p>
+                    </div>
+                  </label>
+
+                  <!-- Medium -->
+                  <label class="severity-option" for="sevMedium">
+                    <input type="radio" name="severityLevel" id="sevMedium" value="medium" checked>
+                    <div class="severity-card">
+                      <div class="severity-card-top">
+                        <span class="severity-name">Medium</span>
+                        <span class="severity-pill medium">Moderate</span>
+                      </div>
+                      <p class="severity-desc">Noticeable hazard, slows traffic, needs attention within routine maintenance.</p>
+                    </div>
+                  </label>
+
+                  <!-- High -->
+                  <label class="severity-option" for="sevHigh">
+                    <input type="radio" name="severityLevel" id="sevHigh" value="high">
+                    <div class="severity-card">
+                      <div class="severity-card-top">
+                        <span class="severity-name">High</span>
+                        <span class="severity-pill high">Urgent</span>
+                      </div>
+                      <p class="severity-desc">Significant safety hazard, vehicle damage risk, lane blockage.</p>
+                    </div>
+                  </label>
+
+                  <!-- Critical -->
+                  <label class="severity-option" for="sevCritical">
+                    <input type="radio" name="severityLevel" id="sevCritical" value="critical">
+                    <div class="severity-card">
+                      <div class="severity-card-top">
+                        <span class="severity-name">Critical</span>
+                        <span class="severity-pill critical">Emergency</span>
+                      </div>
+                      <p class="severity-desc">Imminent risk of severe injury, deep road collapse, or exposed live cables.</p>
+                    </div>
+                  </label>
+                </div>
+                <span class="field-validation-msg" id="severityError" role="alert"></span>
+
+                <div class="severity-disclaimer">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span><strong>Verification Note:</strong> Citizen severity ratings are independently verified by municipal road inspectors prior to dispatching repair contractors.</span>
+                </div>
+              </section>
+
+              <!-- Block 3: Photo Upload -->
+              <section class="form-card-block" aria-labelledby="headingPhotos">
+                <div class="form-card-header">
+                  <div class="card-step-badge">3</div>
+                  <div class="card-title-group">
+                    <h2 id="headingPhotos">Attach Photo Evidence</h2>
+                    <p>Visual proof expedites municipal assessment and repairs.</p>
+                  </div>
+                </div>
+
+                <!-- Dropzone Box -->
+                <div class="photo-dropzone" id="photoDropzone" role="button" tabindex="0" aria-label="Upload photos by clicking or dropping files here">
+                  <input 
+                    type="file" 
+                    id="photoFileInput" 
+                    class="hidden-file-input" 
+                    accept="image/jpeg,image/jpg,image/png,image/webp" 
+                    multiple
+                  >
+                  <div class="dropzone-icon-box">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                  </div>
+                  <p class="dropzone-prompt">Drag &amp; drop photos here, or <span>browse files</span></p>
+                  <p class="dropzone-specs">Supports JPG, PNG, WEBP • Max 3 photos • Up to 5 MB per image</p>
+                </div>
+                <span class="field-validation-msg" id="photoError" role="alert"></span>
+
+                <!-- Previews Grid -->
+                <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+
+                <div class="photo-privacy-note">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  <span><strong>Privacy Advisory:</strong> Please do not upload photos showing visible faces of bystanders, personal vehicle license plates, or interior private property.</span>
+                </div>
+              </section>
+
+              <!-- Block 4: Accuracy Confirmation -->
+              <section class="confirmation-card-block">
+                <label class="accuracy-checkbox-wrapper" for="accuracyConfirmation">
+                  <input type="checkbox" id="accuracyConfirmation" name="accuracyConfirmation" required aria-describedby="accuracyError">
+                  <span class="accuracy-checkbox-label">
+                    <strong>Citizen Verification Agreement:</strong> I confirm that this report describes a genuine civic issue observed firsthand and that the location and details provided are accurate to the best of my knowledge.<span class="label-required">*</span>
+                  </span>
+                </label>
+                <span class="field-validation-msg" id="accuracyError" role="alert"></span>
+
+                <!-- Submit / Reset Actions -->
+                <div class="form-actions-row">
+                  <button type="button" class="btn btn-outline btn-reset-report" id="resetReportBtn">
+                    Reset Form
+                  </button>
+                  <button type="submit" class="btn btn-primary btn-submit-report" id="submitReportBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    Submit Report
+                  </button>
+                </div>
+              </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Location Selection Map -->
+            <div class="form-column">
+              <section class="form-card-block map-card-sticky" aria-labelledby="headingLocation">
+                <div class="form-card-header">
+                  <div class="card-step-badge">4</div>
+                  <div class="card-title-group">
+                    <h2 id="headingLocation">Select Problem Location</h2>
+                    <p>Click on Google Map or use your device's GPS to mark the exact hazard spot.</p>
+                  </div>
+                </div>
+
+                <!-- Map Action Toolbar -->
+                <div class="map-toolbar">
+                  <button type="button" class="btn-use-location" id="useLocationBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                    </svg>
+                    Use My Current Location
+                  </button>
+                  <span class="location-status-badge" id="locationStatusBadge">
+                    Click on Google Map to place a pin
+                  </span>
+                </div>
+
+                <!-- Google Map Container -->
+                <div class="map-viewport-wrapper">
+                  <div id="problemMap" role="region" aria-label="Interactive Google Map for hazard location"></div>
+                  
+                  <!-- Fallback message if Google Maps fails or is offline -->
+                  <div class="map-fallback-overlay" id="mapFallbackOverlay" style="display: none;">
+                    <p><strong>Interactive Map Notice</strong></p>
+                    <p id="mapFallbackDesc" style="font-size: 0.85rem; margin-top: 0.5rem;">
+                      Google Maps Platform key not loaded. You can still use the <strong>"Use My Current Location"</strong> button above or click to set coordinates.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="map-instructions-tip">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>Click anywhere on the Google Map or drag the pin to set exact coordinates.</span>
+                </div>
+
+                <!-- Readout Coordinates -->
+                <div class="coordinates-readout-bar">
+                  <div class="coord-display-box">
+                    <span class="coord-label">Latitude</span>
+                    <span class="coord-value empty" id="latValueDisplay">Not pinned</span>
+                    <input type="hidden" id="latitudeInput" name="latitude">
+                  </div>
+                  <div class="coord-display-box">
+                    <span class="coord-label">Longitude</span>
+                    <span class="coord-value empty" id="lngValueDisplay">Not pinned</span>
+                    <input type="hidden" id="longitudeInput" name="longitude">
+                  </div>
+                </div>
+                <span class="field-validation-msg" id="locationError" role="alert"></span>
+
+                <!-- Landmark / Address Description -->
+                <div class="form-field-group" style="margin-top: 1.25rem;">
+                  <label for="locationLandmark" class="form-field-label">
+                    <span>Landmark / Nearest Street Reference</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    id="locationLandmark" 
+                    name="locationLandmark" 
+                    class="form-input-text" 
+                    placeholder="e.g., Opposite Central Bank, near bus stop"
+                  >
+                  <span class="field-helper-text">Helps field repair workers locate the issue faster on-site.</span>
+                </div>
+              </section>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================
+       4. FOOTER
+       Reused for complete visual harmony
+       ======================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-grid">
+        
+        <!-- Brand column -->
+        <div class="footer-col footer-col-brand">
+          <div class="footer-logo-group">
+            <img src="assets/logo.png" alt="Civic Connect Logo" class="footer-logo" onerror="this.style.display='none'">
+            <span class="footer-brand-name">CIVIC CONNECT</span>
+          </div>
+          <p class="footer-description">
+            A civic-tech initiative dedicated to safe, accessible, and high-quality roads for every neighborhood.
+          </p>
+          <div class="footer-badge">
+            Prototype Version 1.0 (Stage 2)
+          </div>
+        </div>
+
+        <!-- Navigation column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#hero">Home</a></li>
+            <li><a href="report-problem.html">Report Problem</a></li>
+            <li><a href="index.html#recent-complaints">Recent Complaints</a></li>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#about">About Our Mission</a></li>
+          </ul>
+        </div>
+
+        <!-- Problem Types column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Problem Types</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#recent-complaints">Potholes &amp; Road Cracks</a></li>
+            <li><a href="index.html#recent-complaints">Broken Streetlights</a></li>
+            <li><a href="index.html#recent-complaints">Open Drainage &amp; Manholes</a></li>
+            <li><a href="index.html#recent-complaints">Waterlogging Hazards</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact info column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Contact &amp; Support</h4>
+          <ul class="footer-contact-list">
+            <li>
+              <strong>Citizen Helpline:</strong>
+              <span>1800-CIVIC-CONNECT (Toll Free)</span>
+            </li>
+            <li>
+              <strong>Support Email:</strong>
+              <a href="mailto:support@civicconnect.org">support@civicconnect.org</a>
+            </li>
+            <li>
+              <strong>Municipal Liaison Office:</strong>
+              <span>Civic Centre, Public Works Wing, Floor 4</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <p class="copyright">
+          &copy; 2026 Civic Connect. Designed with care for safer roads and communities.
+        </p>
+        <div class="legal-links">
+          <a href="login.html" class="legal-link">Login</a>
+          <span class="divider">•</span>
+          <a href="signup.html" class="legal-link">Sign Up</a>
+          <span class="divider">•</span>
+          <a href="report-problem.html" class="legal-link">Report Problem</a>
+          <span class="divider">•</span>
+          <a href="view-complaints.html" class="legal-link">View Complaints</a>
+          <span class="divider">•</span>
+          <a href="dashboard.html" class="legal-link">Dashboard</a>
+          <span class="divider">•</span>
+          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================
+       5. COMPLAINT SUBMISSION MODALS
+       ======================================================== -->
+
+  <!-- A. Success Submission Modal -->
+  <div class="modal-backdrop" id="demoSubmissionModal" role="dialog" aria-modal="true" aria-labelledby="demoModalTitle" hidden>
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">✅</span>
+          <h3 class="modal-title" id="demoModalTitle">Complaint Registered Successfully</h3>
+        </div>
+        <button type="button" class="modal-close" id="demoModalCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="demoSummaryContainer"></div>
+      </div>
+      <div class="modal-footer">
+        <a href="view-complaints.html" class="btn btn-outline">Browse Public Complaints</a>
+        <button type="button" class="btn btn-primary" id="demoModalDismissBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- B. Duplicate Complaint Detected Modal (Stage 10 Part 21) -->
+  <div class="modal-backdrop" id="duplicateNoticeModal" role="dialog" aria-modal="true" aria-labelledby="duplicateModalTitle" hidden>
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-bottom: 1px solid #bfdbfe;">
+        <div class="modal-title-group">
+          <span class="modal-icon" style="background-color: #3b82f6; color: #fff;">🔄</span>
+          <h3 class="modal-title" id="duplicateModalTitle" style="color: #1e40af;">Similar Complaint Already Exists</h3>
+        </div>
+        <button type="button" class="modal-close" id="duplicateModalCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="duplicate-alert-banner" style="background-color: #eff6ff; border: 1px solid #93c5fd; border-radius: 8px; padding: 0.9rem 1rem; margin-bottom: 1.25rem; font-size: 0.88rem; color: #1e3a8a;">
+          <strong>Similar complaint found.</strong> A matching civic report was already submitted nearby. To avoid cluttering municipal workflows, your report has been added to this existing issue, boosting its community urgency!
+        </div>
+        <div id="duplicateSummaryContainer" class="duplicate-summary-box"></div>
+      </div>
+      <div class="modal-footer">
+        <a href="view-complaints.html" class="btn btn-primary" id="duplicateViewPublicBtn">View on Public Map</a>
+        <button type="button" class="btn btn-outline" id="duplicateModalDismissBtn">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts: Shared Navigation + Auth Helper + Dedicated Problem Reporting Logic -->
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+  <script src="report-problem.js"></script>
+</body>
+</html>

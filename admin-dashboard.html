@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Municipal Administration Console for Civic Connect. Review citizen reports, verify hazards, track ward resolution progress, and monitor civic analytics.">
+  <title>Admin Dashboard | Civic Connect</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans for consistent modern typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Base Civic Connect Design System -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- View Complaints Stylesheet (reusing shared status and severity badge tokens) -->
+  <link rel="stylesheet" href="view-complaints.css">
+
+  <!-- Admin Dashboard Specific Stylesheet -->
+  <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+
+  <!-- ========================================================
+       DEVELOPER SECURITY NOTE (Stage 5 Prototype):
+       Frontend admin controls are for demonstration only. 
+       Real authorization and role-based access control must be 
+       implemented on the backend (Node.js, Express, MongoDB, JWT).
+       ======================================================== -->
+
+  <!-- ========================================================
+       1. NAVIGATION BAR (CIVIC CONNECT ADMIN)
+       ======================================================== -->
+  <header class="site-header" id="top">
+    <div class="container nav-container">
+      
+      <!-- Brand Logo & Name with Admin Indicator -->
+      <a href="index.html" class="brand-link" aria-label="Civic Connect Home">
+        <div class="logo-wrapper">
+          <img 
+            src="assets/logo.png" 
+            alt="Civic Connect Logo" 
+            class="brand-logo"
+            onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+          >
+          <div class="logo-fallback" id="logoFallback">CC</div>
+        </div>
+        <div class="brand-text-group">
+          <div class="brand-title-row">
+            <span class="brand-name">CIVIC CONNECT</span>
+            <span class="admin-nav-pill">Admin Console</span>
+          </div>
+          <span class="brand-tagline">Municipal Oversight &amp; Ward Action</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-menu" id="navMenu" aria-label="Admin Navigation">
+        <ul class="nav-links">
+          <li><a href="#overview" class="nav-link active" aria-current="page">Dashboard</a></li>
+          <li><a href="#complaints-section" class="nav-link">Complaints</a></li>
+          <li><a href="#users-section" class="nav-link">Users</a></li>
+          <li><a href="#analytics-section" class="nav-link">Analytics</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline-nav" id="adminLogoutBtn" title="Return to portal login">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Logout</span>
+          </a>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        type="button" 
+        class="mobile-toggle" 
+        id="mobileMenuToggle" 
+        aria-label="Toggle navigation menu" 
+        aria-expanded="false" 
+        aria-controls="navMenu"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="overview">
+
+    <!-- ========================================================
+         2. ADMIN HERO & PROTOTYPE NOTICE BANNER
+         ======================================================== -->
+    <section class="admin-hero-section">
+      <div class="container">
+        
+        <!-- Architectural Prototype Alert Banner -->
+        <div class="admin-notice-banner" role="alert">
+          <div class="notice-icon-box" aria-hidden="true">🛡️</div>
+          <div class="notice-content">
+            <strong>Frontend Demonstration Mode:</strong>
+            <span>Frontend admin controls are for demonstration only. Real authorization and role-based access control must be implemented on the backend.</span>
+          </div>
+        </div>
+
+        <div class="admin-hero-content">
+          <div class="admin-hero-text">
+            <div class="admin-status-badge">
+              <span class="status-pulse-dot"></span> Authorized Officer: Municipal Works Admin
+            </div>
+            <h1 class="admin-hero-title">Admin Dashboard</h1>
+            <p class="admin-hero-subtitle">
+              Review citizen complaints, verify reports, prioritize critical hazards, update resolution status, and monitor civic statistics.
+            </p>
+          </div>
+
+          <div class="admin-hero-actions">
+            <a href="#complaints-section" class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <span>Manage Complaints</span>
+            </a>
+            <a href="view-complaints.html" class="btn btn-outline" target="_blank" rel="noopener">
+              <span>View Public Portal ↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         3. FIVE ADMIN SUMMARY STATS CARDS
+         (Calculated dynamically via JavaScript from dataset)
+         ======================================================== -->
+    <section class="admin-stats-section" aria-label="Key Administrative Metrics">
+      <div class="container">
+        <div class="admin-stats-grid">
+          
+          <!-- Card 1: Total Complaints -->
+          <article class="admin-stat-card">
+            <div class="stat-icon-box total-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <div class="stat-info-group">
+              <span class="stat-value-text" id="statTotalComplaints">0</span>
+              <span class="stat-title-label">Total Complaints</span>
+            </div>
+          </article>
+
+          <!-- Card 2: Pending Verification -->
+          <article class="admin-stat-card">
+            <div class="stat-icon-box pending-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+            <div class="stat-info-group">
+              <span class="stat-value-text" id="statPendingVerification">0</span>
+              <span class="stat-title-label">Pending Verification</span>
+            </div>
+          </article>
+
+          <!-- Card 3: In Progress -->
+          <article class="admin-stat-card">
+            <div class="stat-icon-box progress-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+              </svg>
+            </div>
+            <div class="stat-info-group">
+              <span class="stat-value-text" id="statInProgress">0</span>
+              <span class="stat-title-label">In Progress</span>
+            </div>
+          </article>
+
+          <!-- Card 4: Resolved -->
+          <article class="admin-stat-card">
+            <div class="stat-icon-box resolved-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="stat-info-group">
+              <span class="stat-value-text" id="statResolved">0</span>
+              <span class="stat-title-label">Resolved</span>
+            </div>
+          </article>
+
+          <!-- Card 5: High / Critical Issues -->
+          <article class="admin-stat-card highlight-card">
+            <div class="stat-icon-box critical-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="stat-info-group">
+              <span class="stat-value-text text-danger" id="statHighCritical">0</span>
+              <span class="stat-title-label">High/Critical Issues</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         4. COMPLAINT MANAGEMENT SECTION (TABLE, SEARCH, FILTERS)
+         ======================================================== -->
+    <section class="admin-section" id="complaints-section" aria-labelledby="headingComplaintsManagement">
+      <div class="container">
+        
+        <div class="admin-panel-card">
+          
+          <!-- Section Header -->
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-main-title" id="headingComplaintsManagement">Complaint Management</h2>
+              <p class="panel-subtitle">Search, filter, inspect hazard evidence, verify tickets, and manage status transitions.</p>
+            </div>
+            <div class="live-counter-badge" id="resultsCountBadge">
+              Showing 0 complaints
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls Toolbar -->
+          <div class="management-controls-box">
+            
+            <!-- Search Bar -->
+            <div class="admin-search-wrapper">
+              <div class="admin-search-box">
+                <svg class="admin-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input 
+                  type="text" 
+                  id="adminSearchInput" 
+                  class="admin-search-input" 
+                  placeholder="Search by ID, title, category, or location..."
+                  aria-label="Search complaints by ID, title, category, or location"
+                >
+                <button type="button" class="admin-search-clear" id="adminSearchClearBtn" aria-label="Clear search query" title="Clear search">
+                  &times;
+                </button>
+              </div>
+            </div>
+
+            <!-- Filters Grid (Stage 10 Part 20) -->
+            <div class="admin-filters-grid">
+              
+              <!-- 1. Category Filter -->
+              <div class="filter-field-col">
+                <label for="filterCategory" class="filter-col-label">Category</label>
+                <select id="filterCategory" class="admin-select-input">
+                  <option value="all">All Categories</option>
+                  <option value="Road/Pothole">Road/Pothole</option>
+                  <option value="Sewage">Sewage</option>
+                  <option value="Street Light">Street Light</option>
+                  <option value="Garbage/Waste">Garbage/Waste</option>
+                  <option value="Waterlogging">Waterlogging</option>
+                  <option value="Traffic">Traffic</option>
+                  <option value="Accident">Accident</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- 2. Status Filter -->
+              <div class="filter-field-col">
+                <label for="filterStatus" class="filter-col-label">Status</label>
+                <select id="filterStatus" class="admin-select-input">
+                  <option value="all">All Statuses</option>
+                  <option value="Reported">Reported</option>
+                  <option value="Under Verification">Under Verification</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              <!-- 3. Priority Filter (Stage 10 Part 20) -->
+              <div class="filter-field-col">
+                <label for="filterPriority" class="filter-col-label">Priority</label>
+                <select id="filterPriority" class="admin-select-input">
+                  <option value="all">All Priorities</option>
+                  <option value="Critical">Critical (76-100)</option>
+                  <option value="High">High (56-75)</option>
+                  <option value="Medium">Medium (31-55)</option>
+                  <option value="Low">Low (0-30)</option>
+                </select>
+              </div>
+
+              <!-- 4. Danger Filter (Stage 10 Part 20) -->
+              <div class="filter-field-col">
+                <label for="filterDanger" class="filter-col-label">AI Danger</label>
+                <select id="filterDanger" class="admin-select-input">
+                  <option value="all">All Danger Levels</option>
+                  <option value="Critical">Critical</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+
+              <!-- 5. Verification Filter -->
+              <div class="filter-field-col">
+                <label for="filterVerification" class="filter-col-label">Verification</label>
+                <select id="filterVerification" class="admin-select-input">
+                  <option value="all">All Verification</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Verified">Verified</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              <!-- Clear Filters Action -->
+              <div class="filter-field-col filter-action-col">
+                <label class="filter-col-label">&nbsp;</label>
+                <button type="button" id="adminClearFiltersBtn" class="btn btn-outline admin-clear-btn" title="Reset all search filters">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="1 4 1 10 7 10"></polyline>
+                    <polyline points="23 20 23 14 17 14"></polyline>
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                  </svg>
+                  <span>Clear Filters</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Dynamic Complaint Table Wrapper (Stage 10 Part 20 Columns) -->
+          <div class="table-responsive-wrapper">
+            <table class="admin-data-table" id="complaintsTable">
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 100px;">Complaint ID</th>
+                  <th scope="col" style="min-width: 180px;">Title</th>
+                  <th scope="col" style="width: 120px;">Category</th>
+                  <th scope="col" style="width: 120px;">AI Danger</th>
+                  <th scope="col" style="width: 75px; text-align: center;">Reports</th>
+                  <th scope="col" style="width: 75px; text-align: center;">Votes</th>
+                  <th scope="col" style="width: 85px; text-align: center;">Community</th>
+                  <th scope="col" style="width: 150px;">Priority (Score &amp; Level)</th>
+                  <th scope="col" style="width: 130px;">Status</th>
+                  <th scope="col" style="width: 120px;">Verification</th>
+                  <th scope="col" style="width: 90px; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="complaintsTableBody">
+                <!-- Dynamically populated by dashboard controller -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty Search/Filter State -->
+          <div class="admin-empty-table" id="emptyTableState" style="display: none;">
+            <div class="empty-icon-circle">🔍</div>
+            <h3>No complaints match your criteria</h3>
+            <p>Try clearing your search keyword or relaxing filter options to view available reports.</p>
+            <button type="button" class="btn btn-primary" id="emptyResetFiltersBtn">Reset Filters</button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================
+         5. TWO-COLUMN ANALYTICS & ACTIVITY ROW
+         (Category Breakdown + Recent Admin Activity Audit)
+         ======================================================== -->
+    <section class="admin-section" id="analytics-section" aria-labelledby="headingCategoryStats">
+      <div class="container">
+        <div class="admin-dual-grid">
+          
+          <!-- LEFT COLUMN: Category Statistics Visualization -->
+          <div class="admin-panel-card">
+            <div class="panel-header-row">
+              <div>
+                <h2 class="panel-main-title" id="headingCategoryStats">Category Statistics</h2>
+                <p class="panel-subtitle">Total volume of reported issues categorized by problem type.</p>
+              </div>
+            </div>
+
+            <!-- Dynamic Category Breakdown Bars -->
+            <div class="category-bars-container" id="categoryStatsList" aria-live="polite">
+              <!-- Rendered via JavaScript -->
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: Recent Admin Activity Timeline -->
+          <div class="admin-panel-card" aria-labelledby="headingAdminActivity">
+            <div class="panel-header-row">
+              <div>
+                <h2 class="panel-main-title" id="headingAdminActivity">Admin Activity</h2>
+                <p class="panel-subtitle">Live audit log of verification checks, status transitions, and resolutions.</p>
+              </div>
+              <span class="live-pulse-badge">Live Log</span>
+            </div>
+
+            <ul class="admin-activity-timeline" id="adminActivityList" aria-live="polite">
+              <!-- Populated via JavaScript -->
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         6. COMPREHENSIVE ANALYTICS KPI CARDS
+         ======================================================== -->
+    <section class="admin-section" aria-labelledby="headingCivicAnalytics">
+      <div class="container">
+        <div class="admin-panel-card">
+          
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-main-title" id="headingCivicAnalytics">Civic Operations Analytics</h2>
+              <p class="panel-subtitle">Key efficiency metrics computed across all active and archived municipal tickets.</p>
+            </div>
+          </div>
+
+          <div class="analytics-kpi-grid">
+            
+            <!-- KPI 1: Resolution Rate -->
+            <div class="kpi-card">
+              <span class="kpi-title">Resolution Rate</span>
+              <div class="kpi-number-row">
+                <span class="kpi-big-number" id="kpiResolutionRate">0%</span>
+                <span class="kpi-trend positive" id="kpiResolvedRatio">0 / 0 closed</span>
+              </div>
+              <div class="kpi-progress-bar">
+                <div class="kpi-progress-fill" id="kpiResolutionBar" style="width: 0%;"></div>
+              </div>
+              <span class="kpi-caption">Percentage of citizen hazards successfully restored</span>
+            </div>
+
+            <!-- KPI 2: Active Open Workload -->
+            <div class="kpi-card">
+              <span class="kpi-title">Active Workload</span>
+              <div class="kpi-number-row">
+                <span class="kpi-big-number" id="kpiActiveWorkload">0</span>
+                <span class="kpi-trend pending">Requires Ward Attention</span>
+              </div>
+              <div class="kpi-progress-bar">
+                <div class="kpi-progress-fill progress-active" id="kpiActiveBar" style="width: 0%;"></div>
+              </div>
+              <span class="kpi-caption">Tickets currently reported, under verification, or in progress</span>
+            </div>
+
+            <!-- KPI 3: High & Critical Priority Ratio -->
+            <div class="kpi-card">
+              <span class="kpi-title">High &amp; Critical Priority Ratio</span>
+              <div class="kpi-number-row">
+                <span class="kpi-big-number text-danger" id="kpiCriticalRate">0%</span>
+                <span class="kpi-trend warning" id="kpiCriticalCountText">0 critical issues</span>
+              </div>
+              <div class="kpi-progress-bar">
+                <div class="kpi-progress-fill progress-critical" id="kpiCriticalBar" style="width: 0%;"></div>
+              </div>
+              <span class="kpi-caption">Hazards marked with immediate safety risk to commuters</span>
+            </div>
+
+            <!-- KPI 4: Most Reported Category -->
+            <div class="kpi-card">
+              <span class="kpi-title">Top Hazard Category</span>
+              <div class="kpi-number-row">
+                <span class="kpi-big-number" id="kpiTopCategory" style="font-size: 1.45rem;">None</span>
+              </div>
+              <div class="kpi-progress-bar">
+                <div class="kpi-progress-fill progress-topcat" style="width: 100%;"></div>
+              </div>
+              <span class="kpi-caption" id="kpiTopCategoryCount">0 reports logged in this category</span>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         7. USER MANAGEMENT SECTION
+         ======================================================== -->
+    <section class="admin-section" id="users-section" aria-labelledby="headingUserManagement">
+      <div class="container">
+        <div class="admin-panel-card">
+          
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-main-title" id="headingUserManagement">Registered Citizen Contributors</h2>
+              <p class="panel-subtitle">Review active citizen reporters, community helper engagement, and reward token balances.</p>
+            </div>
+            <div class="live-counter-badge" id="userCountBadge">
+              6 registered citizens
+            </div>
+          </div>
+
+          <div class="table-responsive-wrapper">
+            <table class="admin-data-table">
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 100px;">User ID</th>
+                  <th scope="col" style="min-width: 180px;">Name</th>
+                  <th scope="col" style="min-width: 200px;">Email</th>
+                  <th scope="col" style="width: 130px; text-align: center;">Reported</th>
+                  <th scope="col" style="width: 130px; text-align: center;">Resolved</th>
+                  <th scope="col" style="width: 140px; text-align: center;">Reward Tokens</th>
+                  <th scope="col" style="width: 120px; text-align: center;">Account Status</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- Dynamically populated from sample user dataset -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       8. COMPLAINT REVIEW & RESOLUTION MODAL
+       ======================================================== -->
+  <div class="modal-backdrop" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle" hidden>
+    <div class="modal-dialog admin-modal-dialog">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">🔎</span>
+          <div>
+            <h3 class="modal-title" id="reviewModalTitle">Complaint Review Record</h3>
+            <span class="modal-subtitle-id" id="modalComplaintIdDisplay">CC-0000</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body" id="reviewModalBody">
+        <!-- Injected via JavaScript controller -->
+      </div>
+
+      <!-- Modal Footer Action Bar (Verify, Reject, Mark In Progress, Mark Resolved) -->
+      <div class="modal-footer admin-modal-footer" id="modalFooterActions">
+        <!-- Rendered dynamically according to current complaint state -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       9. PHOTO ENLARGEMENT LIGHTBOX MODAL
+       ======================================================== -->
+  <div class="modal-backdrop" id="photoLightboxModal" role="dialog" aria-modal="true" aria-label="Complaint Photo Preview" hidden>
+    <div class="modal-dialog lightbox-dialog">
+      <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+        <span class="lightbox-caption" id="lightboxCaption">Hazard Photo</span>
+        <button type="button" class="modal-close" id="lightboxCloseBtn" aria-label="Close preview">&times;</button>
+      </div>
+      <div class="lightbox-body">
+        <img src="" alt="Enlarged complaint view" id="lightboxImg" class="lightbox-image">
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       10. SITE FOOTER
+       ======================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-grid">
+        
+        <!-- Brand column -->
+        <div class="footer-col footer-col-brand">
+          <div class="footer-logo-group">
+            <img src="assets/logo.png" alt="Civic Connect Logo" class="footer-logo" onerror="this.style.display='none'">
+            <span class="footer-brand-name">CIVIC CONNECT</span>
+          </div>
+          <p class="footer-description">
+            A civic-tech initiative dedicated to safe, accessible, and high-quality roads for every neighborhood.
+          </p>
+          <div class="footer-badge">
+            Admin Console Prototype Version 1.0 (Stage 5)
+          </div>
+        </div>
+
+        <!-- Navigation column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#hero">Home</a></li>
+            <li><a href="report-problem.html">Report Problem</a></li>
+            <li><a href="view-complaints.html">View Complaints</a></li>
+            <li><a href="dashboard.html">User Dashboard</a></li>
+            <li><a href="admin-dashboard.html">Admin Dashboard</a></li>
+          </ul>
+        </div>
+
+        <!-- Problem Types column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Problem Types</h4>
+          <ul class="footer-links">
+            <li><a href="view-complaints.html">Potholes &amp; Road Cracks</a></li>
+            <li><a href="view-complaints.html">Broken Streetlights</a></li>
+            <li><a href="view-complaints.html">Open Drainage &amp; Manholes</a></li>
+            <li><a href="view-complaints.html">Waterlogging Hazards</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact info column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Contact &amp; Support</h4>
+          <ul class="footer-contact-list">
+            <li>
+              <strong>Citizen Helpline:</strong>
+              <span>1800-CIVIC-CONNECT (Toll Free)</span>
+            </li>
+            <li>
+              <strong>Municipal Helpdesk:</strong>
+              <a href="mailto:admin-support@civicconnect.org">admin-support@civicconnect.org</a>
+            </li>
+            <li>
+              <strong>Central Control Room:</strong>
+              <span>Civic Centre, Public Works Wing, Floor 4</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <p class="copyright">
+          &copy; 2026 Civic Connect. Designed with care for safer roads and communities.
+        </p>
+        <div class="legal-links">
+          <a href="login.html" class="legal-link">Login</a>
+          <span class="divider">•</span>
+          <a href="signup.html" class="legal-link">Sign Up</a>
+          <span class="divider">•</span>
+          <a href="report-problem.html" class="legal-link">Report Problem</a>
+          <span class="divider">•</span>
+          <a href="view-complaints.html" class="legal-link">View Complaints</a>
+          <span class="divider">•</span>
+          <a href="dashboard.html" class="legal-link">User Dashboard</a>
+          <span class="divider">•</span>
+          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts: Shared Navigation + Auth Helper + Dedicated Admin Controller -->
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+  <script src="admin-dashboard.js"></script>
+</body>
+</html>

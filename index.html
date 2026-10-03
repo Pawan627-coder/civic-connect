@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Civic Connect - A modern civic road-problem reporting platform empowering citizens to report potholes, hazards, and damaged roads for safer communities.">
+  <title>Civic Connect | Build Better Roads & Communities</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans for modern, clean civic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========================================================
+       1. NAVIGATION BAR
+       Responsive header with logo, navigation links, and mobile toggle
+       ======================================================== -->
+  <header class="site-header" id="top">
+    <div class="container nav-container">
+      <!-- Brand Logo & Name -->
+      <a href="#top" class="brand-link" aria-label="Civic Connect Home">
+        <div class="logo-wrapper">
+          <!-- Main Logo with graceful text fallback if image is missing -->
+          <img 
+            src="assets/logo.png" 
+            alt="Civic Connect Logo" 
+            class="brand-logo"
+            id="brandLogo"
+            onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+          >
+          <div class="logo-fallback" id="logoFallback">CC</div>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-name">CIVIC CONNECT</span>
+          <span class="brand-tagline">Road Safety & Civic Action</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="#hero" class="nav-link active">Home</a></li>
+          <li><a href="report-problem.html" class="nav-link">Report Problem</a></li>
+          <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="#about" class="nav-link">About Us</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline-nav">Login</a>
+          <a href="signup.html" class="btn btn-secondary-nav">Sign Up</a>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        type="button" 
+        class="mobile-toggle" 
+        id="mobileMenuToggle" 
+        aria-label="Toggle navigation menu" 
+        aria-expanded="false" 
+        aria-controls="navMenu"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ========================================================
+         2. HERO SECTION
+         Main headline, description, primary action buttons & visual preview
+         ======================================================== -->
+    <section class="hero-section" id="hero">
+      <div class="container hero-container">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-dot"></span>
+            Citizen-Powered Civic Technology
+          </div>
+          <h1 class="hero-title">
+            Together, Let's Build Better Roads and Communities
+          </h1>
+          <p class="hero-description">
+            Civic Connect bridges the gap between residents and municipal authorities. 
+            Report potholes, broken streetlights, and hazardous road conditions in under a minute, 
+            track real-time repairs, and create safer streets for everyone.
+          </p>
+
+          <!-- Primary CTA Buttons -->
+          <div class="hero-actions">
+            <a href="report-problem.html" class="btn btn-primary" id="heroReportBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              Report a Problem
+            </a>
+            <a href="view-complaints.html" class="btn btn-outline">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              View Complaints
+            </a>
+          </div>
+
+          <!-- Trust & Civic Stats Highlight -->
+          <div class="hero-highlights">
+            <div class="highlight-item">
+              <span class="highlight-icon">✓</span>
+              <span>100% Free for Citizens</span>
+            </div>
+            <div class="highlight-item">
+              <span class="highlight-icon">✓</span>
+              <span>Verified Municipal Action</span>
+            </div>
+            <div class="highlight-item">
+              <span class="highlight-icon">✓</span>
+              <span>Transparent Public Log</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Visual Preview Card -->
+        <div class="hero-visual">
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <div class="preview-tag">
+                <span class="status-indicator live-pulse"></span>
+                Active Civic Report Preview
+              </div>
+              <span class="demo-badge">Sample Demo</span>
+            </div>
+            <div class="preview-card-body">
+              <div class="preview-issue-meta">
+                <span class="category-chip">Pothole Hazard</span>
+                <span class="ticket-id">#CC-8429</span>
+              </div>
+              <h3 class="preview-issue-title">Deep Pothole on 14th Main Crossroad</h3>
+              <p class="preview-issue-location">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                Near City Central Metro, Ward 28
+              </p>
+
+              <!-- Progress bar mockup -->
+              <div class="timeline-stepper">
+                <div class="timeline-step completed">
+                  <div class="step-bullet">✓</div>
+                  <span class="step-label">Reported</span>
+                </div>
+                <div class="timeline-line active"></div>
+                <div class="timeline-step active">
+                  <div class="step-bullet">2</div>
+                  <span class="step-label">In Review</span>
+                </div>
+                <div class="timeline-line"></div>
+                <div class="timeline-step">
+                  <div class="step-bullet">3</div>
+                  <span class="step-label">Dispatched</span>
+                </div>
+                <div class="timeline-line"></div>
+                <div class="timeline-step">
+                  <div class="step-bullet">4</div>
+                  <span class="step-label">Resolved</span>
+                </div>
+              </div>
+
+              <div class="preview-card-footer">
+                <div class="officer-note">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                  </svg>
+                  <span>Inspection assigned to Ward Engineering Cell</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         3. FEATURES SECTION
+         Four cards: Easy Reporting, Track Complaints, Community Support, Transparent Updates
+         ======================================================== -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="section-subtitle">Empowering Every Resident</span>
+          <h2 class="section-title">Designed for Quick, Accountable Civic Action</h2>
+          <p class="section-lead">
+            Every feature in Civic Connect is built to eliminate bureaucratic red tape and give communities an active voice in city infrastructure.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Feature 1: Easy Reporting -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <h3 class="feature-card-title">Easy Reporting</h3>
+            <p class="feature-card-text">
+              Pin exact GPS coordinates, upload photos directly from your phone or camera, and describe road damage in simple steps. No lengthy forms or complex paperwork.
+            </p>
+            <div class="feature-tag">Under 60 Seconds</div>
+          </article>
+
+          <!-- Feature 2: Track Complaints -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3 class="feature-card-title">Track Complaints</h3>
+            <p class="feature-card-text">
+              Follow every ticket milestone from initial review by the road safety division to repair crew dispatch. Get notifications right down to project completion.
+            </p>
+            <div class="feature-tag">Live Status Updates</div>
+          </article>
+
+          <!-- Feature 3: Community Support -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3 class="feature-card-title">Community Support</h3>
+            <p class="feature-card-text">
+              Neighbors can upvote reports in their local area, highlighting urgent hazards. Collective community votes help municipal bodies prioritize the most critical repairs.
+            </p>
+            <div class="feature-tag">Neighborhood Upvoting</div>
+          </article>
+
+          <!-- Feature 4: Transparent Updates -->
+          <article class="feature-card">
+            <div class="feature-icon-box">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h3 class="feature-card-title">Transparent Updates</h3>
+            <p class="feature-card-text">
+              Public audit trail with resolution timelines, designated repair contractors, and before-and-after photo verification so citizens know their voices made a difference.
+            </p>
+            <div class="feature-tag">Public Accountability</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         4. HOW IT WORKS SECTION
+         Three clear sequential steps: Report, Track, and Resolve
+         ======================================================== -->
+    <section class="how-it-works-section" id="how-it-works">
+      <div class="container">
+        <div class="section-header text-center">
+          <span class="section-subtitle">Simple 3-Step Process</span>
+          <h2 class="section-title">How Civic Connect Works</h2>
+          <p class="section-lead">
+            Taking action against dangerous road hazards shouldn't be complicated. Here is how your report turns into real repair work.
+          </p>
+        </div>
+
+        <div class="steps-container">
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-badge-number">01</div>
+            <div class="step-icon-wrapper">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Report a Problem</h3>
+            <p class="step-description">
+              Notice a dangerous pothole, overflowing drain, or missing road sign? Take a photo, confirm your location on the map, and add a brief description.
+            </p>
+            <div class="step-footer">
+              <span class="step-check">✓ Geolocation tagging</span>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-badge-number">02</div>
+            <div class="step-icon-wrapper">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Track Progress</h3>
+            <p class="step-description">
+              Your ticket is automatically routed to the responsible civic ward office. You can track status changes from inspection to work order issuance in real time.
+            </p>
+            <div class="step-footer">
+              <span class="step-check">✓ Ward officer assignment</span>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-badge-number">03</div>
+            <div class="step-icon-wrapper">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
+            </div>
+            <h3 class="step-title">Get It Resolved</h3>
+            <p class="step-description">
+              Maintenance crews perform repairs and post verified completion photos. The ticket is marked resolved and the community enjoys safer transit.
+            </p>
+            <div class="step-footer">
+              <span class="step-check">✓ Verified completion proof</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         5. RECENT COMPLAINTS SECTION (SAMPLE/DEMO DATA)
+         Clearly labeled sample records with filter tabs and upvoting
+         ======================================================== -->
+    <section class="complaints-section" id="recent-complaints">
+      <div class="container">
+        <div class="section-header text-center">
+          <div class="demo-notice-banner">
+            <span class="demo-icon">ℹ️</span>
+            <span><strong>Sample Demonstration Records:</strong> Below are mock examples illustrating how submitted community issues will appear. Real complaints will populate here once backend is connected in Stage 2.</span>
+          </div>
+          <span class="section-subtitle">Community Transparency</span>
+          <h2 class="section-title">Recent Road Complaints</h2>
+          <p class="section-lead">
+            Explore active and resolved road problems reported by community members across municipal wards.
+          </p>
+        </div>
+
+        <!-- Filter Controls (Vanilla JS interactive) -->
+        <div class="filter-bar">
+          <button type="button" class="filter-btn active" data-filter="all">All Demo Complaints (4)</button>
+          <button type="button" class="filter-btn" data-filter="under-review">Under Review (1)</button>
+          <button type="button" class="filter-btn" data-filter="in-progress">In Progress (2)</button>
+          <button type="button" class="filter-btn" data-filter="resolved">Resolved (1)</button>
+        </div>
+
+        <!-- Complaints Cards Grid -->
+        <div class="complaints-grid" id="complaintsGrid">
+          
+          <!-- Sample Card 1: In Progress -->
+          <article class="complaint-card" data-category="in-progress">
+            <div class="complaint-card-top">
+              <span class="complaint-id">#DEMO-1042</span>
+              <span class="status-badge status-progress">
+                <span class="dot"></span> In Progress
+              </span>
+            </div>
+            <div class="complaint-category">Pothole Hazard</div>
+            <h3 class="complaint-title">Large Cluster of Potholes on MG Road</h3>
+            <p class="complaint-desc">
+              Deep asphalt erosion causing severe traffic congestion and near-misses for two-wheelers during rainy hours near Metro Pillar 42.
+            </p>
+            <div class="complaint-meta">
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>Central Ward, MG Road</span>
+              </div>
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Reported 2 days ago</span>
+              </div>
+            </div>
+            <div class="complaint-card-footer">
+              <button type="button" class="upvote-btn" data-votes="38" aria-label="Support this issue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18 15 12 9 6 15"/>
+                </svg>
+                <span class="upvote-text">Upvote</span>
+                <span class="vote-count">38</span>
+              </button>
+              <span class="contractor-tag">Repair crew assigned</span>
+            </div>
+          </article>
+
+          <!-- Sample Card 2: Under Review -->
+          <article class="complaint-card" data-category="under-review">
+            <div class="complaint-card-top">
+              <span class="complaint-id">#DEMO-1045</span>
+              <span class="status-badge status-review">
+                <span class="dot"></span> Under Review
+              </span>
+            </div>
+            <div class="complaint-category">Street Lighting & Safety</div>
+            <h3 class="complaint-title">Broken Streetlights & Exposed Cable</h3>
+            <p class="complaint-desc">
+              Four consecutive streetlights out along the school zone corridor. Exposed electrical wiring near the pedestrian curb poses danger.
+            </p>
+            <div class="complaint-meta">
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>South Ward, Sector 4 Cross</span>
+              </div>
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Reported 1 day ago</span>
+              </div>
+            </div>
+            <div class="complaint-card-footer">
+              <button type="button" class="upvote-btn" data-votes="52" aria-label="Support this issue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18 15 12 9 6 15"/>
+                </svg>
+                <span class="upvote-text">Upvote</span>
+                <span class="vote-count">52</span>
+              </button>
+              <span class="contractor-tag">Site inspection pending</span>
+            </div>
+          </article>
+
+          <!-- Sample Card 3: Resolved -->
+          <article class="complaint-card" data-category="resolved">
+            <div class="complaint-card-top">
+              <span class="complaint-id">#DEMO-1038</span>
+              <span class="status-badge status-resolved">
+                <span class="dot"></span> Resolved
+              </span>
+            </div>
+            <div class="complaint-category">Drainage & Manhole</div>
+            <h3 class="complaint-title">Caved-in Stormwater Drain Manhole</h3>
+            <p class="complaint-desc">
+              Reinforced concrete cover cracked and collapsed inward into the sewer main. Hazard barricaded and replaced with heavy-duty cast iron slab.
+            </p>
+            <div class="complaint-meta">
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>North Zone, Market Road</span>
+              </div>
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Fixed on Oct 01</span>
+              </div>
+            </div>
+            <div class="complaint-card-footer">
+              <button type="button" class="upvote-btn upvoted" data-votes="89" aria-label="Support this issue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18 15 12 9 6 15"/>
+                </svg>
+                <span class="upvote-text">Upvoted</span>
+                <span class="vote-count">89</span>
+              </button>
+              <span class="contractor-tag tag-resolved">✓ Verified & Cleared</span>
+            </div>
+          </article>
+
+          <!-- Sample Card 4: In Progress -->
+          <article class="complaint-card" data-category="in-progress">
+            <div class="complaint-card-top">
+              <span class="complaint-id">#DEMO-1051</span>
+              <span class="status-badge status-progress">
+                <span class="dot"></span> In Progress
+              </span>
+            </div>
+            <div class="complaint-category">Traffic Sign & Crosswalk</div>
+            <h3 class="complaint-title">Faded Zebra Crossing & Broken Speed Breaker</h3>
+            <p class="complaint-desc">
+              Vehicles speeding near government hospital entrance due to obliterated paint markings and broken rumble strips.
+            </p>
+            <div class="complaint-meta">
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>East Ward, Hospital Link Rd</span>
+              </div>
+              <div class="meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Reported 3 days ago</span>
+              </div>
+            </div>
+            <div class="complaint-card-footer">
+              <button type="button" class="upvote-btn" data-votes="24" aria-label="Support this issue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18 15 12 9 6 15"/>
+                </svg>
+                <span class="upvote-text">Upvote</span>
+                <span class="vote-count">24</span>
+              </button>
+              <span class="contractor-tag">Repainting scheduled</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         6. REPORT PROBLEM CALL-TO-ACTION (STAGE 1 PREVIEW)
+         Clear explanation for Stage 1 vs Stage 2 functionality
+         ======================================================== -->
+    <section class="cta-section" id="report-problem">
+      <div class="container">
+        <div class="cta-card">
+          <div class="cta-content">
+            <span class="cta-badge">Stage 1 Architecture Preview</span>
+            <h2 class="cta-title">Ready to Report a Hazard in Your Neighborhood?</h2>
+            <p class="cta-text">
+              In this first stage of Civic Connect, we have established our complete frontend design and component layout. 
+              Interactive report submissions, image uploads, and live GPS geolocation will be connected in <strong>Stage 2</strong>.
+            </p>
+            <div class="cta-actions">
+              <a href="report-problem.html" class="btn btn-cta-primary">
+                Launch Report Form
+              </a>
+              <a href="#how-it-works" class="btn btn-cta-secondary">
+                Review How It Works
+              </a>
+            </div>
+          </div>
+          <div class="cta-decoration">
+            <div class="cta-stat-box">
+              <div class="stat-number">3 Min</div>
+              <div class="stat-text">Average report submission time</div>
+            </div>
+            <div class="cta-stat-box">
+              <div class="stat-number">100%</div>
+              <div class="stat-text">Public transparency guarantee</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         7. ABOUT US SECTION
+         Civic mission, principles, and community purpose
+         ======================================================== -->
+    <section class="about-section" id="about">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-text-column">
+            <span class="section-subtitle">Our Civic Mission</span>
+            <h2 class="section-title">Built by Citizens, for Citizens</h2>
+            <p class="about-paragraph">
+              <strong>Civic Connect</strong> was founded on a simple belief: safe, well-maintained roads are a fundamental public right. 
+              Too often, road damage goes unaddressed because residents do not know which department to contact, or complaints get lost in administrative queues.
+            </p>
+            <p class="about-paragraph">
+              Our civic-tech platform brings transparency, neighborhood collaboration, and direct municipal accountability into one unified place. 
+              By documenting problems publicly and tracking solutions openly, we build stronger, safer, and more connected neighborhoods.
+            </p>
+            
+            <div class="about-values">
+              <div class="value-item">
+                <div class="value-icon">🤝</div>
+                <div>
+                  <strong>Community First</strong>
+                  <p>Giving every citizen a direct voice in neighbourhood safety.</p>
+                </div>
+              </div>
+              <div class="value-item">
+                <div class="value-icon">🔍</div>
+                <div>
+                  <strong>Total Transparency</strong>
+                  <p>Public audit trails for every submitted report and repair milestone.</p>
+                </div>
+              </div>
+              <div class="value-item">
+                <div class="value-icon">⚡</div>
+                <div>
+                  <strong>Rapid Response</strong>
+                  <p>Streamlined routing so municipal work crews get dispatched faster.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-card-column">
+            <div class="about-highlight-card">
+              <h3 class="highlight-title">Civic Connect Roadmap</h3>
+              <ul class="roadmap-list">
+                <li class="roadmap-item completed">
+                  <span class="roadmap-check">✓</span>
+                  <div>
+                    <strong>Stage 1: Frontend Foundation</strong>
+                    <p>Responsive design, civic design system, accessible UI & demo data.</p>
+                  </div>
+                </li>
+                <li class="roadmap-item current">
+                  <span class="roadmap-check">●</span>
+                  <div>
+                    <strong>Stage 2: Reporting Engine & Forms</strong>
+                    <p>Image uploads, GPS geolocation picker, and complaint form validation.</p>
+                  </div>
+                </li>
+                <li class="roadmap-item future">
+                  <span class="roadmap-check">○</span>
+                  <div>
+                    <strong>Stage 3: Backend & Database</strong>
+                    <p>Municipal database, user authentication & real-time status dashboard.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================
+       8. FOOTER
+       About Us, Contact, Privacy, and Navigation links
+       ======================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-grid">
+        
+        <!-- Brand column -->
+        <div class="footer-col footer-col-brand">
+          <div class="footer-logo-group">
+            <img src="assets/logo.png" alt="Civic Connect Logo" class="footer-logo" onerror="this.style.display='none'">
+            <span class="footer-brand-name">CIVIC CONNECT</span>
+          </div>
+          <p class="footer-description">
+            A civic-tech initiative dedicated to safe, accessible, and high-quality roads for every neighborhood.
+          </p>
+          <div class="footer-badge">
+            Prototype Version 1.0 (Stage 1)
+          </div>
+        </div>
+
+        <!-- Navigation column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#recent-complaints">Recent Complaints</a></li>
+            <li><a href="#about">About Our Mission</a></li>
+          </ul>
+        </div>
+
+        <!-- Categories column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Problem Types</h4>
+          <ul class="footer-links">
+            <li><a href="#recent-complaints">Potholes & Road Cracks</a></li>
+            <li><a href="#recent-complaints">Broken Streetlights</a></li>
+            <li><a href="#recent-complaints">Open Drainage & Manholes</a></li>
+            <li><a href="#recent-complaints">Waterlogging Hazards</a></li>
+            <li><a href="#recent-complaints">Damaged Traffic Signage</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact info column -->
+        <div class="footer-col" id="contact">
+          <h4 class="footer-heading">Contact & Support</h4>
+          <ul class="footer-contact-list">
+            <li>
+              <strong>Citizen Helpline:</strong>
+              <span>1800-CIVIC-CONNECT (Toll Free)</span>
+            </li>
+            <li>
+              <strong>Support Email:</strong>
+              <a href="mailto:support@civicconnect.org">support@civicconnect.org</a>
+            </li>
+            <li>
+              <strong>Municipal Liaison Office:</strong>
+              <span>Civic Centre, Public Works Wing, Floor 4</span>
+            </li>
+            <li>
+              <strong>Hours of Operation:</strong>
+              <span>Mon – Sat: 8:00 AM – 7:00 PM</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <p class="copyright">
+          &copy; 2026 Civic Connect. Designed with care for safer roads and communities.
+        </p>
+        <div class="legal-links">
+          <a href="login.html" class="legal-link">Login</a>
+          <span class="divider">•</span>
+          <a href="signup.html" class="legal-link">Sign Up</a>
+          <span class="divider">•</span>
+          <a href="report-problem.html" class="legal-link">Report Problem</a>
+          <span class="divider">•</span>
+          <a href="view-complaints.html" class="legal-link">View Complaints</a>
+          <span class="divider">•</span>
+          <a href="dashboard.html" class="legal-link">Dashboard</a>
+          <span class="divider">•</span>
+          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+          <span class="divider">•</span>
+          <a href="#" class="legal-link" id="privacyLink">Privacy Policy</a>
+          <span class="divider">•</span>
+          <a href="#" class="legal-link" id="termsLink">Terms of Use</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================
+       9. STAGE 1 INFORMATIONAL MODAL
+       Guides the user & clearly explains next development stages
+       ======================================================== -->
+  <div class="modal-backdrop" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">🚀</span>
+          <h3 class="modal-title" id="modalTitle">Feature Coming in Stage 2</h3>
+        </div>
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <p>
+          You are exploring <strong>Stage 1: Frontend Foundation</strong> of Civic Connect!
+        </p>
+        <p>
+          The complaint submission form, live camera/photo upload, and map-based GPS coordinate picker will be built in <strong>Stage 2</strong>, followed by user accounts and database integration in <strong>Stage 3</strong>.
+        </p>
+        <div class="modal-callout">
+          <strong>What you can try right now:</strong>
+          <ul>
+            <li>Filter the demo complaints by status above</li>
+            <li>Click the "Upvote" button on any sample complaint card</li>
+            <li>Test the mobile hamburger menu on smaller screens</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="modalDismissBtn">Got it, thanks!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Vanilla JavaScript -->
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

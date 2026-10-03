@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create your Civic Connect account to report road hazards, support neighborhood repairs, and track civic solutions.">
+  <title>Create Your Account | Civic Connect</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans for consistent civic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- External Stylesheet (Reuses core Civic Connect design system) -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========================================================
+       1. NAVIGATION BAR
+       Reused from homepage for brand consistency
+       ======================================================== -->
+  <header class="site-header" id="top">
+    <div class="container nav-container">
+      <!-- Brand Logo & Name -->
+      <a href="index.html" class="brand-link" aria-label="Civic Connect Home">
+        <div class="logo-wrapper">
+          <img 
+            src="assets/logo.png" 
+            alt="Civic Connect Logo" 
+            class="brand-logo"
+            onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+          >
+          <div class="logo-fallback" id="logoFallback">CC</div>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-name">CIVIC CONNECT</span>
+          <span class="brand-tagline">Road Safety & Civic Action</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="index.html#hero" class="nav-link">Home</a></li>
+          <li><a href="report-problem.html" class="nav-link">Report Problem</a></li>
+          <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
+          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+          <li><a href="index.html#how-it-works" class="nav-link">How It Works</a></li>
+          <li><a href="index.html#about" class="nav-link">About Us</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline-nav">Login</a>
+          <a href="signup.html" class="btn btn-secondary-nav" aria-current="page">Sign Up</a>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        type="button" 
+        class="mobile-toggle" 
+        id="mobileMenuToggle" 
+        aria-label="Toggle navigation menu" 
+        aria-expanded="false" 
+        aria-controls="navMenu"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================
+       2. MAIN CONTENT - SIGNUP CARD
+       ======================================================== -->
+  <main class="auth-page-section">
+    <div class="container">
+      <div class="auth-wrapper auth-wrapper-wide">
+        <article class="auth-card">
+          
+          <!-- Card Header -->
+          <header class="auth-header">
+            <div class="auth-badge">
+              <span>●</span> Citizen Registration
+            </div>
+            <h1 class="auth-title">Create Your Account</h1>
+            <p class="auth-subtitle">
+              Join Civic Connect to report road hazards, support neighborhood repairs, and track verified civic solutions in your ward.
+            </p>
+          </header>
+
+          <!-- Accessible Feedback Banner (Shown on valid frontend submission) -->
+          <div class="auth-status-banner" id="signupStatusBanner" role="status" aria-live="polite"></div>
+
+          <!-- Signup Form with novalidate to allow custom accessible validation -->
+          <form class="auth-form" id="signupForm" novalidate>
+            
+            <!-- 1. Full Name -->
+            <div class="form-group">
+              <label for="fullName" class="form-label">
+                <span>Full Name <span class="required-star">*</span></span>
+              </label>
+              <input 
+                type="text" 
+                id="fullName" 
+                name="fullName" 
+                class="form-input" 
+                placeholder="e.g., Rajesh Sharma" 
+                autocomplete="name" 
+                required 
+                aria-describedby="fullNameError"
+              >
+              <span class="field-error" id="fullNameError" role="alert"></span>
+            </div>
+
+            <!-- 2. Mobile Number -->
+            <div class="form-group">
+              <label for="mobileNumber" class="form-label">
+                <span>Mobile Number <span class="required-star">*</span></span>
+              </label>
+              <input 
+                type="tel" 
+                id="mobileNumber" 
+                name="mobileNumber" 
+                class="form-input" 
+                placeholder="10-digit mobile number" 
+                autocomplete="tel" 
+                inputmode="numeric" 
+                required 
+                aria-describedby="mobileError mobileHint"
+              >
+              <span class="field-hint" id="mobileHint">Used for verification and critical ticket resolution updates.</span>
+              <span class="field-error" id="mobileError" role="alert"></span>
+            </div>
+
+            <!-- 3. Email Address -->
+            <div class="form-group">
+              <label for="emailAddress" class="form-label">
+                <span>Email Address <span class="required-star">*</span></span>
+              </label>
+              <input 
+                type="email" 
+                id="emailAddress" 
+                name="emailAddress" 
+                class="form-input" 
+                placeholder="name@example.com" 
+                autocomplete="email" 
+                required 
+                aria-describedby="emailError"
+              >
+              <span class="field-error" id="emailError" role="alert"></span>
+            </div>
+
+            <!-- 4. Password with Show/Hide Toggle -->
+            <div class="form-group">
+              <label for="password" class="form-label">
+                <span>Password <span class="required-star">*</span></span>
+              </label>
+              <div class="input-container">
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  class="form-input has-toggle" 
+                  placeholder="At least 8 characters" 
+                  autocomplete="new-password" 
+                  required 
+                  aria-describedby="passwordError passwordHint"
+                >
+                <button 
+                  type="button" 
+                  class="btn-password-toggle" 
+                  aria-controls="password" 
+                  aria-label="Show password" 
+                  aria-pressed="false"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <ul class="password-requirements" id="passwordHint">
+                <li class="req-item"><span>•</span> Minimum 8 characters</li>
+                <li class="req-item"><span>•</span> Must contain both letters and numbers</li>
+              </ul>
+              <span class="field-error" id="passwordError" role="alert"></span>
+            </div>
+
+            <!-- 5. Confirm Password with Show/Hide Toggle -->
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">
+                <span>Confirm Password <span class="required-star">*</span></span>
+              </label>
+              <div class="input-container">
+                <input 
+                  type="password" 
+                  id="confirmPassword" 
+                  name="confirmPassword" 
+                  class="form-input has-toggle" 
+                  placeholder="Re-enter your password" 
+                  autocomplete="new-password" 
+                  required 
+                  aria-describedby="confirmPasswordError"
+                >
+                <button 
+                  type="button" 
+                  class="btn-password-toggle" 
+                  aria-controls="confirmPassword" 
+                  aria-label="Show password" 
+                  aria-pressed="false"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <span class="field-error" id="confirmPasswordError" role="alert"></span>
+            </div>
+
+            <!-- 6. Terms & Privacy Checkbox -->
+            <div class="form-group">
+              <label class="checkbox-label" for="termsCheckbox">
+                <input type="checkbox" id="termsCheckbox" name="termsCheckbox" required aria-describedby="termsError">
+                <span>
+                  I agree to the <a href="#" id="termsModalLink" class="terms-link">Terms and Conditions</a> and <a href="#" id="privacyModalLink" class="terms-link">Privacy Policy</a>.<span class="required-star">*</span>
+                </span>
+              </label>
+              <span class="field-error" id="termsError" role="alert"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-auth-submit" id="createAccountBtn">
+              Create Account
+            </button>
+          </form>
+
+          <!-- Card Footer: Link to Login -->
+          <footer class="auth-footer">
+            Already have an account? 
+            <a href="login.html" class="auth-switch-link">Log In</a>
+          </footer>
+
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================
+       3. FOOTER
+       Reused for complete visual harmony
+       ======================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-grid">
+        
+        <!-- Brand column -->
+        <div class="footer-col footer-col-brand">
+          <div class="footer-logo-group">
+            <img src="assets/logo.png" alt="Civic Connect Logo" class="footer-logo" onerror="this.style.display='none'">
+            <span class="footer-brand-name">CIVIC CONNECT</span>
+          </div>
+          <p class="footer-description">
+            A civic-tech initiative dedicated to safe, accessible, and high-quality roads for every neighborhood.
+          </p>
+          <div class="footer-badge">
+            Prototype Version 1.0 (Stage 1)
+          </div>
+        </div>
+
+        <!-- Navigation column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#hero">Home</a></li>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="index.html#recent-complaints">Recent Complaints</a></li>
+            <li><a href="index.html#about">About Our Mission</a></li>
+          </ul>
+        </div>
+
+        <!-- Problem Types column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Problem Types</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#recent-complaints">Potholes & Road Cracks</a></li>
+            <li><a href="index.html#recent-complaints">Broken Streetlights</a></li>
+            <li><a href="index.html#recent-complaints">Open Drainage & Manholes</a></li>
+            <li><a href="index.html#recent-complaints">Waterlogging Hazards</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact info column -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Contact & Support</h4>
+          <ul class="footer-contact-list">
+            <li>
+              <strong>Citizen Helpline:</strong>
+              <span>1800-CIVIC-CONNECT (Toll Free)</span>
+            </li>
+            <li>
+              <strong>Support Email:</strong>
+              <a href="mailto:support@civicconnect.org">support@civicconnect.org</a>
+            </li>
+            <li>
+              <strong>Municipal Liaison Office:</strong>
+              <span>Civic Centre, Public Works Wing, Floor 4</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bottom">
+        <p class="copyright">
+          &copy; 2026 Civic Connect. Designed with care for safer roads and communities.
+        </p>
+        <div class="legal-links">
+          <a href="login.html" class="legal-link">Login</a>
+          <span class="divider">•</span>
+          <a href="signup.html" class="legal-link">Sign Up</a>
+          <span class="divider">•</span>
+          <a href="report-problem.html" class="legal-link">Report Problem</a>
+          <span class="divider">•</span>
+          <a href="view-complaints.html" class="legal-link">View Complaints</a>
+          <span class="divider">•</span>
+          <a href="dashboard.html" class="legal-link">Dashboard</a>
+          <span class="divider">•</span>
+          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================
+       4. INFORMATIONAL MODAL DIALOG
+       For Terms & Conditions and Privacy Policy previews
+       ======================================================== -->
+  <div class="modal-backdrop" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📄</span>
+          <h3 class="modal-title" id="modalTitle">Information</h3>
+        </div>
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="modalDismissBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts: Shared Navigation + Dedicated Authentication Logic -->
+  <script src="script.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

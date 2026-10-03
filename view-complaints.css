@@ -1,0 +1,766 @@
+/* ========================================================
+   CIVIC CONNECT - VIEW COMPLAINTS STYLESHEET
+   Stage 3: Public Complaints Dashboard & Filter Engine
+   ======================================================== */
+
+/* --------------------------------------------------------
+   1. PAGE HEADER & SEARCH SECTION
+   -------------------------------------------------------- */
+.complaints-hero-section {
+  padding: 3rem 0 2rem;
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg-body) 100%);
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.complaints-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary-teal);
+  background-color: var(--primary-teal-light);
+  padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-pill);
+  margin-bottom: 0.85rem;
+}
+
+.complaints-hero-title {
+  font-size: 2.5rem;
+  color: var(--navy-blue);
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
+}
+
+.complaints-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-body);
+  max-width: 680px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+/* Search Bar Container */
+.search-bar-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.search-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.15rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text-main);
+  background-color: #ffffff;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  padding: 0.85rem 3rem 0.85rem 3rem;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--primary-teal);
+  box-shadow: 0 0 0 3px rgba(7, 84, 107, 0.18), var(--shadow-lg);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 1.1rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.search-clear-btn:hover {
+  color: var(--navy-blue);
+}
+
+.search-clear-btn.visible {
+  display: flex;
+}
+
+/* --------------------------------------------------------
+   2. FILTER TOOLBAR CONTROLS
+   -------------------------------------------------------- */
+.filters-toolbar-section {
+  padding: 1.75rem 0;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-controls-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.filter-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-select-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.filter-select {
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--navy-blue);
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 2.2rem 0.55rem 0.85rem;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2307546B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 14px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.filter-select:hover {
+  border-color: var(--primary-teal);
+  background-color: #ffffff;
+}
+
+.filter-select:focus {
+  border-color: var(--primary-teal);
+  box-shadow: 0 0 0 3px rgba(7, 84, 107, 0.15);
+  background-color: #ffffff;
+}
+
+.btn-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-teal);
+  background-color: var(--primary-teal-light);
+  border: 1px solid rgba(7, 84, 107, 0.2);
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  align-self: flex-end;
+  height: 38px;
+}
+
+.btn-clear-filters:hover {
+  background-color: var(--primary-teal);
+  color: #ffffff;
+}
+
+/* Results Count Bar */
+.results-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.results-count {
+  font-weight: 700;
+  color: var(--navy-blue);
+}
+
+/* --------------------------------------------------------
+   3. COMPLAINTS GRID & CARDS
+   -------------------------------------------------------- */
+.complaints-content-section {
+  padding: 3rem 0 5rem;
+  background-color: var(--bg-body);
+}
+
+.complaints-grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+.complaint-item-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.65rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.complaint-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+/* Card Header */
+.card-header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.card-complaint-id {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.card-category-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-teal);
+  background-color: var(--primary-teal-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.card-problem-title {
+  font-size: 1.15rem;
+  color: var(--navy-blue);
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+}
+
+.card-problem-desc {
+  font-size: 0.9rem;
+  color: var(--text-body);
+  line-height: 1.55;
+  margin-bottom: 1.15rem;
+  flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Badges Row (Severity + Status) */
+.card-badges-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* --------------------------------------------------------
+   4. STATUS BADGE DESIGN (CSS Classes)
+   -------------------------------------------------------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.status-badge .badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* .status-reported */
+.status-reported {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.status-reported .badge-dot {
+  background-color: #64748b;
+}
+
+/* .status-verification */
+.status-verification {
+  background-color: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fef3c7;
+}
+.status-verification .badge-dot {
+  background-color: #d97706;
+}
+
+/* .status-progress */
+.status-progress {
+  background-color: var(--primary-teal-light);
+  color: var(--primary-teal);
+  border: 1px solid rgba(7, 84, 107, 0.2);
+}
+.status-progress .badge-dot {
+  background-color: var(--primary-teal);
+}
+
+/* .status-resolved */
+.status-resolved {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.status-resolved .badge-dot {
+  background-color: #10b981;
+}
+
+/* --------------------------------------------------------
+   5. SEVERITY BADGE DESIGN (CSS Classes)
+   -------------------------------------------------------- */
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* .severity-low */
+.severity-low {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+/* .severity-medium */
+.severity-medium {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+/* .severity-high */
+.severity-high {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+/* .severity-critical */
+.severity-critical {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Card Details (Location & Date) */
+.card-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0;
+  border-top: 1px dashed var(--border-color);
+  border-bottom: 1px dashed var(--border-color);
+  margin-bottom: 1.15rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.card-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.card-info-item svg {
+  color: var(--primary-teal);
+  flex-shrink: 0;
+}
+
+/* Card Action Footer */
+.card-actions-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-top: auto;
+}
+
+/* Support Button */
+.btn-support-complaint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--bg-surface-alt);
+  color: var(--navy-blue);
+  border: 1px solid var(--border-color);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.825rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-support-complaint:hover {
+  background-color: var(--primary-teal-light);
+  color: var(--primary-teal);
+  border-color: var(--primary-teal);
+}
+
+.btn-support-complaint.supported {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-color: #10b981;
+  cursor: default;
+}
+
+.btn-support-complaint svg {
+  transition: transform var(--transition-fast);
+}
+
+.btn-support-complaint:hover:not(.supported) svg {
+  transform: translateY(-2px);
+}
+
+.supporter-badge-count {
+  font-weight: 800;
+}
+
+/* View Details Button */
+.btn-view-details {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: transparent;
+  color: var(--primary-teal);
+  border: 1px solid var(--border-color);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.825rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-view-details:hover {
+  background-color: var(--primary-teal);
+  color: #ffffff;
+  border-color: var(--primary-teal);
+}
+
+/* View on Map Button (Stage 10 Part 22) */
+.btn-view-on-map {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: transparent;
+  color: var(--navy-blue);
+  border: 1px solid var(--border-color);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-view-on-map:hover {
+  background-color: #f1f5f9;
+  color: var(--primary-teal);
+  border-color: var(--primary-teal);
+}
+
+/* Priority & Danger Badges (Stage 10 Part 18 & 22) */
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.priority-critical {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.priority-high {
+  background-color: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+}
+
+.priority-medium {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.priority-low {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.danger-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background-color: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+/* --------------------------------------------------------
+   6. EMPTY RESULT STATE
+   -------------------------------------------------------- */
+.empty-results-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #ffffff;
+  border: 1.5px dashed var(--border-color);
+  border-radius: var(--radius-xl);
+  margin: 1rem 0;
+}
+
+.empty-icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: var(--primary-teal-light);
+  color: var(--primary-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.empty-title {
+  font-size: 1.45rem;
+  color: var(--navy-blue);
+  margin-bottom: 0.5rem;
+}
+
+.empty-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 440px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------
+   7. VIEW DETAILS MODAL
+   -------------------------------------------------------- */
+.detail-modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.detail-header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-complaint-id {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--primary-teal);
+  background-color: var(--primary-teal-light);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+}
+
+.detail-badges-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-title {
+  font-size: 1.4rem;
+  color: var(--navy-blue);
+  line-height: 1.35;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.detail-text {
+  font-size: 0.95rem;
+  color: var(--text-body);
+  line-height: 1.65;
+  background-color: var(--bg-surface-alt);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.detail-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detail-info-cell-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+}
+
+.detail-prototype-notice {
+  font-size: 0.8rem;
+  color: #166534;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------
+   8. RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
+   -------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .complaints-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .complaints-hero-title {
+    font-size: 2rem;
+  }
+
+  .filters-container {
+    gap: 1rem;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-controls-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .btn-clear-filters {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .complaints-grid-container {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
