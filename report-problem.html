@@ -16,6 +16,12 @@
 
   <!-- Report Problem Specific Stylesheet -->
   <link rel="stylesheet" href="report-problem.css">
+
+  <!-- Real-time Notifications Stylesheet -->
+  <link rel="stylesheet" href="notifications.css">
+
+  <!-- Leaflet CSS for Interactive Map Engine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 </head>
 <body>
 
@@ -48,9 +54,8 @@
           <li><a href="index.html#hero" class="nav-link">Home</a></li>
           <li><a href="report-problem.html" class="nav-link active" aria-current="page">Report Problem</a></li>
           <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
-          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-          <li><a href="index.html#how-it-works" class="nav-link">How It Works</a></li>
-          <li><a href="index.html#about" class="nav-link">About Us</a></li>
+          <li><a href="emergency-report.html" class="nav-link" style="color: #dc2626; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;"><span style="width: 7px; height: 7px; background-color: #dc2626; border-radius: 50%; display: inline-block;"></span> Emergency</a></li>
+          <li class="nav-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html" class="nav-link" id="navDashboardLink">Dashboard</a></li>
         </ul>
         <div class="nav-actions">
           <a href="login.html" class="btn btn-outline-nav">Login</a>
@@ -104,6 +109,22 @@
         </div>
       </div>
     </section>
+
+    <!-- Emergency Accident Quick Diversion Banner -->
+    <div class="container" style="margin-top: 1.5rem; margin-bottom: -1rem;">
+      <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 1.5px solid #f87171; border-radius: 12px; padding: 0.9rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.85rem; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span style="font-size: 1.5rem;">🚨</span>
+          <div>
+            <strong style="color: #991b1b; font-size: 0.95rem; display: block;">Witnessed a Live Road Accident?</strong>
+            <span style="color: #7f1d1d; font-size: 0.82rem;">For urgent collisions, use our specialized emergency response tool to discover nearest trauma care & dispatch alerts.</span>
+          </div>
+        </div>
+        <a href="emergency-report.html" class="btn btn-sm" style="background-color: #dc2626; color: #ffffff; font-weight: 800; font-size: 0.85rem; padding: 0.45rem 1rem; border-radius: 8px; text-decoration: none; white-space: nowrap;">
+          🚨 Emergency Accident Report &rarr;
+        </a>
+      </div>
+    </div>
 
     <!-- ========================================================
          3. MAIN REPORT FORM & MAP CONTAINER
@@ -205,7 +226,13 @@
                     <input type="radio" name="severityLevel" id="sevLow" value="low" required>
                     <div class="severity-card">
                       <div class="severity-card-top">
-                        <span class="severity-name">Low</span>
+                        <div class="severity-title-group">
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#176B70" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="severity-icon sev-icon-low" aria-hidden="true">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                          </svg>
+                          <span class="severity-name">Low</span>
+                        </div>
                         <span class="severity-pill low">Minor</span>
                       </div>
                       <p class="severity-desc">Minor inconvenience, normal traffic flow, cosmetic road erosion.</p>
@@ -217,7 +244,14 @@
                     <input type="radio" name="severityLevel" id="sevMedium" value="medium" checked>
                     <div class="severity-card">
                       <div class="severity-card-top">
-                        <span class="severity-name">Medium</span>
+                        <div class="severity-title-group">
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#23839A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="severity-icon sev-icon-medium" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                          </svg>
+                          <span class="severity-name">Medium</span>
+                        </div>
                         <span class="severity-pill medium">Moderate</span>
                       </div>
                       <p class="severity-desc">Noticeable hazard, slows traffic, needs attention within routine maintenance.</p>
@@ -229,7 +263,14 @@
                     <input type="radio" name="severityLevel" id="sevHigh" value="high">
                     <div class="severity-card">
                       <div class="severity-card-top">
-                        <span class="severity-name">High</span>
+                        <div class="severity-title-group">
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B7791F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="severity-icon sev-icon-high" aria-hidden="true">
+                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                          </svg>
+                          <span class="severity-name">High</span>
+                        </div>
                         <span class="severity-pill high">Urgent</span>
                       </div>
                       <p class="severity-desc">Significant safety hazard, vehicle damage risk, lane blockage.</p>
@@ -241,7 +282,18 @@
                     <input type="radio" name="severityLevel" id="sevCritical" value="critical">
                     <div class="severity-card">
                       <div class="severity-card-top">
-                        <span class="severity-name">Critical</span>
+                        <div class="severity-title-group">
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C43D46" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="severity-icon sev-icon-critical" aria-hidden="true">
+                            <path d="M7 12a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v6H7v-6Z"></path>
+                            <path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2H5v-2Z"></path>
+                            <path d="M21 12h1"></path>
+                            <path d="M18.5 4.5 19 4"></path>
+                            <path d="M2 12h1"></path>
+                            <path d="M12 2v1"></path>
+                            <path d="m4.93 4.93.7.7"></path>
+                          </svg>
+                          <span class="severity-name">Critical</span>
+                        </div>
                         <span class="severity-pill critical">Emergency</span>
                       </div>
                       <p class="severity-desc">Imminent risk of severe injury, deep road collapse, or exposed live cables.</p>
@@ -262,23 +314,53 @@
 
               <!-- Block 3: Photo Upload -->
               <section class="form-card-block" aria-labelledby="headingPhotos">
+              <!-- Block 3: Photo Upload & Camera Evidence -->
+              <section class="form-card-block" aria-labelledby="headingPhotos">
                 <div class="form-card-header">
                   <div class="card-step-badge">3</div>
                   <div class="card-title-group">
                     <h2 id="headingPhotos">Attach Photo Evidence</h2>
-                    <p>Visual proof expedites municipal assessment and repairs.</p>
+                    <p>Capture a live photo at the scene or upload clear evidence from your device.</p>
                   </div>
                 </div>
 
+                <!-- Dual Photo Input Buttons -->
+                <div class="photo-input-options-row">
+                  <button type="button" class="btn-photo-action camera-btn" id="cameraCaptureBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                      <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                    <span>Take Photo (Camera)</span>
+                  </button>
+                  <button type="button" class="btn-photo-action gallery-btn" id="galleryUploadBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span>Browse Gallery / Files</span>
+                  </button>
+                </div>
+
+                <!-- Hidden inputs for Camera and Gallery -->
+                <input 
+                  type="file" 
+                  id="cameraFileInput" 
+                  class="hidden-file-input" 
+                  accept="image/*" 
+                  capture="environment"
+                >
+                <input 
+                  type="file" 
+                  id="photoFileInput" 
+                  class="hidden-file-input" 
+                  accept="image/jpeg,image/jpg,image/png,image/webp" 
+                  multiple
+                >
+
                 <!-- Dropzone Box -->
                 <div class="photo-dropzone" id="photoDropzone" role="button" tabindex="0" aria-label="Upload photos by clicking or dropping files here">
-                  <input 
-                    type="file" 
-                    id="photoFileInput" 
-                    class="hidden-file-input" 
-                    accept="image/jpeg,image/jpg,image/png,image/webp" 
-                    multiple
-                  >
                   <div class="dropzone-icon-box">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -286,7 +368,7 @@
                       <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                   </div>
-                  <p class="dropzone-prompt">Drag &amp; drop photos here, or <span>browse files</span></p>
+                  <p class="dropzone-prompt">Drag &amp; drop photos here, or <span>choose an option above</span></p>
                   <p class="dropzone-specs">Supports JPG, PNG, WEBP • Max 3 photos • Up to 5 MB per image</p>
                 </div>
                 <span class="field-validation-msg" id="photoError" role="alert"></span>
@@ -294,11 +376,15 @@
                 <!-- Previews Grid -->
                 <div class="photo-preview-grid" id="photoPreviewGrid"></div>
 
+                <!-- Hidden inputs for photo metadata -->
+                <input type="hidden" id="photoSourceInput" name="photoSource" value="upload">
+                <input type="hidden" id="photoUploadedAtInput" name="photoUploadedAt" value="">
+
                 <div class="photo-privacy-note">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                   </svg>
-                  <span><strong>Privacy Advisory:</strong> Please do not upload photos showing visible faces of bystanders, personal vehicle license plates, or interior private property.</span>
+                  <span><strong>Privacy &amp; Evidence Advisory:</strong> Photo submission time is recorded separately from GPS capture time. Civic Connect human inspectors cross-reference image features against municipal maps. Please do not photograph visible faces or private residential interiors.</span>
                 </div>
               </section>
 
@@ -322,21 +408,21 @@
                       <line x1="22" y1="2" x2="11" y2="13"></line>
                       <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
-                    Submit Report
+                    Review &amp; Submit
                   </button>
                 </div>
               </section>
 
             </div>
 
-            <!-- RIGHT COLUMN: Location Selection Map -->
+            <!-- RIGHT COLUMN: Location Selection Map & GPS Verification -->
             <div class="form-column">
               <section class="form-card-block map-card-sticky" aria-labelledby="headingLocation">
                 <div class="form-card-header">
                   <div class="card-step-badge">4</div>
                   <div class="card-title-group">
-                    <h2 id="headingLocation">Select Problem Location</h2>
-                    <p>Click on Google Map or use your device's GPS to mark the exact hazard spot.</p>
+                    <h2 id="headingLocation">Location &amp; Evidence Verification</h2>
+                    <p>Capture device GPS for verified reporting or manually select on the map.</p>
                   </div>
                 </div>
 
@@ -348,20 +434,30 @@
                     </svg>
                     Use My Current Location
                   </button>
+                  <button type="button" class="btn-retry-location" id="retryLocationBtn" style="display: none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="23 4 23 10 17 10"></polyline>
+                      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Retry GPS
+                  </button>
                   <span class="location-status-badge" id="locationStatusBadge">
-                    Click on Google Map to place a pin
+                    Click on Map or tap GPS button
                   </span>
                 </div>
 
-                <!-- Google Map Container -->
+                <!-- GPS Notice / Status Banner -->
+                <div class="location-alert-box" id="locationAlertBox" style="display: none;"></div>
+
+                <!-- Map Container -->
                 <div class="map-viewport-wrapper">
-                  <div id="problemMap" role="region" aria-label="Interactive Google Map for hazard location"></div>
+                  <div id="problemMap" role="region" aria-label="Interactive Map for hazard location"></div>
                   
-                  <!-- Fallback message if Google Maps fails or is offline -->
+                  <!-- Fallback message if Maps fails or is offline -->
                   <div class="map-fallback-overlay" id="mapFallbackOverlay" style="display: none;">
                     <p><strong>Interactive Map Notice</strong></p>
                     <p id="mapFallbackDesc" style="font-size: 0.85rem; margin-top: 0.5rem;">
-                      Google Maps Platform key not loaded. You can still use the <strong>"Use My Current Location"</strong> button above or click to set coordinates.
+                      Interactive map is currently in fallback mode. You can still use the <strong>"Use My Current Location"</strong> button above.
                     </p>
                   </div>
                 </div>
@@ -372,10 +468,10 @@
                     <line x1="12" y1="16" x2="12" y2="12"></line>
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                   </svg>
-                  <span>Click anywhere on the Google Map or drag the pin to set exact coordinates.</span>
+                  <span>Click anywhere on map or drag the pin to set location manually.</span>
                 </div>
 
-                <!-- Readout Coordinates -->
+                <!-- Comprehensive Coordinates & Verification Readout -->
                 <div class="coordinates-readout-bar">
                   <div class="coord-display-box">
                     <span class="coord-label">Latitude</span>
@@ -388,21 +484,55 @@
                     <input type="hidden" id="longitudeInput" name="longitude">
                   </div>
                 </div>
+
+                <!-- Location Evidence Metadata Readout -->
+                <div class="location-evidence-meta-grid">
+                  <div class="evidence-meta-pill">
+                    <span class="evidence-meta-label">Location Source:</span>
+                    <span class="evidence-meta-val" id="locationSourceDisplay">
+                      <span class="source-badge manual">📍 Not Pinned</span>
+                    </span>
+                  </div>
+                  <div class="evidence-meta-pill">
+                    <span class="evidence-meta-label">GPS Precision:</span>
+                    <span class="evidence-meta-val" id="locationAccuracyDisplay">--</span>
+                  </div>
+                  <div class="evidence-meta-pill" style="grid-column: 1 / -1;">
+                    <span class="evidence-meta-label">GPS Capture Timestamp:</span>
+                    <span class="evidence-meta-val" id="locationTimeDisplay">Not captured</span>
+                  </div>
+                </div>
+
+                <!-- Hidden inputs for Location Evidence Metadata -->
+                <input type="hidden" id="locationSourceInput" name="locationSource" value="manual">
+                <input type="hidden" id="locationAccuracyInput" name="locationAccuracy" value="">
+                <input type="hidden" id="locationCapturedAtInput" name="locationCapturedAt" value="">
+
                 <span class="field-validation-msg" id="locationError" role="alert"></span>
 
                 <!-- Landmark / Address Description -->
                 <div class="form-field-group" style="margin-top: 1.25rem;">
                   <label for="locationLandmark" class="form-field-label">
                     <span>Landmark / Nearest Street Reference</span>
+                    <span class="field-helper-text" id="landmarkSyncBadge" style="font-size: 0.75rem; color: var(--primary-teal); font-weight: 600;">🔄 Auto-syncs with map</span>
                   </label>
-                  <input 
-                    type="text" 
-                    id="locationLandmark" 
-                    name="locationLandmark" 
-                    class="form-input-text" 
-                    placeholder="e.g., Opposite Central Bank, near bus stop"
-                  >
-                  <span class="field-helper-text">Helps field repair workers locate the issue faster on-site.</span>
+                  <div class="landmark-input-wrapper" style="position: relative; display: flex; align-items: center;">
+                    <input 
+                      type="text" 
+                      id="locationLandmark" 
+                      name="locationLandmark" 
+                      class="form-input-text" 
+                      placeholder="e.g., Gorakhpur Railway Station, or click/drop pin on map"
+                      style="padding-right: 2.5rem;"
+                    >
+                    <button type="button" id="locateLandmarkBtn" title="Find and pin this location on map" aria-label="Locate address on map" style="position: absolute; right: 0.5rem; background: none; border: none; cursor: pointer; color: var(--primary-teal); padding: 0.35rem; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: transform 0.15s ease;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
+                    </button>
+                  </div>
+                  <span class="field-helper-text" id="landmarkStatusText">Drop a pin on the map or type an address — both update automatically.</span>
                 </div>
               </section>
             </div>
@@ -441,8 +571,8 @@
           <ul class="footer-links">
             <li><a href="index.html#hero">Home</a></li>
             <li><a href="report-problem.html">Report Problem</a></li>
-            <li><a href="index.html#recent-complaints">Recent Complaints</a></li>
-            <li><a href="index.html#how-it-works">How It Works</a></li>
+            <li><a href="view-complaints.html">View Complaints</a></li>
+            <li class="footer-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html">Dashboard</a></li>
             <li><a href="index.html#about">About Our Mission</a></li>
           </ul>
         </div>
@@ -491,10 +621,10 @@
           <a href="report-problem.html" class="legal-link">Report Problem</a>
           <span class="divider">•</span>
           <a href="view-complaints.html" class="legal-link">View Complaints</a>
-          <span class="divider">•</span>
-          <a href="dashboard.html" class="legal-link">Dashboard</a>
-          <span class="divider">•</span>
-          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+          <span class="divider auth-only-divider" style="display: none;">•</span>
+          <a href="dashboard.html" class="legal-link footer-dashboard-link" data-auth="required" style="display: none;">Dashboard</a>
+          <span class="divider auth-admin-divider" style="display: none;">•</span>
+          <a href="admin-dashboard.html" class="legal-link footer-admin-link" data-auth="admin-only" style="display: none;">Admin Dashboard</a>
         </div>
       </div>
     </div>
@@ -503,6 +633,34 @@
   <!-- ========================================================
        5. COMPLAINT SUBMISSION MODALS
        ======================================================== -->
+
+  <!-- 0. Pre-Submission Confirmation & Evidence Review Modal -->
+  <div class="modal-backdrop" id="preSubmitConfirmModal" role="dialog" aria-modal="true" aria-labelledby="preSubmitModalTitle" hidden>
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">🔍</span>
+          <div>
+            <h3 class="modal-title" id="preSubmitModalTitle">Confirm Complaint Submission</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Please review your reported location, photo, and details before submitting.</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="preSubmitModalCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="preSubmitSummaryContainer" class="presubmit-summary-box"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="preSubmitModalEditBtn">Edit Details</button>
+        <button type="button" class="btn btn-primary" id="preSubmitModalConfirmBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Confirm &amp; Submit
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- A. Success Submission Modal -->
   <div class="modal-backdrop" id="demoSubmissionModal" role="dialog" aria-modal="true" aria-labelledby="demoModalTitle" hidden>
@@ -547,9 +705,73 @@
     </div>
   </div>
 
-  <!-- Scripts: Shared Navigation + Auth Helper + Dedicated Problem Reporting Logic -->
+  <!-- C. Live Camera Viewfinder Modal -->
+  <div class="modal-backdrop" id="cameraModal" role="dialog" aria-modal="true" aria-labelledby="cameraModalTitle" hidden>
+    <div class="modal-dialog" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">📷</span>
+          <div>
+            <h3 class="modal-title" id="cameraModalTitle">Live Camera Capture</h3>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Frame the hazard clearly. Browser will request camera permission.</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="cameraModalCloseBtn" aria-label="Close camera">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1rem;">
+        <div id="cameraStatusMsg" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.75rem; font-size: 0.85rem;"></div>
+        <div class="camera-viewport-wrap" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #0b1120; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;">
+          <video id="cameraVideo" playsinline autoplay muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+          <canvas id="cameraCanvas" style="display: none;"></canvas>
+          
+          <!-- Targeting reticle / viewfinder overlay -->
+          <div class="camera-reticle" style="position: absolute; inset: 12%; border: 2px dashed rgba(255,255,255,0.45); border-radius: 12px; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+            <span style="color: rgba(255,255,255,0.85); font-size: 0.8rem; background: rgba(0,0,0,0.55); padding: 4px 10px; border-radius: 6px; font-weight: 600;">Center hazard inside frame</span>
+          </div>
+
+          <!-- Camera Flash effect on snap -->
+          <div id="cameraFlash" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.15s ease;"></div>
+
+          <!-- Permission prompt overlay -->
+          <div id="cameraPermissionPrompt" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; text-align: center; gap: 0.75rem;">
+            <div style="font-size: 2.25rem;">📸</div>
+            <strong style="font-size: 1.1rem;">Requesting Camera Permission...</strong>
+            <p style="font-size: 0.88rem; color: #94a3b8; max-width: 320px; margin: 0; line-height: 1.5;">
+              Please click <strong>"Allow"</strong> when your browser prompts for camera access.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+        <button type="button" class="btn btn-outline" id="cameraSwitchBtn" title="Switch between front and back camera" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Switch Camera
+        </button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline" id="cameraCancelBtn">Cancel</button>
+          <button type="button" class="btn btn-primary" id="cameraSnapBtn" style="background-color: #16a34a; border-color: #16a34a; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            Capture Photo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS for Free Interactive OpenStreetMap Engine -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Unified Civic API Configuration -->
+  <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="auth.js"></script>
+  <script src="notifications.js"></script>
   <script src="report-problem.js"></script>
 </body>
 </html>

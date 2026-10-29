@@ -1,0 +1,1063 @@
+/* ========================================================
+   CIVIC CONNECT - REAL-TIME NOTIFICATIONS SYSTEM (notifications.css)
+   Stunning glassmorphic popup toasts & notification centers for:
+   1. Authority Portal (New Complaint Popups)
+   2. Citizen Portal (Complaint Resolved Celebration Popups)
+   ======================================================== */
+
+/* --------------------------------------------------------
+   1. TOAST CONTAINER (FIXED FLOATING STACK)
+   -------------------------------------------------------- */
+#civicNotificationContainer {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 440px;
+  width: calc(100vw - 3rem);
+  pointer-events: none; /* Allows clicks through container */
+}
+
+@media (max-width: 640px) {
+  #civicNotificationContainer {
+    top: 1rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* --------------------------------------------------------
+   2. BASE TOAST CARD
+   -------------------------------------------------------- */
+.civic-toast {
+  pointer-events: auto; /* Re-enables clicks for toast */
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 1.15rem 1.25rem 1.25rem;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35), 0 0 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transform: translateX(120%);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  will-change: transform, opacity;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.civic-toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.civic-toast.hide {
+  transform: translateX(130%) scale(0.92);
+  opacity: 0;
+}
+
+/* --------------------------------------------------------
+   3. AUTHORITY POPUP TOAST (New Hazard Alert)
+   Deep Indigo Slate + Glowing Amber/Red Alert Halo
+   -------------------------------------------------------- */
+.civic-toast.authority-toast {
+  background: rgba(15, 23, 42, 0.94);
+  border: 1.5px solid rgba(239, 68, 68, 0.45);
+  color: #ffffff;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45), 0 0 30px rgba(239, 68, 68, 0.25);
+}
+
+.civic-toast.authority-toast.priority-critical {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 35px rgba(239, 68, 68, 0.35);
+}
+
+.civic-toast.authority-toast.priority-high {
+  border-color: rgba(249, 115, 22, 0.7);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 35px rgba(249, 115, 22, 0.3);
+}
+
+.civic-toast.authority-toast.priority-medium {
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 35px rgba(245, 158, 11, 0.25);
+}
+
+/* --------------------------------------------------------
+   4. CITIZEN POPUP TOAST (Problem Resolved Celebration)
+   Deep Emerald Green + Glowing Gold & Mint Accents
+   -------------------------------------------------------- */
+.civic-toast.citizen-toast {
+  background: rgba(6, 78, 59, 0.95);
+  border: 1.5px solid rgba(52, 211, 153, 0.65);
+  color: #ffffff;
+  box-shadow: 0 20px 45px rgba(6, 78, 59, 0.4), 0 0 35px rgba(16, 185, 129, 0.35);
+}
+
+/* --------------------------------------------------------
+   5. TOAST HEADER & LIVE BADGES
+   -------------------------------------------------------- */
+.civic-toast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.civic-toast-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.civic-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.civic-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: civic-pulse-dot 1.2s infinite ease-in-out;
+}
+
+@keyframes civic-pulse-dot {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+    box-shadow: 0 0 12px #ef4444;
+  }
+}
+
+.civic-resolved-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.25);
+  color: #a7f3d0;
+  border: 1px solid rgba(52, 211, 153, 0.5);
+}
+
+.civic-ticket-id-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #38bdf8;
+  letter-spacing: 0.03em;
+}
+
+.citizen-toast .civic-ticket-id-tag {
+  color: #fde047;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.civic-toast-close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.civic-toast-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+  transform: rotate(90deg);
+}
+
+/* --------------------------------------------------------
+   6. TOAST BODY & CONTENT
+   -------------------------------------------------------- */
+.civic-toast-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.35;
+  margin-bottom: 0.45rem;
+  color: #ffffff;
+}
+
+.civic-toast-desc {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.45;
+  margin-bottom: 0.75rem;
+}
+
+.civic-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 0.85rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.civic-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.civic-meta-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.civic-meta-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.civic-meta-val {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Resolution Note Box */
+.civic-resolution-quote {
+  background: rgba(0, 0, 0, 0.25);
+  border-left: 3.5px solid #34d399;
+  border-radius: 4px 8px 8px 4px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.83rem;
+  color: #ecfdf5;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.civic-resolution-by {
+  display: block;
+  font-size: 0.74rem;
+  color: #6ee7b7;
+  font-weight: 700;
+  margin-top: 0.35rem;
+  font-style: normal;
+}
+
+/* Reward Tokens Celebration Pill */
+.civic-reward-earned-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.25) 0%, rgba(202, 138, 4, 0.15) 100%);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.85rem;
+  color: #fef08a;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+/* --------------------------------------------------------
+   7. TOAST ACTION BUTTONS
+   -------------------------------------------------------- */
+.civic-toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.civic-toast-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  border: none;
+}
+
+.civic-toast-btn-primary {
+  background: #38bdf8;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
+.civic-toast-btn-primary:hover {
+  background: #7dd3fc;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+}
+
+.citizen-toast .civic-toast-btn-primary {
+  background: #34d399;
+  color: #064e3b;
+  box-shadow: 0 4px 12px rgba(52, 211, 153, 0.35);
+}
+
+.citizen-toast .civic-toast-btn-primary:hover {
+  background: #6ee7b7;
+  box-shadow: 0 6px 16px rgba(52, 211, 153, 0.5);
+}
+
+.civic-toast-btn-ghost {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.civic-toast-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------
+   8. AUTO-DISMISS TIMER PROGRESS BAR
+   -------------------------------------------------------- */
+.civic-toast-timer-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.civic-toast-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: #38bdf8;
+  transform-origin: left center;
+  animation: civic-timer-shrink 10s linear forwards;
+}
+
+.citizen-toast .civic-toast-timer-bar {
+  background: #34d399;
+}
+
+.civic-toast:hover .civic-toast-timer-bar {
+  animation-play-state: paused;
+}
+
+@keyframes civic-timer-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* --------------------------------------------------------
+   9. CELEBRATION CONFETTI SHOWER (CITIZEN PORTAL RESOLUTION)
+   -------------------------------------------------------- */
+.civic-confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999998;
+  overflow: hidden;
+}
+
+.civic-confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0.9;
+  animation: civic-confetti-fall 3.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes civic-confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg) rotateY(0deg);
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg) rotateY(360deg);
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------
+   10. NAVBAR NOTIFICATION BELL & UNREAD BADGE
+   -------------------------------------------------------- */
+.civic-notif-nav-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.civic-notif-bell-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy-blue, #0f172a);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.site-header.dark .civic-notif-bell-btn,
+.admin-site-header .civic-notif-bell-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.civic-notif-bell-btn:hover {
+  background: var(--primary-teal-light, #e0f2f7);
+  border-color: var(--primary-teal, #07546B);
+  color: var(--primary-teal, #07546B);
+  transform: translateY(-1px);
+}
+
+.civic-notif-bell-btn.ring {
+  animation: civic-bell-ring 0.8s ease-in-out;
+}
+
+@keyframes civic-bell-ring {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(15deg); }
+  40% { transform: rotate(-15deg); }
+  60% { transform: rotate(8deg); }
+  80% { transform: rotate(-8deg); }
+}
+
+.civic-notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.civic-notif-badge.hidden {
+  display: none;
+}
+
+/* --------------------------------------------------------
+   11. NOTIFICATION CENTER DROPDOWN PANEL
+   -------------------------------------------------------- */
+.civic-notif-panel {
+  position: absolute;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  width: 380px;
+  max-width: 90vw;
+  background: #ffffff;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 14px;
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.18), 0 5px 15px rgba(15, 23, 42, 0.08);
+  z-index: 10000;
+  overflow: hidden;
+  display: none;
+  animation: civic-panel-dropdown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.civic-notif-panel.open {
+  display: block;
+}
+
+@keyframes civic-panel-dropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.civic-notif-panel-header {
+  padding: 0.85rem 1.15rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.civic-notif-panel-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--navy-blue, #0f172a);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.civic-notif-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.civic-notif-text-btn {
+  background: none;
+  border: none;
+  color: var(--primary-teal, #07546B);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+
+.civic-notif-text-btn:hover {
+  background: var(--primary-teal-light, #e0f2f7);
+}
+
+.civic-notif-list {
+  max-height: 380px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.civic-notif-item {
+  padding: 0.85rem 1.15rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  position: relative;
+}
+
+.civic-notif-item:hover {
+  background: #f8fafc;
+}
+
+.civic-notif-item.unread {
+  background: #f0fdfa;
+}
+
+.civic-notif-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3.5px;
+  background: var(--primary-teal, #07546B);
+}
+
+.civic-notif-item-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  background: #e0f2fe;
+}
+
+.civic-notif-item.type-resolved .civic-notif-item-icon {
+  background: #dcfce7;
+}
+
+.civic-notif-item.type-new .civic-notif-item-icon {
+  background: #fee2e2;
+}
+
+.civic-notif-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.civic-notif-item-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.civic-notif-item-desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.4;
+  margin-bottom: 0.35rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.civic-notif-item-time {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.civic-notif-empty {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.civic-notif-empty-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.civic-notif-empty-text {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+/* Row Flash Highlight in Tables / Cards */
+@keyframes civic-row-highlight {
+  0% {
+    background-color: rgba(56, 189, 248, 0.35);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.civic-highlight-pulse {
+  animation: civic-row-highlight 2.5s ease-out;
+}
+
+/* ========================================================
+ * 5. TABS & FILTER CONTROLS FOR NOTIFICATION DROPDOWN
+ * ======================================================== */
+.civic-notif-tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 4px;
+}
+
+.civic-notif-tab {
+  flex: 1;
+  text-align: center;
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #64748b;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.civic-notif-tab:hover {
+  color: #0f172a;
+}
+
+.civic-notif-tab.active {
+  background: #ffffff;
+  color: #0284c7;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.civic-notif-cid-pill {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+
+.civic-desktop-notif-btn {
+  background: rgba(2, 132, 199, 0.08);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.civic-desktop-notif-btn:hover {
+  background: rgba(2, 132, 199, 0.16);
+}
+
+.civic-desktop-notif-btn.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.civic-notif-panel-footer {
+  padding: 8px 12px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.civic-notif-view-all-btn {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0284c7;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.civic-notif-view-all-btn:hover {
+  background: #e0f2fe;
+}
+
+/* ========================================================
+ * 6. "ALL NOTIFICATIONS" FULL MODAL VIEWER
+ * ======================================================== */
+.civic-notif-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.civic-notif-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.civic-notif-modal-content {
+  background: #ffffff;
+  border-radius: 14px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transform: translateY(20px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.civic-notif-modal-backdrop.open .civic-notif-modal-content {
+  transform: translateY(0);
+}
+
+.civic-notif-modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.civic-notif-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.civic-notif-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.civic-notif-modal-close:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.civic-notif-modal-body {
+  overflow-y: auto;
+  padding: 0;
+  flex: 1;
+}
+
+.civic-notif-modal-footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ========================================================
+ * 7. "✨ NEW" UNREVIEWED COMPLAINT BADGE
+ * ======================================================== */
+@keyframes civic-new-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 8px 2px rgba(37, 99, 235, 0.25);
+    transform: scale(1.03);
+  }
+}
+
+.badge-new-complaint {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #1e40af;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: 0.02em;
+  animation: civic-new-glow 2.4s infinite ease-in-out;
+}
+
+/* ========================================================
+ * 8. PERMANENT FLOATING SIDE QUICK-ACCESS BELL WIDGET
+ * Ensures notifications are ALWAYS visible & accessible
+ * on any page (Citizen & Authority) while scrolling or on mobile.
+ * ======================================================== */
+.civic-notif-side-widget {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.civic-notif-side-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #07546B 0%, #033240 100%);
+  color: #ffffff;
+  border: 2.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 24px rgba(7, 84, 107, 0.45), 0 3px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.civic-notif-side-btn:hover {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow: 0 12px 30px rgba(7, 84, 107, 0.6), 0 4px 14px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #0a6b88 0%, #044458 100%);
+}
+
+.civic-notif-side-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.civic-notif-side-btn svg {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.civic-notif-side-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 9999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.5);
+  animation: civic-badge-pulse 2s infinite ease-in-out;
+}
+
+.civic-notif-side-badge.hidden {
+  display: none;
+}
+
+@keyframes civic-badge-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+.civic-notif-side-btn.ring {
+  animation: civic-bell-ring 0.8s ease-in-out;
+}
+
+/* Floating quick tooltip */
+.civic-notif-side-tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.civic-notif-side-btn:hover .civic-notif-side-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+/* Dropdown Popup anchored above side button */
+.civic-notif-side-panel {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  right: 0;
+  width: 380px;
+  max-width: 90vw;
+  background: #ffffff;
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22), 0 6px 16px rgba(15, 23, 42, 0.1);
+  z-index: 10000;
+  overflow: hidden;
+  display: none;
+  animation: civic-side-panel-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.civic-notif-side-panel.open {
+  display: block;
+}
+
+@keyframes civic-side-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .civic-notif-side-widget {
+    bottom: 20px;
+    right: 20px;
+  }
+  .civic-notif-side-btn {
+    width: 48px;
+    height: 48px;
+  }
+  .civic-notif-side-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .civic-notif-side-panel {
+    width: 330px;
+    max-width: calc(100vw - 40px);
+  }
+}
+
+

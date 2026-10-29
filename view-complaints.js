@@ -15,117 +15,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ========================================================
-   * 1. COMPLAINTS DATASET (Fallback Mock + Live API Store)
+   * 1. COMPLAINTS DATASET (Live API Store)
    * Populated live from GET /api/complaints via Express
-   * ========================================================
-   */
-  let complaints = [
-    {
-      id: "CC-1001",
-      title: "Large pothole cluster near main road",
-      category: "Road/Pothole",
-      description: "Deep asphalt erosion causing severe traffic congestion and near-misses for two-wheelers during rainy hours near Metro Pillar 42.",
-      location: "Gorakhpur, Uttar Pradesh",
-      date: "28 September 2026",
-      severity: "High",
-      status: "Under Verification",
-      supporters: 14,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1002",
-      title: "Overflowing sewage drain near market entrance",
-      category: "Sewage",
-      description: "Blocked underground sewer line causing foul wastewater to spill onto the pedestrian walkway and retail market entrance.",
-      location: "Sector 18 Market, Noida, Uttar Pradesh",
-      date: "30 September 2026",
-      severity: "Critical",
-      status: "In Progress",
-      supporters: 32,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1003",
-      title: "Four non-functional streetlights along school zone",
-      category: "Street Light",
-      description: "Streetlights have been completely dark for over a week, making evening pedestrian transit unsafe near the girls secondary school.",
-      location: "Indira Nagar, Lucknow, Uttar Pradesh",
-      date: "01 October 2026",
-      severity: "Medium",
-      status: "Reported",
-      supporters: 9,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1004",
-      title: "Severe waterlogging at railway underpass during rains",
-      category: "Waterlogging",
-      description: "Subway drainage pumps failed during recent monsoon rains, leaving 2 feet of stagnant rainwater blocking cars and two-wheelers.",
-      location: "Shivaji Nagar Underpass, Pune, Maharashtra",
-      date: "02 October 2026",
-      severity: "High",
-      status: "In Progress",
-      supporters: 45,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1005",
-      title: "Uncollected municipal garbage dump on roadside",
-      category: "Garbage/Waste",
-      description: "Solid waste has not been collected for five days. Stray animals are scattering plastic waste onto the active roadway.",
-      location: "Banjara Hills Road No. 12, Hyderabad, Telangana",
-      date: "29 September 2026",
-      severity: "Medium",
-      status: "Reported",
-      supporters: 18,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1006",
-      title: "Damaged traffic signal causing chaotic intersection",
-      category: "Traffic",
-      description: "Red and amber lights blinking erratically on the 4-way intersection, leading to heavy vehicular gridlock and near-accidents.",
-      location: "MG Road Junction, Bengaluru, Karnataka",
-      date: "25 September 2026",
-      severity: "Critical",
-      status: "Resolved",
-      supporters: 68,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1007",
-      title: "Caved-in drainage manhole slab near bus shelter",
-      category: "Road/Pothole",
-      description: "Heavy concrete manhole lid collapsed into the sewer pit. Dangerously open hole with no safety barricades or warning cones.",
-      location: "Civil Lines, Kanpur, Uttar Pradesh",
-      date: "27 September 2026",
-      severity: "High",
-      status: "Resolved",
-      supporters: 51,
-      reportedBy: "Civic User"
-    },
-    {
-      id: "CC-1008",
-      title: "Blind corner without convex mirror at frequent accident turn",
-      category: "Accident",
-      description: "Sharp blind turn on narrow arterial road has witnessed 3 two-wheeler collisions this month. Requires warning rumble strips and convex mirror.",
-      location: "Mall Road, Shimla, Himachal Pradesh",
-      date: "02 October 2026",
-      severity: "High",
-      status: "Under Verification",
-      supporters: 27,
-      reportedBy: "Civic User"
-    }
-  ];
+   * ======================================================== */
+  let complaints = [];
 
   // Track user-supported complaint IDs in memory (prevents repeated voting)
   const userSupportedIds = new Set();
 
-
   /* ========================================================
    * 2. DOM ELEMENT REFERENCES
-   * ========================================================
-   */
+   * ======================================================== */
   const complaintsGrid = document.getElementById('complaintsGrid');
   const emptyResultsState = document.getElementById('emptyResultsState');
   const resultsCountText = document.getElementById('resultsCountText');
@@ -161,35 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
    * Avoids hard-coding color hex codes directly in JavaScript
    * ========================================================
    */
-  function getStatusClass(status) {
-    switch (status) {
-      case 'Reported':
-        return 'status-reported';
-      case 'Under Verification':
-        return 'status-verification';
-      case 'In Progress':
-        return 'status-progress';
-      case 'Resolved':
-        return 'status-resolved';
-      default:
-        return 'status-reported';
-    }
-  }
-
-  function getSeverityClass(severity) {
-    switch (severity) {
-      case 'Low':
-        return 'severity-low';
-      case 'Medium':
-        return 'severity-medium';
-      case 'High':
-        return 'severity-high';
-      case 'Critical':
-        return 'severity-critical';
-      default:
-        return 'severity-medium';
-    }
-  }
+  const getStatusClass = window.getStatusClass || ((s) => s === 'In Progress' ? 'status-progress' : (s === 'Resolved' ? 'status-resolved' : 'status-reported'));
+  const getSeverityClass = window.getSeverityClass || ((s) => `severity-${(s || 'medium').toLowerCase()}`);
+  const escapeHtml = window.escapeHtml || ((str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
 
   function getPriorityClass(level) {
     switch (String(level).toUpperCase()) {
@@ -200,41 +74,288 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Color tokens with high contrast between Critical (Red), High (Orange), Medium (Yellow/Gold), Low (Blue)
   function getPriorityColor(level) {
     switch (String(level).toUpperCase()) {
-      case 'CRITICAL': return '#dc2626';
-      case 'HIGH': return '#ea580c';
-      case 'MEDIUM': return '#d97706';
-      default: return '#0284c7';
+      case 'CRITICAL': return '#dc2626'; // Vivid Crimson Red (Emergency)
+      case 'HIGH': return '#ea580c';     // Vibrant Safety Orange (High Hazard)
+      case 'MEDIUM': return '#eab308';   // Bright Golden Yellow (Medium - clearly distinct from orange)
+      default: return '#0284c7';         // Sky/Royal Blue (Low Severity)
     }
   }
 
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+  // Resolve effective priority level by prioritizing highest urgency:
+  // Critical emergencies/high danger are never masked as medium
+  function getEffectivePriorityLevel(item) {
+    if (!item) return 'MEDIUM';
+    const sev = String(item.severity || '').toUpperCase();
+    const danger = String(item.aiAnalysis && item.aiAnalysis.dangerLevel || '').toUpperCase();
+    const priLevel = String(item.priority && item.priority.level || '').toUpperCase();
+
+    if (sev === 'CRITICAL' || danger === 'CRITICAL' || priLevel === 'CRITICAL') {
+      return 'CRITICAL';
+    }
+    if (sev === 'HIGH' || danger === 'HIGH' || priLevel === 'HIGH') {
+      return 'HIGH';
+    }
+    if (sev === 'LOW' && (danger === 'LOW' || !danger) && (priLevel === 'LOW' || !priLevel)) {
+      return 'LOW';
+    }
+    if (priLevel === 'LOW' && (sev === 'LOW' || !sev)) {
+      return 'LOW';
+    }
+    return 'MEDIUM';
   }
 
 
   /* ========================================================
-   * 4. GOOGLE MAPS API INTEGRATION & PRIORITY MARKERS
+   * 4. MAP INTEGRATION (Google Maps + Leaflet / OSM Fallback)
    * (Stage 10 Part 10 & 11)
    * ========================================================
    */
+  let leafletMap = null;
+  let leafletMarkersGroup = null;
+  let leafletMarkersMap = {};
+  let leafletHighlightCircle = null;
+  let googleHighlightCircle = null;
+
+  // Build the rich brief popup HTML for any complaint on the map
+  function buildComplaintBriefPopupHtml(item) {
+    const statusClass = getStatusClass(item.status);
+    const priorityLevel = getEffectivePriorityLevel(item);
+    const priorityScore = (item.priority && item.priority.score !== undefined) ? item.priority.score : 50;
+    const priorityClass = getPriorityClass(priorityLevel);
+    const dangerLevel = (item.aiAnalysis && item.aiAnalysis.dangerLevel) ? item.aiAnalysis.dangerLevel.toUpperCase() : (item.severity ? item.severity.toUpperCase() : 'MEDIUM');
+    const reportCount = item.reportCount || 1;
+    const voteCount = item.supporters !== undefined ? item.supporters : (item.voters ? item.voters.length : 0);
+
+    const locationStr = (item.location && typeof item.location === 'object' && item.location.address)
+      ? item.location.address
+      : (item.location || 'Pinned Coordinates');
+
+    const descSnippet = item.description 
+      ? (item.description.length > 95 ? item.description.slice(0, 95) + '...' : item.description)
+      : 'No description provided.';
+
+    return `
+      <div class="map-brief-popup">
+        <div class="popup-top-meta">
+          <span class="popup-id">${escapeHtml(item.id)}</span>
+          <span class="status-badge ${statusClass}">
+            <span class="badge-dot"></span>
+            ${escapeHtml(item.status)}
+          </span>
+        </div>
+        <h4 class="popup-title">${escapeHtml(item.title)}</h4>
+        <p class="popup-desc">${escapeHtml(descSnippet)}</p>
+        <div class="popup-badges-row">
+          <span class="priority-badge ${priorityClass}">Priority: ${priorityLevel} (${priorityScore}/100)</span>
+          <span class="danger-badge">Danger: ${dangerLevel}</span>
+        </div>
+        <div class="popup-stats-row">
+          <span>📢 ${reportCount} Report(s)</span> • <span>👍 ${voteCount} Vote(s)</span>
+        </div>
+        <div class="popup-location-row" title="${escapeHtml(locationStr)}">
+          <span>📍 ${escapeHtml(locationStr)}</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary popup-details-btn" onclick="window.viewComplaintDetails('${escapeHtml(item.id)}')">
+          View Full Details &rarr;
+        </button>
+      </div>
+    `;
+  }
+
+  // Generate color-coded custom map pin icon based on priority level with distinct symbols
+  function createLeafletMarkerIcon(priorityLevel) {
+    const level = String(priorityLevel).toUpperCase();
+    const color = getPriorityColor(level);
+    
+    // Distinctive visual symbol inside pin center for quick recognition and accessibility
+    let symbol = '●';
+    let symbolFontSize = '10px';
+    let symbolY = '14.5px';
+    if (level === 'CRITICAL') {
+      symbol = '!';
+      symbolFontSize = '12px';
+      symbolY = '15.5px';
+    } else if (level === 'HIGH') {
+      symbol = '▲';
+      symbolFontSize = '8px';
+      symbolY = '13.5px';
+    } else if (level === 'MEDIUM') {
+      symbol = '■';
+      symbolFontSize = '8px';
+      symbolY = '13.5px';
+    } else {
+      symbol = '●';
+      symbolFontSize = '8px';
+      symbolY = '13.5px';
+    }
+
+    return L.divIcon({
+      className: 'custom-map-pin',
+      html: `
+        <div class="pin-marker-wrapper" style="--pin-color: ${color};" title="Priority: ${level}">
+          <div class="pin-marker-body">
+            <svg width="28" height="34" viewBox="0 0 24 30" fill="none" style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));">
+              <!-- Outer Pin Teardrop with White Contrast Border -->
+              <path d="M12 0C5.37 0 0 5.37 0 12C0 19.5 12 30 12 30C12 30 24 19.5 24 12C24 5.37 18.63 0 12 0Z" fill="${color}" stroke="#ffffff" stroke-width="1.3"/>
+              <!-- Inner White Center Disc -->
+              <circle cx="12" cy="11" r="5.5" fill="#ffffff"/>
+              <!-- High-Contrast Priority Symbol -->
+              <text x="12" y="${symbolY}" font-size="${symbolFontSize}" font-weight="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" text-anchor="middle" fill="${color}">${symbol}</text>
+            </svg>
+          </div>
+          <div class="pin-marker-shadow"></div>
+        </div>
+      `,
+      iconSize: [28, 34],
+      iconAnchor: [14, 34],
+      popupAnchor: [0, -32]
+    });
+  }
+
+  function initLeafletComplaintsMap() {
+    const mapElement = document.getElementById('complaintsGoogleMap');
+    if (!mapElement || !window.L) return;
+
+    try {
+      const offlineBanner = document.getElementById('mapOfflineBanner');
+      if (offlineBanner) offlineBanner.style.display = 'none';
+
+      leafletMap = L.map('complaintsGoogleMap').setView([DEFAULT_LAT, DEFAULT_LNG], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 18
+      }).addTo(leafletMap);
+
+      leafletMarkersGroup = L.layerGroup().addTo(leafletMap);
+      updateLeafletMapMarkers(complaints);
+      console.log('[Leaflet Map]: View Complaints map initialized.');
+    } catch (err) {
+      console.error('[Leaflet Map]: Initialization error:', err);
+    }
+  }
+
+  function updateLeafletMapMarkers(list) {
+    if (!leafletMap || !leafletMarkersGroup) return;
+
+    leafletMarkersGroup.clearLayers();
+    leafletMarkersMap = {};
+    if (leafletHighlightCircle) {
+      try { leafletMap.removeLayer(leafletHighlightCircle); } catch (e) {}
+      leafletHighlightCircle = null;
+    }
+
+    const bounds = [];
+
+    list.forEach(item => {
+      let lat = null;
+      let lng = null;
+
+      if (item.location && typeof item.location === 'object') {
+        lat = item.location.latitude;
+        lng = item.location.longitude;
+      } else if (item.latitude && item.longitude) {
+        lat = item.latitude;
+        lng = item.longitude;
+      }
+
+      if (lat === null || lng === null || isNaN(lat) || isNaN(lng)) return;
+
+      const numLat = parseFloat(lat);
+      const numLng = parseFloat(lng);
+      bounds.push([numLat, numLng]);
+
+      const priorityLevel = getEffectivePriorityLevel(item);
+      const customIcon = createLeafletMarkerIcon(priorityLevel);
+
+      const marker = L.marker([numLat, numLng], { icon: customIcon });
+      const popupContent = buildComplaintBriefPopupHtml(item);
+
+      marker.bindPopup(popupContent, { maxWidth: 280, className: 'leaflet-custom-popup' });
+
+      // Clicking any marker highlights its location on the map and highlights its card in the list
+      marker.on('click', () => {
+        highlightLocationOnMap(numLat, numLng, item);
+        highlightComplaintCard(item.id);
+      });
+
+      leafletMarkersGroup.addLayer(marker);
+      leafletMarkersMap[item.id] = { marker, lat: numLat, lng: numLng, item };
+    });
+
+    if (bounds.length > 1) {
+      leafletMap.fitBounds(bounds, { padding: [35, 35], maxZoom: 14 });
+    } else if (bounds.length === 1) {
+      leafletMap.setView(bounds[0], 14);
+    }
+  }
+
+  // Draw pulsating highlight radar circle around selected problem location
+  function highlightLocationOnMap(lat, lng, item) {
+    const priorityLevel = getEffectivePriorityLevel(item);
+    const color = getPriorityColor(priorityLevel);
+
+    // 1. Highlight on Leaflet Map
+    if (leafletMap) {
+      if (leafletHighlightCircle) {
+        try { leafletMap.removeLayer(leafletHighlightCircle); } catch (e) {}
+      }
+      leafletHighlightCircle = L.circle([lat, lng], {
+        radius: 80,
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.28,
+        weight: 3,
+        className: 'pulse-map-circle'
+      }).addTo(leafletMap);
+    }
+
+    // 2. Highlight on Google Map
+    if (googleMap) {
+      if (googleHighlightCircle) {
+        googleHighlightCircle.setMap(null);
+      }
+      googleHighlightCircle = new google.maps.Circle({
+        strokeColor: color,
+        strokeOpacity: 0.85,
+        strokeWeight: 3,
+        fillColor: color,
+        fillOpacity: 0.28,
+        map: googleMap,
+        center: { lat, lng },
+        radius: 80
+      });
+    }
+  }
+
+  // Highlight and gently scroll to the problem's card in the grid below
+  function highlightComplaintCard(id) {
+    const card = document.querySelector(`.complaint-item-card[data-id="${id}"]`);
+    if (!card) return;
+
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    card.classList.remove('card-highlight-flash');
+    void card.offsetWidth; // trigger reflow
+    card.classList.add('card-highlight-flash');
+
+    setTimeout(() => {
+      card.classList.remove('card-highlight-flash');
+    }, 2500);
+  }
+
   async function loadComplaintsGoogleMap() {
     try {
-      const res = await fetch('/api/config/maps-key');
+      const fetchFn = window.civicFetch || fetch;
+      const res = await fetchFn('/api/config/maps-key');
       const data = await res.json();
       const apiKey = data.mapsApiKey;
 
-      if (!apiKey) {
-        console.warn('[View Complaints Map]: GOOGLE_MAPS_API_KEY is not configured in .env. Map offline banner shown.');
-        const offlineBanner = document.getElementById('mapOfflineBanner');
-        if (offlineBanner) offlineBanner.style.display = 'flex';
+      if (!apiKey || apiKey.trim() === '') {
+        console.info('[View Complaints Map]: Google Maps key not set. Activating Leaflet + OpenStreetMap.');
+        initLeafletComplaintsMap();
         return;
       }
 
@@ -253,14 +374,14 @@ document.addEventListener('DOMContentLoaded', () => {
       script.async = true;
       script.defer = true;
       script.onerror = () => {
-        console.error('[View Complaints Map]: Failed to load Google Maps script.');
-        const offlineBanner = document.getElementById('mapOfflineBanner');
-        if (offlineBanner) offlineBanner.style.display = 'flex';
+        console.warn('[View Complaints Map]: Failed to load Google Maps script. Switching to Leaflet.');
+        initLeafletComplaintsMap();
       };
       document.head.appendChild(script);
 
     } catch (err) {
       console.warn('[View Complaints Map]: Error checking maps configuration:', err.message);
+      initLeafletComplaintsMap();
     }
   }
 
@@ -287,17 +408,24 @@ document.addEventListener('DOMContentLoaded', () => {
       updateMapMarkers(complaints);
     } catch (err) {
       console.error('[Google Maps]: Failed to initialize View Complaints map:', err);
+      initLeafletComplaintsMap();
     }
   }
 
   // Update map markers when complaints list changes or is filtered
   function updateMapMarkers(list) {
+    updateLeafletMapMarkers(list);
+
     if (!googleMap || !isGoogleMapsLoaded) return;
 
     // Clear previous markers
     mapMarkers.forEach(m => m.setMap(null));
     mapMarkers = [];
     markersMap = {};
+    if (googleHighlightCircle) {
+      googleHighlightCircle.setMap(null);
+      googleHighlightCircle = null;
+    }
 
     const bounds = new google.maps.LatLngBounds();
     let validCoordsCount = 0;
@@ -315,21 +443,15 @@ document.addEventListener('DOMContentLoaded', () => {
         lng = item.longitude;
       }
 
-      // Check if coordinates are valid numbers
       if (lat === null || lng === null || isNaN(lat) || isNaN(lng)) return;
 
       validCoordsCount++;
       const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
       bounds.extend(pos);
 
-      const priorityLevel = (item.priority && item.priority.level) ? item.priority.level : (item.severity ? item.severity.toUpperCase() : 'MEDIUM');
-      const priorityScore = (item.priority && item.priority.score !== undefined) ? item.priority.score : 50;
-      const dangerLevel = (item.aiAnalysis && item.aiAnalysis.dangerLevel) ? item.aiAnalysis.dangerLevel.toUpperCase() : 'MEDIUM';
-      const reportCount = item.reportCount || 1;
-      const voteCount = item.supporters || (item.voters ? item.voters.length : 0);
+      const priorityLevel = getEffectivePriorityLevel(item);
       const color = getPriorityColor(priorityLevel);
 
-      // Create distinctive SVG pin marker with priority level color and symbol
       const svgMarker = {
         path: 'M 12 2 C 7.03 2 3 6.03 3 11 C 3 16.55 12 26 12 26 C 12 26 21 16.55 21 11 C 21 6.03 16.97 2 12 2 Z',
         fillColor: color,
@@ -347,42 +469,18 @@ document.addEventListener('DOMContentLoaded', () => {
         title: `${priorityLevel} — ${item.title}`
       });
 
-      // InfoWindow HTML with accessible priority and danger details (Part 10 & 11)
-      const infoContent = `
-        <div style="font-family: 'Plus Jakarta Sans', system-ui, sans-serif; padding: 4px; max-width: 260px; line-height: 1.4;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #1e40af; background-color: #dbeafe; padding: 1px 5px; border-radius: 3px;">
-              ${escapeHtml(item.id)}
-            </span>
-            <span style="font-size: 0.72rem; font-weight: 800; color: ${color}; text-transform: uppercase;">
-              ${priorityLevel} (${priorityScore}/100)
-            </span>
-          </div>
-          <h4 style="margin: 0 0 4px; font-size: 0.95rem; color: #0f172a; font-weight: 700;">
-            ${escapeHtml(item.title)}
-          </h4>
-          <div style="font-size: 0.75rem; color: #475569; margin-bottom: 6px;">
-            <span>Category: <strong>${escapeHtml(item.category)}</strong></span><br>
-            <span>Danger: <strong style="color: ${color};">${dangerLevel}</strong></span> • 
-            <span>Status: <strong>${escapeHtml(item.status)}</strong></span>
-          </div>
-          <div style="font-size: 0.75rem; color: #07546b; font-weight: 700; background-color: #f0fdf4; padding: 3px 6px; border-radius: 4px; margin-bottom: 8px;">
-            📢 ${reportCount} Report(s) • 👍 ${voteCount} Vote(s)
-          </div>
-          <button type="button" class="btn btn-sm btn-primary" onclick="window.viewComplaintDetails('${escapeHtml(item.id)}')" style="width: 100%; font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
-            View Full Details
-          </button>
-        </div>
-      `;
+      const infoContent = buildComplaintBriefPopupHtml(item);
 
       marker.addListener('click', () => {
         if (activeInfoWindow) activeInfoWindow.close();
         activeInfoWindow.setContent(infoContent);
         activeInfoWindow.open(googleMap, marker);
+        highlightLocationOnMap(pos.lat, pos.lng, item);
+        highlightComplaintCard(item.id);
       });
 
       mapMarkers.push(marker);
-      markersMap[item.id] = { marker, pos, infoContent };
+      markersMap[item.id] = { marker, pos, infoContent, item };
     });
 
     if (validCoordsCount > 1) {
@@ -396,24 +494,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Scroll to and focus a complaint marker on the Google Map
+  // Scroll to and focus a complaint marker on the map with glowing highlight & brief details
   function focusComplaintOnMap(complaintId) {
-    const entry = markersMap[complaintId];
-    const mapSection = document.getElementById('complaintsMapSection');
+    const item = complaints.find(c => c.id === complaintId);
+    if (!item) return;
 
+    let lat = null, lng = null;
+    if (item.location && typeof item.location === 'object') {
+      lat = item.location.latitude;
+      lng = item.location.longitude;
+    } else if (item.latitude && item.longitude) {
+      lat = item.latitude;
+      lng = item.longitude;
+    }
+
+    if (lat === null || lng === null || isNaN(lat) || isNaN(lng)) {
+      alert(`Problem ${complaintId} does not have map GPS coordinates pinned.`);
+      return;
+    }
+
+    const numLat = parseFloat(lat);
+    const numLng = parseFloat(lng);
+
+    // Scroll up smoothly to the map viewport
+    const mapSection = document.getElementById('complaintsMapSection');
     if (mapSection) {
       mapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    if (entry && googleMap) {
-      googleMap.panTo(entry.pos);
-      googleMap.setZoom(16);
-      if (activeInfoWindow) {
-        activeInfoWindow.setContent(entry.infoContent);
-        activeInfoWindow.open(googleMap, entry.marker);
-      }
-    } else {
-      console.warn(`[Map Notice]: Coordinates for ticket ${complaintId} are not plotted or map is offline.`);
+    // 1. Leaflet Map
+    if (leafletMap && leafletMarkersMap[complaintId]) {
+      const entry = leafletMarkersMap[complaintId];
+      setTimeout(() => {
+        leafletMap.setView([numLat, numLng], 16, { animate: true });
+        entry.marker.openPopup();
+        highlightLocationOnMap(numLat, numLng, item);
+      }, 300);
+      return;
+    }
+
+    // 2. Google Map
+    if (googleMap && markersMap[complaintId]) {
+      const entry = markersMap[complaintId];
+      setTimeout(() => {
+        googleMap.panTo(entry.pos);
+        googleMap.setZoom(16);
+        if (activeInfoWindow) {
+          activeInfoWindow.setContent(entry.infoContent);
+          activeInfoWindow.open(googleMap, entry.marker);
+        }
+        highlightLocationOnMap(numLat, numLng, item);
+      }, 300);
+      return;
     }
   }
 
@@ -609,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const matchesSeverity = selectedSeverity === 'all' || item.severity === selectedSeverity;
 
       // 5. Priority matching (Stage 10 Part 18)
-      const itemPriorityLevel = (item.priority && item.priority.level) ? item.priority.level : (item.severity ? item.severity.toUpperCase() : 'MEDIUM');
+      const itemPriorityLevel = getEffectivePriorityLevel(item);
       const matchesPriority = selectedPriority === 'all' || itemPriorityLevel.toUpperCase() === selectedPriority.toUpperCase();
 
       return matchesSearch && matchesCategory && matchesStatus && matchesSeverity && matchesPriority;
@@ -645,7 +777,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!targetComplaint) return;
 
     // Send vote request to Express backend: POST /api/complaints/:id/vote
-    fetch(`/api/complaints/${complaintId}/vote`, {
+    const fetchFn = window.civicFetch || fetch;
+    fetchFn(`/api/complaints/${complaintId}/vote`, {
       method: 'POST',
       credentials: 'include'
     })
@@ -734,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const priorityClass = getPriorityClass(priorityLevel);
 
     const reportCount = item.reportCount || 1;
-    const voteCount = item.supporters || (item.voters ? item.voters.length : 0);
+    const voteCount = item.supporters !== undefined ? item.supporters : (item.voters ? item.voters.length : 0);
 
     let addressStr = 'Pinned Coordinates';
     let coordsStr = 'N/A';
@@ -748,6 +881,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (item.latitude && item.longitude) {
       coordsStr = `${item.latitude}, ${item.longitude}`;
+    }
+
+    const dateStr = item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Recently Reported');
+
+    let imageHtml = '';
+    if (item.image && typeof item.image === 'string' && item.image.trim() !== '' && item.image !== 'none') {
+      imageHtml = `
+        <div class="detail-section">
+          <span class="detail-label">Attached Photo / Evidence</span>
+          <div class="detail-image-box">
+            <img src="${escapeHtml(item.image)}" alt="Evidence photo for ${escapeHtml(item.title)}" class="detail-photo" onerror="this.closest('.detail-section').style.display='none';">
+          </div>
+        </div>
+      `;
+    } else {
+      imageHtml = `
+        <div class="detail-section">
+          <span class="detail-label">Attached Photo / Evidence</span>
+          <div class="detail-no-image-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span>No photo attached with this complaint report</span>
+          </div>
+        </div>
+      `;
+    }
+
+    let resolutionHtml = '';
+    if (item.status === 'Resolved' && (item.resolutionNote || item.resolvedDate)) {
+      resolutionHtml = `
+        <div style="background-color: #ecfdf5; border: 1.5px solid #a7f3d0; border-radius: 8px; padding: 1rem; color: #065f46;">
+          <strong style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.35rem;">
+            <span>✅</span> Resolution Details:
+          </strong>
+          ${item.resolvedDate ? `<div style="font-size: 0.8rem; margin-bottom: 0.35rem; color: #047857;">Resolved on: <strong>${escapeHtml(item.resolvedDate)}</strong></div>` : ''}
+          ${item.resolutionNote ? `<p style="margin: 0; font-size: 0.88rem; line-height: 1.5;">${escapeHtml(item.resolutionNote)}</p>` : ''}
+        </div>
+      `;
     }
 
     modalDetailBody.innerHTML = `
@@ -767,15 +941,21 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Problem Title -->
       <h2 class="detail-title">${escapeHtml(item.title)}</h2>
 
+      <!-- Attached Image / Evidence -->
+      ${imageHtml}
+
       <!-- Full Description -->
       <div class="detail-section">
         <span class="detail-label">Problem Description</span>
         <div class="detail-text">${escapeHtml(item.description)}</div>
       </div>
 
+      <!-- Resolution Notice if Resolved -->
+      ${resolutionHtml}
+
       <!-- AI Danger Assessment (Stage 10 Part 23) -->
-      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+      <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
           <strong style="color: var(--navy-blue); font-size: 0.9rem; display: flex; align-items: center; gap: 0.35rem;">
             <span>🤖</span> AI Danger Assessment
           </strong>
@@ -792,7 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
 
       <!-- Priority Calculation Formula Breakdown (Stage 10 Part 17) -->
-      <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 0.9rem 1rem; margin-bottom: 1.25rem; font-size: 0.82rem; color: #166534;">
+      <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.82rem; color: #166534;">
         <strong>Priority Score Calculation:</strong>
         <div style="margin-top: 0.35rem; display: flex; flex-direction: column; gap: 0.2rem;">
           <span>• AI Danger Contribution (60%): <strong>${Math.round(dangerScore * 0.6)} pts</strong></span>
@@ -809,6 +989,11 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="detail-info-cell">
+          <span class="detail-label">Reported On</span>
+          <span class="detail-info-cell-value">${escapeHtml(dateStr)}</span>
+        </div>
+
+        <div class="detail-info-cell">
           <span class="detail-label">Location / Landmark</span>
           <span class="detail-info-cell-value">${escapeHtml(addressStr)}</span>
         </div>
@@ -819,18 +1004,27 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="detail-info-cell">
-          <span class="detail-label">Community Weight</span>
-          <span class="detail-info-cell-value">${reportCount} Report(s) • ${voteCount} Vote(s)</span>
+          <span class="detail-label">Community Support</span>
+          <span class="detail-info-cell-value">👍 ${voteCount} Vote(s)</span>
+        </div>
+
+        <div class="detail-info-cell">
+          <span class="detail-label">Citizen Reports</span>
+          <span class="detail-info-cell-value">📢 ${reportCount} Report(s)</span>
         </div>
 
         <div class="detail-info-cell" style="grid-column: 1 / -1;">
           <span class="detail-label">Reported By</span>
-          <span class="detail-info-cell-value">${escapeHtml(item.reportedBy || 'Civic User')} (Verified Citizen)</span>
+          <span class="detail-info-cell-value">${escapeHtml(item.reporterName || item.reportedBy || 'Civic User')} (${escapeHtml(item.verification || 'Verified Citizen')})</span>
         </div>
       </div>
     `;
 
     complaintDetailModal.removeAttribute('hidden');
+    const modalBodyEl = complaintDetailModal.querySelector('.modal-body');
+    if (modalBodyEl) {
+      modalBodyEl.scrollTop = 0;
+    }
     document.body.style.overflow = 'hidden';
   }
 
@@ -925,7 +1119,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadComplaintsFromBackend() {
     try {
       console.log('Connecting to Express backend: GET /api/complaints ...');
-      const response = await fetch('/api/complaints');
+      const fetchFn = window.civicFetch || fetch;
+      const response = await fetchFn('/api/complaints');
 
       if (!response.ok) {
         throw new Error(`Server returned HTTP ${response.status}`);
@@ -944,9 +1139,25 @@ document.addEventListener('DOMContentLoaded', () => {
           badge.style.color = '#065f46';
           badge.style.border = '1px solid #a7f3d0';
         }
+      } else {
+        complaints = [];
       }
     } catch (err) {
-      console.warn(`[Express Backend Notice]: Could not reach /api/complaints (${err.message}). Using local sample data fallback.`);
+      console.warn(`[Express Backend Notice]: Could not reach /api/complaints (${err.message}).`);
+      complaints = [];
+      if (complaintsGrid) {
+        complaintsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 2.5rem 1.5rem; text-align: center; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 12px; color: #991b1b; margin-bottom: 1.5rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
+            <h3 style="margin: 0 0 0.5rem; font-size: 1.25rem;">Unable to load complaints from database</h3>
+            <p style="margin: 0 0 1rem; font-size: 0.9rem; color: #7f1d1d;">Could not reach <code>/api/complaints</code> (${escapeHtml(err.message)}). Please verify backend server is running.</p>
+            <button type="button" class="btn btn-primary" onclick="window.location.reload()" style="padding: 0.5rem 1.25rem;">
+              Retry Connection
+            </button>
+          </div>
+        `;
+      }
+      return;
     } finally {
       renderComplaints(complaints);
       updateMapMarkers(complaints);

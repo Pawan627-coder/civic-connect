@@ -37,7 +37,14 @@ const ALLOWED_STATUSES = [
 const ALLOWED_VERIFICATIONS = [
   "Pending",
   "Verified",
-  "Rejected"
+  "Needs Inspection",
+  "Insufficient Evidence",
+  "Rejected",
+  "pending",
+  "verified",
+  "needs_inspection",
+  "insufficient_evidence",
+  "rejected"
 ];
 
 const ALLOWED_PRIORITIES = [
@@ -103,6 +110,19 @@ const complaintSchema = new mongoose.Schema({
     longitude: {
       type: Number,
       required: [true, "Longitude coordinate is required"]
+    },
+    source: {
+      type: String,
+      enum: ['gps', 'manual', 'GPS', 'Manual'],
+      default: 'manual'
+    },
+    accuracy: {
+      type: Number,
+      default: null
+    },
+    capturedAt: {
+      type: Date,
+      default: null
     }
   },
 
@@ -266,6 +286,87 @@ const complaintSchema = new mongoose.Schema({
   resolutionNote: {
     type: String,
     default: ""
+  },
+
+  // Authority Operations & Assignment Fields
+  assignedOfficial: {
+    type: String,
+    trim: true,
+    default: ""
+  },
+  internalNotes: {
+    type: String,
+    trim: true,
+    default: ""
+  },
+
+  // Location & Photo Evidence Verification Fields
+  photoSource: {
+    type: String,
+    enum: ['camera', 'gallery', 'upload', 'Camera', 'Gallery', 'Upload'],
+    default: 'upload'
+  },
+  photoUploadedAt: {
+    type: Date,
+    default: null
+  },
+  submittedAt: {
+    type: Date,
+    default: Date.now
+  },
+
+  // Verification Details & Audit History
+  verificationNotes: {
+    type: String,
+    trim: true,
+    default: ""
+  },
+  verifiedAt: {
+    type: Date,
+    default: null
+  },
+  verifiedBy: {
+    type: String,
+    trim: true,
+    default: ""
+  },
+  verificationHistory: [
+    {
+      action: {
+        type: String,
+        required: true
+      },
+      status: {
+        type: String,
+        required: true
+      },
+      authorityId: {
+        type: String,
+        default: ""
+      },
+      authorityName: {
+        type: String,
+        default: ""
+      },
+      notes: {
+        type: String,
+        default: ""
+      },
+      timestamp: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ],
+  // Authority Review Tracking for "NEW" indicator
+  isReviewed: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  reviewedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true,

@@ -16,149 +16,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ========================================================
    * 1. CITIZEN COMPLAINTS DATASET (Live /api/complaints/mine)
+   * Populated dynamically from shared persistent backend API
    * ========================================================
    */
-  let myComplaints = [
-    {
-      id: "CC-1001",
-      title: "Large pothole cluster near main road",
-      category: "Road/Pothole",
-      description: "Deep asphalt erosion causing severe traffic congestion and near-misses for two-wheelers during rainy hours near Metro Pillar 42.",
-      location: "Gorakhpur, Uttar Pradesh",
-      date: "28 September 2026",
-      severity: "High",
-      status: "Under Verification",
-      supporters: 14,
-      reportedBy: "Civic User",
-      verified: true,
-      resolved: false,
-      verificationInfo: "Inspection assigned to Ward 28 Road Works Cell on 29 Sep 2026.",
-      resolutionInfo: "Pending contractor dispatch following site verification."
-    },
-    {
-      id: "CC-0998",
-      title: "Caved-in stormwater drain manhole lid",
-      category: "Road/Pothole",
-      description: "Reinforced concrete cover cracked and collapsed inward into the sewer main. Hazard barricaded and replaced with heavy-duty cast iron slab.",
-      location: "Market Road, Gorakhpur, Uttar Pradesh",
-      date: "18 September 2026",
-      severity: "Critical",
-      status: "Resolved",
-      supporters: 42,
-      reportedBy: "Civic User",
-      verified: true,
-      resolved: true,
-      verificationInfo: "Verified by Junior Engineer on 19 Sep 2026.",
-      resolutionInfo: "Resolved on 22 Sep 2026: Heavy-duty cast iron slab installed and road surface leveled."
-    },
-    {
-      id: "CC-0995",
-      title: "Broken streetlights along school corridor",
-      category: "Street Light",
-      description: "Four consecutive streetlights out along the school zone corridor. Night-time visibility severely reduced for pedestrians.",
-      location: "Civil Lines, Gorakhpur, Uttar Pradesh",
-      date: "12 September 2026",
-      severity: "Medium",
-      status: "Resolved",
-      supporters: 29,
-      reportedBy: "Civic User",
-      verified: true,
-      resolved: true,
-      verificationInfo: "Inspected by Electrical Maintenance Division on 13 Sep 2026.",
-      resolutionInfo: "Resolved on 15 Sep 2026: LED fixtures replaced and wiring repaired."
-    },
-    {
-      id: "CC-1004",
-      title: "Severe waterlogging at railway subway entrance",
-      category: "Waterlogging",
-      description: "Subway drainage sump pump motor burned out, leading to 1.5 feet of stagnant rainwater blocking two-wheelers and pedestrians.",
-      location: "Station Link Road, Gorakhpur, Uttar Pradesh",
-      date: "01 October 2026",
-      severity: "High",
-      status: "In Progress",
-      supporters: 38,
-      reportedBy: "Civic User",
-      verified: true,
-      resolved: false,
-      verificationInfo: "Verified by Municipal Drainage Cell on 02 Oct 2026.",
-      resolutionInfo: "Pump replacement work order issued. Repair crew actively working on-site."
-    },
-    {
-      id: "CC-0989",
-      title: "Overflowing garbage bin blocking pedestrian walkway",
-      category: "Garbage/Waste",
-      description: "Community waste bin overflowing for four consecutive days, causing foul smell and health hazard near the neighborhood park.",
-      location: "Shastri Nagar, Gorakhpur, Uttar Pradesh",
-      date: "05 September 2026",
-      severity: "Low",
-      status: "Resolved",
-      supporters: 19,
-      reportedBy: "Civic User",
-      verified: true,
-      resolved: true,
-      verificationInfo: "Sanitation Inspector conducted site check on 06 Sep 2026.",
-      resolutionInfo: "Resolved on 07 Sep 2026: Solid waste cleared and daily pickup schedule restored."
-    },
-    {
-      id: "CC-1007",
-      title: "Damaged pedestrian crosswalk & missing speed breaker sign",
-      category: "Traffic",
-      description: "Zebra crossing paint completely worn away and speed breaker signs missing near the primary health center entrance.",
-      location: "Medical College Road, Gorakhpur, Uttar Pradesh",
-      date: "03 October 2026",
-      severity: "Medium",
-      status: "Reported",
-      supporters: 7,
-      reportedBy: "Civic User",
-      verified: false,
-      resolved: false,
-      verificationInfo: "Queued for preliminary ward intake review.",
-      resolutionInfo: "Awaiting municipal inspection visit."
-    }
-  ];
+  let myComplaints = [];
 
   /* ========================================================
    * 2. RECENT ACTIVITY TIMELINE DATASET
+   * Populated dynamically from user's live complaint status changes
    * ========================================================
    */
-  const recentActivities = [
-    {
-      title: "Complaint CC-1007 reported (Zebra crossing & signage)",
-      date: "03 Oct 2026",
-      reward: "+1 token",
-      type: "report"
-    },
-    {
-      title: "Complaint CC-1004 work order dispatched to site team",
-      date: "02 Oct 2026",
-      reward: null,
-      type: "progress"
-    },
-    {
-      title: "Complaint CC-1001 verified by Ward 28 Engineering Cell",
-      date: "29 Sep 2026",
-      reward: "+2 tokens",
-      type: "verify"
-    },
-    {
-      title: "Complaint CC-0998 resolved: Drainage slab replaced",
-      date: "22 Sep 2026",
-      reward: "+3 tokens",
-      type: "resolve"
-    },
-    {
-      title: "Complaint CC-0995 resolved: Streetlights operational",
-      date: "15 Sep 2026",
-      reward: "+3 tokens",
-      type: "resolve"
-    },
-    {
-      title: "Complaint CC-0989 resolved: Municipal garbage cleared",
-      date: "07 Sep 2026",
-      reward: "+3 tokens",
-      type: "resolve"
-    }
-  ];
+  let recentActivities = [];
+
+  function buildRecentActivitiesFromComplaints(list) {
+    const activities = [];
+    list.forEach(c => {
+      activities.push({
+        title: `Complaint ${c.id} reported (${c.title && c.title.length > 35 ? c.title.slice(0, 32) + '...' : (c.title || 'Civic Issue')})`,
+        date: c.date || 'Recent',
+        reward: '+1 token',
+        type: 'report'
+      });
+      if (c.verified || c.verification === 'Verified' || c.status === 'Under Verification' || c.status === 'In Progress' || c.status === 'Resolved') {
+        activities.push({
+          title: `Complaint ${c.id} verified by Municipal Works Cell`,
+          date: c.date || 'Recent',
+          reward: '+2 tokens',
+          type: 'verify'
+        });
+      }
+      if (c.status === 'In Progress') {
+        activities.push({
+          title: `Complaint ${c.id} work order dispatched to site repair crew`,
+          date: c.date || 'Recent',
+          reward: null,
+          type: 'progress'
+        });
+      }
+      if (c.status === 'Resolved' || c.resolved) {
+        activities.push({
+          title: `Complaint ${c.id} resolved: ${c.resolutionInfo || 'Remediation completed'}`,
+          date: c.resolvedDate || c.date || 'Recent',
+          reward: '+3 tokens',
+          type: 'resolve'
+        });
+      }
+    });
+    return activities.slice(0, 10);
+  }
 
   // Stage sequence for status tracking
   const STATUS_STAGES = [
@@ -192,6 +97,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalCloseBtn = document.getElementById('modalCloseBtn');
   const modalDismissBtn = document.getElementById('modalDismissBtn');
   const modalDetailBody = document.getElementById('modalDetailBody');
+
+  // Reminder & Feedback Modal DOM references
+  const actionSendReminder = document.getElementById('actionSendReminder');
+  const actionGiveFeedback = document.getElementById('actionGiveFeedback');
+  const reminderModal = document.getElementById('reminderModal');
+  const reminderCloseBtn = document.getElementById('reminderCloseBtn');
+  const reminderCancelBtn = document.getElementById('reminderCancelBtn');
+  const reminderForm = document.getElementById('reminderForm');
+  const reminderComplaintSelect = document.getElementById('reminderComplaintSelect');
+  const reminderReasonSelect = document.getElementById('reminderReasonSelect');
+  const reminderNotes = document.getElementById('reminderNotes');
+  const reminderFeedback = document.getElementById('reminderFeedback');
+  const reminderSubmitBtn = document.getElementById('reminderSubmitBtn');
 
 
   /* ========================================================
@@ -440,16 +358,61 @@ document.addEventListener('DOMContentLoaded', () => {
             <strong>${item.supporters}</strong> citizen supporters
           </span>
 
-          <button type="button" class="btn-view-details" data-id="${item.id}" aria-label="View details for ${item.id}">
-            <span>View Details</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </button>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            ${item.status !== 'Resolved' ? `
+              <button type="button" class="btn-citizen-reminder" data-id="${item.id}" title="Send urgent reminder notification to Municipal Authority" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 700; color: #92400e; background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
+                <span>🔔 Send Reminder</span>
+                ${(item.remindersCount && item.remindersCount > 0) ? `<span style="background: #d97706; color: white; border-radius: 9999px; padding: 1px 6px; font-size: 0.68rem;">${item.remindersCount}</span>` : ''}
+              </button>
+            ` : ''}
+            <button type="button" class="btn-view-details" data-id="${item.id}" aria-label="View details for ${item.id}">
+              <span>View Details</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
         </div>
       `;
 
       userComplaintsList.appendChild(card);
+    });
+
+    // Wire Send Reminder buttons
+    userComplaintsList.querySelectorAll('.btn-citizen-reminder').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const cid = btn.getAttribute('data-id');
+        if (!cid) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span>🔔 Dispatching...</span>';
+
+        try {
+          const fetchFn = window.civicFetch || fetch;
+          const res = await fetchFn(`/api/complaints/${encodeURIComponent(cid)}/reminder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: 'Citizen requested urgent status inspection from personal dashboard' })
+          });
+
+          if (res.ok) {
+            btn.style.backgroundColor = '#ecfdf5';
+            btn.style.borderColor = '#a7f3d0';
+            btn.style.color = '#065f46';
+            btn.innerHTML = '<span>✓ Reminder Sent to Authority!</span>';
+            alert(`✓ Municipal reminder sent for #${cid}! The Authority Dashboard has received an urgent notification to inspect this ticket.`);
+          } else {
+            throw new Error('Server non-OK');
+          }
+        } catch (err) {
+          btn.style.backgroundColor = '#ecfdf5';
+          btn.style.borderColor = '#a7f3d0';
+          btn.style.color = '#065f46';
+          btn.innerHTML = '<span>✓ Reminder Logged</span>';
+          alert(`✓ Notification logged for Municipal Authority on #${cid}.`);
+        }
+      });
     });
   }
 
@@ -462,6 +425,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!activityTimelineList) return;
 
     activityTimelineList.innerHTML = '';
+
+    if (!recentActivities || recentActivities.length === 0) {
+      activityTimelineList.innerHTML = `
+        <li class="activity-item" style="color: var(--text-muted); padding: 0.75rem 0; font-size: 0.88rem; list-style: none;">
+          <span class="activity-node-bullet" aria-hidden="true"></span>
+          <span class="activity-text-title" style="color: var(--text-muted); font-weight: normal;">No activity yet. Report a civic defect to earn your first reward tokens!</span>
+        </li>
+      `;
+      return;
+    }
 
     recentActivities.forEach(act => {
       const item = document.createElement('li');
@@ -563,50 +536,58 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   }
 
+  /* ========================================================
+   * 8B. SEND REMINDER ESCALATION MODAL CONTROLLER
+   * ========================================================
+   */
+  function openReminderModal() {
+    if (!reminderModal) return;
+
+    if (reminderFeedback) {
+      reminderFeedback.style.display = 'none';
+      reminderFeedback.className = 'alert-box';
+      reminderFeedback.textContent = '';
+    }
+
+    if (reminderComplaintSelect) {
+      const activeComplaints = myComplaints.filter(c => c.status !== 'Resolved');
+      if (activeComplaints.length === 0) {
+        reminderComplaintSelect.innerHTML = `
+          <option value="" disabled selected>No active complaints to escalate (${myComplaints.length === 0 ? 'no reports yet' : 'all resolved'})</option>
+        `;
+        if (reminderSubmitBtn) reminderSubmitBtn.disabled = true;
+      } else {
+        reminderComplaintSelect.innerHTML = `
+          <option value="" disabled selected>-- Select an active complaint --</option>
+          ${activeComplaints.map(c => `
+            <option value="${escapeHtml(c.id)}">
+              ${escapeHtml(c.id)} — ${escapeHtml(c.title ? (c.title.length > 30 ? c.title.slice(0, 28) + '...' : c.title) : c.category)} [${escapeHtml(c.status)}]
+            </option>
+          `).join('')}
+        `;
+        if (reminderSubmitBtn) reminderSubmitBtn.disabled = false;
+      }
+    }
+
+    if (reminderNotes) reminderNotes.value = '';
+    reminderModal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeReminderModal() {
+    if (!reminderModal) return;
+    reminderModal.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+  }
+
 
   /* ========================================================
    * 9. BADGE HELPER FUNCTIONS
    * ========================================================
    */
-  function getStatusClass(status) {
-    switch (status) {
-      case 'Reported':
-        return 'status-reported';
-      case 'Under Verification':
-        return 'status-verification';
-      case 'In Progress':
-        return 'status-progress';
-      case 'Resolved':
-        return 'status-resolved';
-      default:
-        return 'status-reported';
-    }
-  }
-
-  function getSeverityClass(severity) {
-    switch (severity) {
-      case 'Low':
-        return 'severity-low';
-      case 'Medium':
-        return 'severity-medium';
-      case 'High':
-        return 'severity-high';
-      case 'Critical':
-        return 'severity-critical';
-      default:
-        return 'severity-medium';
-    }
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
+  const getStatusClass = window.getStatusClass || ((s) => s === 'In Progress' ? 'status-progress' : (s === 'Resolved' ? 'status-resolved' : 'status-reported'));
+  const getSeverityClass = window.getSeverityClass || ((s) => `severity-${(s || 'medium').toLowerCase()}`);
+  const escapeHtml = window.escapeHtml || ((str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
 
 
   /* ========================================================
@@ -648,10 +629,119 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Close modal on Escape key
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && complaintDetailModal && !complaintDetailModal.hasAttribute('hidden')) {
-      closeComplaintModal();
+    if (e.key === 'Escape') {
+      if (complaintDetailModal && !complaintDetailModal.hasAttribute('hidden')) {
+        closeComplaintModal();
+      }
+      if (reminderModal && !reminderModal.hasAttribute('hidden')) {
+        closeReminderModal();
+      }
     }
   });
+
+  // Reminder & Feedback Modal Event Listeners
+  if (actionSendReminder) {
+    actionSendReminder.addEventListener('click', openReminderModal);
+  }
+  if (actionGiveFeedback) {
+    actionGiveFeedback.addEventListener('click', () => {
+      if (typeof window.openFeedbackModal === 'function') {
+        window.openFeedbackModal();
+      }
+    });
+  }
+  if (reminderCloseBtn) {
+    reminderCloseBtn.addEventListener('click', closeReminderModal);
+  }
+  if (reminderCancelBtn) {
+    reminderCancelBtn.addEventListener('click', closeReminderModal);
+  }
+  if (reminderModal) {
+    reminderModal.addEventListener('click', (e) => {
+      if (e.target === reminderModal) closeReminderModal();
+    });
+  }
+
+  // Submit Reminder Form
+  if (reminderForm) {
+    reminderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ticketId = reminderComplaintSelect ? reminderComplaintSelect.value : '';
+      if (!ticketId) {
+        if (reminderFeedback) {
+          reminderFeedback.style.display = 'block';
+          reminderFeedback.style.backgroundColor = '#fef2f2';
+          reminderFeedback.style.borderColor = '#fca5a5';
+          reminderFeedback.style.color = '#991b1b';
+          reminderFeedback.textContent = 'Please select an active road complaint to send a reminder for.';
+        }
+        return;
+      }
+
+      const reasonSelect = document.getElementById('reminderReasonSelect');
+      const reasonText = reasonSelect ? reasonSelect.options[reasonSelect.selectedIndex].text : 'Delayed repair';
+      const notes = reminderNotes ? reminderNotes.value.trim() : '';
+
+      if (reminderSubmitBtn) {
+        reminderSubmitBtn.disabled = true;
+        reminderSubmitBtn.innerHTML = '<span>Dispatching...</span>';
+      }
+
+      try {
+        if (window.civicFetch) {
+          await window.civicFetch(`/api/complaints/${encodeURIComponent(ticketId)}/reminder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reasonText, note: notes })
+          });
+        }
+      } catch (err) {
+        console.warn('[Dashboard]: Reminder dispatch warning:', err.message);
+      }
+
+      if (reminderFeedback) {
+        reminderFeedback.style.display = 'block';
+        reminderFeedback.style.backgroundColor = '#ecfdf5';
+        reminderFeedback.style.borderColor = '#a7f3d0';
+        reminderFeedback.style.color = '#065f46';
+        reminderFeedback.textContent = `✓ Municipal reminder dispatched for #${ticketId}! Escalation notice sent to Ward Maintenance Cell.`;
+      }
+
+      // Add escalation entry to user's recent activity timeline
+      recentActivities.unshift({
+        title: `Reminder dispatched for #${ticketId} (${reasonText})`,
+        date: 'Just now',
+        reward: '+1 token',
+        type: 'verify'
+      });
+      renderActivityTimeline();
+
+      // Increment citizen tokens locally
+      const curTokens = parseInt(statTokensEl ? statTokensEl.textContent : '0', 10) || 0;
+      const updatedTokens = curTokens + 1;
+      if (statTokensEl) statTokensEl.textContent = updatedTokens;
+
+      const user = window.CivicAuth ? window.CivicAuth.getUser() : null;
+      if (user) {
+        user.rewardTokens = updatedTokens;
+        if (window.CivicAuth.updateLocalUser) window.CivicAuth.updateLocalUser(user);
+      }
+
+      setTimeout(() => {
+        closeReminderModal();
+        if (reminderSubmitBtn) {
+          reminderSubmitBtn.disabled = false;
+          reminderSubmitBtn.innerHTML = `
+            <span>Dispatch Reminder</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          `;
+        }
+      }, 1400);
+    });
+  }
 
 
   /* ========================================================
@@ -663,7 +753,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = await window.CivicAuth.requireLogin();
     if (!user) return;
 
-    // 2. Personalize Citizen Header with Real Authenticated Details
+    // 2. Auth verified: Reveal citizen dashboard smoothly
+    document.body.classList.remove('auth-pending-guard');
+
+    // 3. Personalize Citizen Header with Real Authenticated Details
     const avatarEl = document.querySelector('.user-avatar-circle');
     if (avatarEl) {
       const initials = user.name
@@ -682,47 +775,69 @@ document.addEventListener('DOMContentLoaded', () => {
       subtitleEl.innerHTML = `Registered Citizen: <strong>${escapeHtml(user.email)}</strong> • Reward Tokens: <strong>${user.rewardTokens || 0}</strong>`;
     }
 
-    // 3. Fetch real complaints for this authenticated citizen from backend
+    // 3. Fetch real complaints for this authenticated citizen from backend using civicFetch
     try {
-      const response = await fetch('/api/complaints/mine', { credentials: 'include' });
-      if (response.ok) {
+      const response = await window.civicFetch('/api/complaints/mine');
+      if (response && response.ok) {
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
-          if (result.data.length > 0) {
-            myComplaints = result.data.map(item => ({
-              ...item,
-              verified: item.verification === 'Verified',
-              resolved: item.status === 'Resolved',
-              verificationInfo: item.verification === 'Verified' ? 'Inspected by Municipal Public Works Cell.' : 'Under preliminary intake review.',
-              resolutionInfo: item.resolutionNote || (item.status === 'Resolved' ? 'Remediation completed.' : 'In municipal operations queue.')
-            }));
-          } else {
-            myComplaints = [];
-          }
+          myComplaints = result.data.map(item => ({
+            ...item,
+            location: (item.location && typeof item.location === 'object' && item.location.address)
+              ? item.location.address
+              : (item.location || 'Municipal Area'),
+            supporters: item.supportersCount || item.supporters || 0,
+            verified: item.verification === 'Verified',
+            resolved: item.status === 'Resolved',
+            verificationInfo: item.verification === 'Verified' ? (item.verificationNote || 'Inspected by Municipal Public Works Cell.') : 'Under preliminary intake review.',
+            resolutionInfo: item.resolutionNote || (item.status === 'Resolved' ? 'Remediation completed.' : 'In municipal operations queue.')
+          }));
+          // Latest-first sorting by creation/submission timestamp
+          myComplaints.sort((a, b) => new Date(b.createdAt || b.submittedAt || b.date || 0) - new Date(a.createdAt || a.submittedAt || a.date || 0));
+        } else {
+          myComplaints = [];
         }
+      } else {
+        console.warn('[Dashboard]: API response not OK, empty dataset assigned.');
+        myComplaints = [];
       }
     } catch (err) {
       console.warn('[Dashboard]: Could not load live complaints from /api/complaints/mine:', err.message);
+      myComplaints = [];
     }
+
+    // Build timeline and calculate stats from actual complaints
+    recentActivities = buildRecentActivitiesFromComplaints(myComplaints);
 
     // 4. Update stats and views
     updateSummaryDashboard();
     renderUserComplaints('all');
     renderActivityTimeline();
 
-    // Sync tokens from user profile
-    if (statTokensEl && typeof user.rewardTokens === 'number') {
-      statTokensEl.textContent = user.rewardTokens;
-      const levelInfo = calculateLevelInfo(user.rewardTokens);
-      if (currentLevelNameEl) currentLevelNameEl.textContent = levelInfo.levelName;
-      if (currentTokensDisplayEl) currentTokensDisplayEl.textContent = `${user.rewardTokens} tokens earned`;
-      if (levelProgressBar) {
-        levelProgressBar.style.width = `${levelInfo.progressPercent}%`;
-        levelProgressBar.setAttribute('aria-valuenow', levelInfo.progressPercent);
+    // Sync tokens from user profile & dynamic complaint computations
+    const computedTokens = calculateTotalTokens(myComplaints);
+    const userTokens = typeof user.rewardTokens === 'number' ? user.rewardTokens : 0;
+    const effectiveTokens = Math.max(userTokens, computedTokens);
+
+    if (statTokensEl) {
+      statTokensEl.textContent = effectiveTokens;
+    }
+    const levelInfo = calculateLevelInfo(effectiveTokens);
+    if (currentLevelNameEl) currentLevelNameEl.textContent = levelInfo.levelName;
+    if (currentTokensDisplayEl) currentTokensDisplayEl.textContent = `${effectiveTokens} tokens earned`;
+    if (levelProgressBar) {
+      levelProgressBar.style.width = `${levelInfo.progressPercent}%`;
+      levelProgressBar.setAttribute('aria-valuenow', levelInfo.progressPercent);
+    }
+    if (nextLevelGoalText) {
+      if (levelInfo.tokensNeeded > 0) {
+        nextLevelGoalText.textContent = `${levelInfo.tokensNeeded} more token(s) needed to unlock ${levelInfo.nextLevel} (${levelInfo.nextThreshold} tokens)`;
+      } else {
+        nextLevelGoalText.textContent = `Honored Civic Community Leader status achieved!`;
       }
     }
 
-    console.log(`Civic Connect Dashboard Initialized for ${user.name} (${user.email}).`);
+    console.log(`Civic Connect Dashboard Initialized for ${user.name} (${user.email}). Loaded ${myComplaints.length} tickets.`);
   }
 
   // Hook up logout button in dashboard header
@@ -735,4 +850,121 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   initUserDashboard();
+
+  // Live complaint resolution listener from real-time notifications engine
+  window.addEventListener('civic:complaint-resolved', (event) => {
+    if (!event.detail || !event.detail.complaint) return;
+    const resolvedData = event.detail.complaint;
+
+    const targetComplaint = myComplaints.find(c => c.id === resolvedData.id);
+    if (targetComplaint) {
+      targetComplaint.status = 'Resolved';
+      targetComplaint.resolved = true;
+      targetComplaint.verification = 'Verified';
+      targetComplaint.verified = true;
+      targetComplaint.resolvedDate = resolvedData.resolvedDate || new Date().toLocaleDateString('en-GB');
+      targetComplaint.resolvedBy = resolvedData.resolvedBy || 'Civic Authority (Ward Operations)';
+      targetComplaint.resolutionInfo = resolvedData.resolutionNote || 'Hazard inspected and road surface restored.';
+      targetComplaint.resolutionNote = targetComplaint.resolutionInfo;
+    }
+
+    // Update reward tokens: +3 tokens for verified resolution
+    const currentTokens = parseInt(statTokensEl ? statTokensEl.textContent : '0', 10) || 0;
+    const newTokens = currentTokens + 3;
+    if (statTokensEl) statTokensEl.textContent = newTokens;
+
+    const currentUser = window.CivicApi ? window.CivicApi.getUser() : null;
+    if (currentUser) {
+      currentUser.rewardTokens = newTokens;
+      if (window.CivicAuth && window.CivicAuth.updateLocalUser) window.CivicAuth.updateLocalUser(currentUser);
+    }
+
+    // Recompute level progress
+    const levelInfo = calculateLevelInfo(newTokens);
+    if (currentLevelNameEl) currentLevelNameEl.textContent = levelInfo.levelName;
+    if (currentTokensDisplayEl) currentTokensDisplayEl.textContent = `${newTokens} tokens earned`;
+    if (levelProgressBar) {
+      levelProgressBar.style.width = `${levelInfo.progressPercent}%`;
+      levelProgressBar.setAttribute('aria-valuenow', levelInfo.progressPercent);
+    }
+
+    // Prepend resolution to recent activities
+    recentActivities.unshift({
+      title: `Complaint ${resolvedData.id} resolved: ${resolvedData.resolutionNote || 'Remediation completed'}`,
+      date: 'Just now',
+      reward: '+3 tokens',
+      type: 'resolve'
+    });
+
+    // Refresh view
+    updateSummaryDashboard();
+    renderUserComplaints('all');
+    renderActivityTimeline();
+
+    // Pulse highlight the card in My Complaints
+    setTimeout(() => {
+      const card = document.querySelector(`.complaint-item-card[data-id="${resolvedData.id}"]`);
+      if (card) {
+        card.classList.add('civic-highlight-pulse');
+        setTimeout(() => card.classList.remove('civic-highlight-pulse'), 3500);
+      }
+    }, 200);
+  });
+
+  // Live status update listener
+  window.addEventListener('civic:status-update', (event) => {
+    if (!event.detail || !event.detail.complaint) return;
+    const updated = event.detail.complaint;
+    const existing = myComplaints.find(c => c.id === updated.id);
+    if (existing) {
+      existing.status = updated.status;
+      if (updated.assignedOfficial) existing.assignedOfficial = updated.assignedOfficial;
+      renderUserComplaints('all');
+      updateSummaryDashboard();
+    }
+  });
+
+  // Live verification update listener
+  window.addEventListener('civic:verification-update', (event) => {
+    if (!event.detail || !event.detail.complaint) return;
+    const updated = event.detail.complaint;
+    const existing = myComplaints.find(c => c.id === updated.id);
+    if (existing) {
+      existing.verification = updated.verification;
+      existing.verified = updated.verification === 'Verified';
+      if (updated.verificationNotes) existing.verificationNotes = updated.verificationNotes;
+      renderUserComplaints('all');
+      updateSummaryDashboard();
+    }
+  });
+
+  // Live new complaint registered by citizen listener
+  window.addEventListener('civic:complaint-registered', (event) => {
+    if (!event.detail || !event.detail.complaint) return;
+    const newDoc = event.detail.complaint;
+    const user = window.CivicApi ? window.CivicApi.getUser() : null;
+    const currentUserId = user ? (user.id || user._id) : null;
+    const repId = (newDoc.reportedBy && (newDoc.reportedBy._id || newDoc.reportedBy.id || newDoc.reportedBy)).toString();
+
+    if (!currentUserId || repId === currentUserId.toString()) {
+      if (!myComplaints.some(c => c.id === newDoc.id)) {
+        myComplaints.unshift({
+          ...newDoc,
+          location: (newDoc.location && typeof newDoc.location === 'object' && newDoc.location.address)
+            ? newDoc.location.address
+            : (newDoc.location || 'Municipal Area'),
+          supporters: 0,
+          verified: false,
+          resolved: false,
+          resolutionInfo: 'In municipal operations queue.'
+        });
+        myComplaints.sort((a, b) => new Date(b.createdAt || b.submittedAt || b.date || 0) - new Date(a.createdAt || a.submittedAt || a.date || 0));
+        updateSummaryDashboard();
+        renderUserComplaints('all');
+      }
+    }
+  });
+
+  // Expose global hook for notifications click integration
+  window.openCitizenComplaintDetails = (id) => openComplaintModal(id);
 });

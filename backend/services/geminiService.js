@@ -339,7 +339,66 @@ function getFallbackDuplicateCheck(newReport, candidates) {
   };
 }
 
+/**
+ * 3. Generate Factual Emergency Incident Summary (Optional AI Assistant)
+ * Formats user-provided facts into a concise dispatcher-ready incident briefing.
+ * Never invents injuries, casualties, or vehicles not reported by citizen.
+ */
+async function generateEmergencyIncidentSummary(reportData) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const desc = reportData.description || 'Road accident reported.';
+  const casualties = reportData.estimatedCasualties || 'Unspecified';
+  const addr = (reportData.location && reportData.location.address) || 'Pinned Coordinates';
+  const imgCount = (reportData.images && reportData.images.length) || 0;
+
+  // Immediate rule-based fallback if no Gemini key or fast response needed
+  const ruleSummary = `Road accident reported at ${addr}. Observed conditions: ${casualties}. Attached evidence: ${imgCount} photo(s).`;
+
+  if (!apiKey) {
+    return {
+      summary: ruleSummary,
+      suggestedUrgency: casualties.includes('Injuries') || casualties.includes('Critical') ? 'Critical' : 'High',
+      extractedKeyDetails: [addr, casualties, `${imgCount} photos`]
+    };
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = `
+You are an emergency civic response assistant. Create a 1-sentence strictly factual dispatch summary from this citizen accident report:
+- Address: ${addr}
+- Citizen Notes: ${desc}
+- Casualties/Injuries Reported: ${casualties}
+- Photographs: ${imgCount} attached
+
+RULES:
+1. Do NOT invent people, vehicle types, or injuries not present in the input.
+2. Return ONLY a single concise, professional sentence for emergency dispatch.
+`.trim();
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [{ text: prompt }]
+    });
+
+    const text = response && response.text ? response.text.trim() : ruleSummary;
+    return {
+      summary: text,
+      suggestedUrgency: casualties.includes('Injuries') || casualties.includes('Critical') ? 'Critical' : 'High',
+      extractedKeyDetails: [addr, casualties, `${imgCount} photos`]
+    };
+  } catch (err) {
+    console.warn('[Gemini AI Emergency]: AI summary fallback used:', err.message);
+    return {
+      summary: ruleSummary,
+      suggestedUrgency: casualties.includes('Injuries') ? 'Critical' : 'High',
+      extractedKeyDetails: [addr, casualties, `${imgCount} photos`]
+    };
+  }
+}
+
 module.exports = {
   analyzeComplaint,
-  checkDuplicateWithGemini
+  checkDuplicateWithGemini,
+  generateEmergencyIncidentSummary
 };

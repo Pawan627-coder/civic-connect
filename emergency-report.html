@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Civic Connect - Emergency Accident Response. Capture live verified crash scene photos, lock accident coordinates, and identify nearest trauma hospitals and police stations.">
+  <title>Emergency Accident Response | Civic Connect</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23dc2626'><path d='M12 2L1 21h22L12 2zm0 4l7.53 13H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans for clean, modern Civic Connect typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Core & Shared Styles -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="notifications.css">
+  <link rel="stylesheet" href="emergency-report.css">
+
+  <!-- Leaflet CSS for Map Engine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+</head>
+<body class="emergency-page-body">
+
+  <!-- ========================================================
+       1. NAVIGATION BAR (100% Identical to Homepage Header)
+       ======================================================== -->
+  <header class="site-header" id="top">
+    <div class="container nav-container">
+      <!-- Brand Logo & Name -->
+      <a href="index.html" class="brand-link" aria-label="Civic Connect Home">
+        <div class="logo-wrapper">
+          <img 
+            src="assets/logo.png" 
+            alt="Civic Connect Logo" 
+            class="brand-logo"
+            onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex';"
+          >
+          <div class="logo-fallback" id="logoFallback">CC</div>
+        </div>
+        <div class="brand-text-group">
+          <span class="brand-name">CIVIC CONNECT</span>
+          <span class="brand-tagline">Road Safety & Civic Action</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="index.html#hero" class="nav-link">Home</a></li>
+          <li><a href="report-problem.html" class="nav-link">Report Problem</a></li>
+          <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
+          <li>
+            <a href="emergency-report.html" class="nav-link active emergency-nav-pill" aria-current="page">
+              <span class="nav-emergency-dot"></span> Emergency
+            </a>
+          </li>
+          <li class="nav-item-dashboard" data-auth="required" style="display: none;">
+            <a href="dashboard.html" class="nav-link" id="navDashboardLink">Dashboard</a>
+          </li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline-nav">Login</a>
+          <a href="signup.html" class="btn btn-secondary-nav">Sign Up</a>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        type="button" 
+        class="mobile-toggle" 
+        id="mobileMenuToggle" 
+        aria-label="Toggle navigation menu" 
+        aria-expanded="false" 
+        aria-controls="navMenu"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="emergency-main-wrapper">
+    <div class="container emergency-layout-container">
+
+      <!-- ========================================================
+           HERO SECTION (Matching Homepage Hero Design)
+           ======================================================== -->
+      <section class="emergency-hero-banner">
+        <div class="hero-badge emergency-badge-pill">
+          <span class="badge-dot badge-dot-red"></span>
+          Immediate Road Safety Priority
+        </div>
+        <h1 class="emergency-hero-title">
+          Emergency Accident Response Hub
+        </h1>
+        <p class="emergency-hero-desc">
+          Capture verified live collision scene photographs to automatically lock crash GPS coordinates, discover nearest trauma hospitals & police stations, and transmit critical alerts to rescue channels.
+        </p>
+
+        <!-- Direct Emergency 112 Hotline Banner -->
+        <div class="emergency-hotline-banner">
+          <div class="hotline-icon-wrap">🚨</div>
+          <div class="hotline-text-wrap">
+            <strong>CRITICAL LIFE SAFETY ADVISORY:</strong>
+            <p>If anyone is seriously injured, trapped, or in immediate danger, dial <strong>112</strong> directly from your phone. Do not delay medical aid.</p>
+          </div>
+          <a href="tel:112" class="btn btn-hotline-dial">
+            <span class="pulse-call-dot"></span>
+            <span>📞 Call 112 Now</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           COLLEGE PROJECT VIVA DEMO BANNER (Matching Civic Card Style)
+           ======================================================== -->
+      <section class="college-viva-card" id="collegeDemoBar">
+        <div class="viva-card-top">
+          <div class="viva-badge-pill">
+            <span class="viva-pill-dot"></span>
+            🎓 College Mini-Project Viva Demonstration Mode
+          </div>
+          <div class="viva-tag-note">Simulated Telephony Guard Active</div>
+        </div>
+        <div class="viva-card-body">
+          <p class="viva-explanation">
+            To prevent accidental automated calls to public emergency switchboards (112 / hospitals / police stations), outbound automated voice dispatch calls in this demo are safely routed to your <strong>personal test phone number</strong>.
+          </p>
+          <div class="viva-phone-control-row">
+            <label for="demoReceiverPhoneInput" class="viva-input-label">
+              📱 Demo Voice Dispatch Receiver Number:
+            </label>
+            <div class="viva-input-group">
+              <input 
+                type="tel" 
+                id="demoReceiverPhoneInput" 
+                class="form-control viva-phone-field" 
+                placeholder="+91 98765 43210" 
+                value="+919876543210"
+                title="Enter your student phone number to test voice alerts"
+              >
+              <button type="button" class="btn btn-viva-set" id="btnSaveDemoPhone">
+                ✓ Set Number
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           SCREEN 1: EMERGENCY REPORT FORM
+           ======================================================== -->
+      <section id="emergencyFormSection" class="emergency-form-wrapper">
+        <form id="emergencyReportForm" novalidate>
+
+          <!-- ========================================================
+               STEP 1: LIVE SCENE CAMERA CAPTURE (MANDATORY, NO GALLERY)
+               ======================================================== -->
+          <div class="civic-step-card">
+            <div class="step-card-header">
+              <div class="step-circle-num">01</div>
+              <div class="step-header-text">
+                <div class="step-title-row">
+                  <h2 class="step-main-title">Live Accident Scene Capture</h2>
+                  <span class="badge-mandatory-pill">Mandatory • Live Camera Only</span>
+                </div>
+                <p class="step-subtitle">
+                  Photographs must be snapped <strong>live from the accident scene</strong> to verify authentic collision telemetry. Gallery image uploads are strictly disabled.
+                </p>
+              </div>
+            </div>
+
+            <!-- Viewfinder Container -->
+            <div class="viewfinder-wrapper" id="cameraHudContainer">
+              <div class="viewfinder-screen">
+                <video id="liveCameraFeed" autoplay playsinline muted class="viewfinder-video"></video>
+                <canvas id="cameraCaptureCanvas" style="display: none;"></canvas>
+
+                <!-- Reticle HUD Overlay -->
+                <div class="reticle-hud" aria-hidden="true">
+                  <div class="reticle-corner top-left"></div>
+                  <div class="reticle-corner top-right"></div>
+                  <div class="reticle-corner bottom-left"></div>
+                  <div class="reticle-corner bottom-right"></div>
+                  <div class="reticle-center-cross"></div>
+                </div>
+
+                <!-- Top Telemetry Badges -->
+                <div class="viewfinder-top-bar">
+                  <div class="vf-badge-live">
+                    <span class="vf-live-dot"></span>
+                    <span id="cameraStateLabel">LIVE VIEW SENSOR</span>
+                  </div>
+                  <div class="vf-badge-gps" id="hudGpsTag">
+                    <span>🛰️ GPS SYNC: READY</span>
+                  </div>
+                </div>
+
+                <!-- Bottom Telemetry Banner -->
+                <div class="viewfinder-bottom-bar">
+                  <span id="hudTimestamp">--:--:--</span>
+                  <span class="vf-bar-sep">•</span>
+                  <span id="hudCoordsSnippet">GPS auto-locks at accident site on shutter snap</span>
+                </div>
+
+                <!-- Shutter Flash Overlay -->
+                <div id="cameraFlashOverlay" class="viewfinder-flash-overlay"></div>
+
+                <!-- Fallback / Camera Inactive Placeholder -->
+                <div id="cameraOffPlaceholder" class="viewfinder-fallback-screen" style="display: none;">
+                  <div class="vf-fallback-icon">📷</div>
+                  <h3 class="vf-fallback-title">Camera Sensor Standby</h3>
+                  <p class="vf-fallback-text">Click below to activate live camera feed or use the direct phone camera shutter.</p>
+                  <button type="button" class="btn btn-vf-activate" id="btnRestartCamera">
+                    ▶️ Activate Live Camera
+                  </button>
+                </div>
+              </div>
+
+              <!-- Shutter Command Bar -->
+              <div class="viewfinder-controls-bar">
+                <!-- Primary Shutter Button -->
+                <button type="button" class="btn btn-camera-shutter" id="btnSnapLivePhoto">
+                  <span class="shutter-icon-disc">📸</span>
+                  <span class="shutter-label-wrap">
+                    <strong class="shutter-main-label">Snap Live Photo</strong>
+                    <span class="shutter-sub-label">Auto-locks accident GPS on snap</span>
+                  </span>
+                </button>
+
+                <!-- Lens & Hardware Controls -->
+                <div class="viewfinder-tools-group">
+                  <button type="button" class="btn btn-tool-pill" id="btnSwitchCamera" title="Switch between Rear and Front Lens">
+                    <span>🔄 Flip Lens</span>
+                  </button>
+                  <button type="button" class="btn btn-tool-pill" id="btnToggleCameraStream" title="Pause or restart camera feed">
+                    <span id="toggleCamText">⏹️ Stop Cam</span>
+                  </button>
+                  
+                  <!-- Mobile Direct Camera Sensor Fallback (strict capture="environment") -->
+                  <input 
+                    type="file" 
+                    id="mobileDirectCameraInput" 
+                    accept="image/*" 
+                    capture="environment" 
+                    style="display: none;"
+                  >
+                  <button type="button" class="btn btn-tool-pill btn-mobile-sensor" id="btnTriggerMobileSensor" title="Launches direct hardware camera sensor on mobile devices">
+                    <span>📱 Mobile Direct Snap</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Mandatory Requirement Live Status Badge -->
+              <div class="photo-requirement-card">
+                <div class="requirement-badge-wrap" id="photoReqIndicator">
+                  <span class="req-icon">⚠️</span>
+                  <strong id="photoReqText">0 / 3 Live Photos Captured (At least 1 live photo is strictly required to submit)</strong>
+                </div>
+                <div class="requirement-hint">
+                  ⚡ <em>Each live photo automatically updates and pins GPS coordinates at the exact point of accident.</em>
+                </div>
+              </div>
+
+              <!-- Captured Live Photos Gallery Reel -->
+              <div id="capturedLivePhotosReel" class="captured-photos-grid">
+                <!-- Live captured photo cards rendered via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================
+               STEP 2: ACCIDENT SITE LOCATION & GPS TELEMETRY
+               ======================================================== -->
+          <div class="civic-step-card">
+            <div class="step-card-header">
+              <div class="step-circle-num">02</div>
+              <div class="step-header-text">
+                <div class="step-title-row">
+                  <h2 class="step-main-title">Accident Site Location & GPS Telemetry</h2>
+                  <span class="badge-autosync-pill" id="gpsAutoSyncBadge">⚡ Auto-Updates on Photo Capture</span>
+                </div>
+                <p class="step-subtitle">
+                  Accident coordinates are automatically pinned when you snap a photo. You can also tap "Acquire GPS" or drag the red emergency pin.
+                </p>
+              </div>
+            </div>
+
+            <!-- GPS Action Bar -->
+            <div class="location-action-bar">
+              <button type="button" class="btn btn-civic-teal" id="getAccidentLocationBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                </svg>
+                <span>Acquire High-Accuracy GPS</span>
+              </button>
+
+              <button type="button" class="btn btn-outline" id="retryAccidentLocationBtn" style="display: none;">
+                🔄 Retry GPS
+              </button>
+
+              <div class="location-status-text" id="locationStatusText">
+                📸 Snapping a live photo above will automatically synchronize coordinates at the accident point.
+              </div>
+            </div>
+
+            <!-- Coordinate Telemetry Chips -->
+            <div class="telemetry-chips-grid">
+              <div class="telemetry-chip">
+                <span class="t-label">Latitude</span>
+                <strong id="displayLatitude" class="t-val">--.------</strong>
+              </div>
+              <div class="telemetry-chip">
+                <span class="t-label">Longitude</span>
+                <strong id="displayLongitude" class="t-val">--.------</strong>
+              </div>
+              <div class="telemetry-chip">
+                <span class="t-label">GPS Precision</span>
+                <strong id="displayAccuracy" class="t-val">Pending Snap</strong>
+              </div>
+              <div class="telemetry-chip">
+                <span class="t-label">Time Locked</span>
+                <strong id="displayCaptureTime" class="t-val">--:--:--</strong>
+              </div>
+            </div>
+
+            <!-- Reverse Geocoded Landmark Address Field -->
+            <div class="form-group" style="margin-top: 1.25rem;">
+              <label for="accidentAddressInput" class="form-label">
+                Nearest Road Address / Landmark <span class="required-indicator">*</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">📍</span>
+                <input 
+                  type="text" 
+                  id="accidentAddressInput" 
+                  name="address" 
+                  class="form-control" 
+                  placeholder="Auto-detected road name or nearby landmark..."
+                  required
+                >
+              </div>
+              <span class="field-hint">Auto-detected from GPS pin. You can edit this landmark to help ambulance drivers navigate quickly.</span>
+            </div>
+
+            <!-- Leaflet Interactive Map Viewport -->
+            <div class="map-container-box">
+              <div id="accidentLeafletMap" style="width: 100%; height: 340px;"></div>
+              <div class="map-floating-tip">
+                💡 Drag red emergency marker or tap anywhere on the map to adjust exact crash site
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================
+               STEP 3: COLLISION SEVERITY & INCIDENT DETAILS
+               ======================================================== -->
+          <div class="civic-step-card">
+            <div class="step-card-header">
+              <div class="step-circle-num">03</div>
+              <div class="step-header-text">
+                <div class="step-title-row">
+                  <h2 class="step-main-title">Collision Severity & Incident Assessment</h2>
+                </div>
+                <p class="step-subtitle">
+                  Select the observed collision type to guide incoming emergency trauma and traffic clearance teams.
+                </p>
+              </div>
+            </div>
+
+            <!-- Interactive Severity Quick-Selector Grid -->
+            <div class="form-group">
+              <label class="form-label">Quick Collision Assessment</label>
+              <div class="severity-cards-grid" id="severityChipsGrid">
+                <button type="button" class="severity-select-card active" data-val="Injuries Observed - Immediate Medical Needed">
+                  <span class="card-icon">🚑</span>
+                  <div class="card-content">
+                    <strong>Critical Medical Trauma</strong>
+                    <small>Casualties / Victims Injured</small>
+                  </div>
+                </button>
+                <button type="button" class="severity-select-card" data-val="Severe Entrapment / Critical Collision">
+                  <span class="card-icon">💥</span>
+                  <div class="card-content">
+                    <strong>Severe Entrapment</strong>
+                    <small>Vehicle Mangled / Trapped</small>
+                  </div>
+                </button>
+                <button type="button" class="severity-select-card" data-val="Two-Wheeler / Pedestrian Hit">
+                  <span class="card-icon">🚲</span>
+                  <div class="card-content">
+                    <strong>Pedestrian / Bike Hit</strong>
+                    <small>Vulnerable Road User</small>
+                  </div>
+                </button>
+                <button type="button" class="severity-select-card" data-val="Vehicular Damage Only - Road Blocked">
+                  <span class="card-icon">🚧</span>
+                  <div class="card-content">
+                    <strong>Road / Lane Blocked</strong>
+                    <small>Traffic Gridlock / Road Hazard</small>
+                  </div>
+                </button>
+                <button type="button" class="severity-select-card" data-val="Fire or Fuel Leak Observed">
+                  <span class="card-icon">🔥</span>
+                  <div class="card-content">
+                    <strong>Fire / Fuel Spill</strong>
+                    <small>Explosion Risk / Hazard</small>
+                  </div>
+                </button>
+                <button type="button" class="severity-select-card" data-val="Minor Injuries / First Aid Needed">
+                  <span class="card-icon">⚠️</span>
+                  <div class="card-content">
+                    <strong>Minor Injuries</strong>
+                    <small>First Aid / Moderate Impact</small>
+                  </div>
+                </button>
+              </div>
+              <input type="hidden" id="estimatedCasualtiesSelect" name="estimatedCasualties" value="Injuries Observed - Immediate Medical Needed">
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="reporterPhoneInput" class="form-label">
+                  Your Phone Number (Optional)
+                </label>
+                <div class="input-with-icon">
+                  <span class="input-icon">📞</span>
+                  <input 
+                    type="tel" 
+                    id="reporterPhoneInput" 
+                    name="reporterPhone" 
+                    class="form-control" 
+                    placeholder="e.g. +91 98765 43210 (Optional contact)"
+                  >
+                </div>
+                <span class="field-hint">Optional contact for responding emergency officers.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="accidentDescriptionInput" class="form-label">
+                  Brief Incident Description
+                </label>
+                <div class="input-with-icon">
+                  <span class="input-icon">📝</span>
+                  <input 
+                    type="text"
+                    id="accidentDescriptionInput" 
+                    name="description" 
+                    class="form-control" 
+                    placeholder="Vehicles involved, blocked lanes, hazards..."
+                  >
+                </div>
+                <span class="field-hint">Brief factual summary to guide incoming emergency crews.</span>
+              </div>
+            </div>
+
+            <!-- Confirmation Checkbox -->
+            <div class="genuine-declaration-box">
+              <label class="custom-checkbox-label">
+                <input type="checkbox" id="genuineConfirmCheck" required checked>
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">
+                  I confirm this is an authentic emergency report. I understand that submitting false emergency alarms is illegal and wastes critical public safety resources.
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Action Buttons Bar -->
+          <div class="form-submit-row">
+            <button type="submit" class="btn btn-emergency-transmit" id="submitEmergencyBtn">
+              <span class="btn-spinner" id="submitSpinner" style="display: none;"></span>
+              <span id="submitBtnText">🚨 Submit Emergency Accident Report</span>
+            </button>
+            <a href="index.html" class="btn btn-cancel-outline">Cancel</a>
+          </div>
+
+          <p class="submit-note-hint" id="formMandatoryHint">
+            🔒 Note: Submission requires at least <strong>1 live captured photo</strong> in Step 1 and locked GPS coordinates.
+          </p>
+        </form>
+      </section>
+
+      <!-- ========================================================
+           SCREEN 2: RESPONSE DASHBOARD (Post-submission)
+           ======================================================== -->
+      <section id="emergencyResponseSection" class="emergency-response-wrapper" style="display: none;">
+        
+        <div class="response-header-card">
+          <div class="response-status-bar">
+            <div class="live-status-pill">
+              <span class="live-status-dot"></span>
+              <span id="resReportStatus">RECEIVED</span>
+            </div>
+            <div class="report-id-chip">
+              Report ID: <strong id="resReportId">ACC-2026-0000</strong>
+              <button type="button" class="btn-copy-id" id="copyReportIdBtn" title="Copy Report ID">📋</button>
+            </div>
+          </div>
+
+          <h2 class="response-heading">Accident Incident Logged Successfully</h2>
+          <p class="response-subtext">
+            Accident coordinates and live scene photographs have been securely stored in the municipal incident registry.
+          </p>
+
+          <!-- Direct Call Alert Card -->
+          <div class="response-direct-call-box">
+            <div class="call-box-icon">🚨</div>
+            <div class="call-box-content">
+              <h3>Immediate Emergency Medical / Police Assistance</h3>
+              <p>For urgent medical trauma, unconscious victims, or active fire, dial National Emergency Helpline directly:</p>
+            </div>
+            <a href="tel:112" class="btn btn-hero-dial">
+              📞 Call 112 (National Emergency)
+            </a>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             COLLEGE PROJECT VIVA VOICE DISPATCH CONSOLE
+             ======================================================== -->
+        <div class="viva-dispatch-console-card" id="vivaDemoDispatchCard">
+          <div class="viva-console-header">
+            <div class="viva-badge-pill">
+              <span class="viva-pill-dot"></span>
+              🎓 College Project Viva Voice Dispatch Console
+            </div>
+            <h3 class="viva-console-title">Test Automated Voice Alert on Your Phone</h3>
+            <p class="viva-console-desc">
+              During college viva presentations, demonstrate how the automated telephony dispatch system speaks incident coordinates to emergency teams.
+            </p>
+          </div>
+
+          <div class="viva-console-actions-grid">
+            <!-- Action 1: Call Phone Number -->
+            <div class="viva-action-card">
+              <div class="action-card-icon">📱</div>
+              <div class="action-card-text">
+                <strong>Dispatch Outbound Voice Call</strong>
+                <p>Places an automated dispatch call to: <span class="phone-chip" id="vivaActiveTargetPhone">+919876543210</span></p>
+              </div>
+              <button type="button" class="btn btn-viva-action" id="btnTriggerDemoCall">
+                <span class="btn-spinner" id="demoCallSpinner" style="display: none;"></span>
+                <span>📞 Call My Phone Now</span>
+              </button>
+            </div>
+
+            <!-- Action 2: In-Browser Speech Simulator -->
+            <div class="viva-action-card">
+              <div class="action-card-icon">🔊</div>
+              <div class="action-card-text">
+                <strong>In-Browser Voice Broadcast Simulation</strong>
+                <p>Listen to realistic emergency voice dispatch through laptop speakers (works without Twilio credentials).</p>
+              </div>
+              <button type="button" class="btn btn-speech-action" id="btnPlaySpeechDispatch">
+                <span>🔊 Play Dispatch Audio</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-Time Voice Message Transcript Box -->
+          <div class="speech-transcript-box" id="speechTranscriptBox" style="display: none;">
+            <div class="transcript-header">
+              <span class="audio-wave-anim"><span></span><span></span><span></span><span></span><span></span></span>
+              <strong>Simulated Automated Dispatch Voice Transmission:</strong>
+            </div>
+            <div class="transcript-body" id="speechTranscriptText">
+              <!-- Speech text will appear here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column Layout: Nearest Facilities & Dispatch Status -->
+        <div class="response-columns-grid">
+          
+          <!-- Column 1: Suggested Nearby Facilities -->
+          <div class="facilities-column-card">
+            <div class="facilities-header-row">
+              <div class="fac-heading-group">
+                <span class="fac-icon-big">🏥</span>
+                <div>
+                  <h3 class="fac-title">Suggested Nearby Emergency Facilities</h3>
+                  <p class="fac-desc">Based on accident coordinates (<span id="resCoordsSnippet">--</span>)</p>
+                </div>
+              </div>
+              <span class="fac-badge-count" id="resFacilitiesCount">0 Found</span>
+            </div>
+
+            <div class="fac-info-banner">
+              ⚠️ Facilities listed are geographical proximity suggestions. In college demo mode, voice alerts trigger simulation alerts to your designated test phone.
+            </div>
+
+            <!-- Facilities List -->
+            <div id="facilitiesList" class="facilities-items-list"></div>
+          </div>
+
+          <!-- Column 2: Notification & Dispatch Status Audit -->
+          <div class="audit-column-card">
+            <div class="facilities-header-row">
+              <div class="fac-heading-group">
+                <span class="fac-icon-big">📡</span>
+                <div>
+                  <h3 class="fac-title">Emergency Notification Status</h3>
+                  <p class="fac-desc">Verified facility contact and voice dispatch audit</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="audit-summary-box">
+              <div class="summary-row">
+                <span class="s-label">Contact State:</span>
+                <strong id="resContactState" class="s-val state-pending">NOTIFICATION_PENDING</strong>
+              </div>
+              <div class="summary-row">
+                <span class="s-label">Location Synced:</span>
+                <span id="resLocationAddress" class="s-val">Pinned Coordinates</span>
+              </div>
+              <div class="summary-row">
+                <span class="s-label">Attached Evidence:</span>
+                <span id="resImagesCount" class="s-val">0 Photos Attached</span>
+              </div>
+            </div>
+
+            <!-- Attached Evidence Thumbnail Preview in Dashboard -->
+            <div class="evidence-preview-section">
+              <h4 class="section-sub-title">Live Captured Evidence</h4>
+              <div id="resEvidenceGrid" class="evidence-thumbs-grid"></div>
+            </div>
+
+            <!-- Notification Attempts Timeline -->
+            <h4 class="section-sub-title">Dispatch Log & Contact Attempts</h4>
+            <div id="notificationAttemptsList" class="attempts-log-list">
+              <div class="empty-attempts-notice">
+                No outbound facility notification triggered yet. You can request a voice dispatch to any verified facility on the left or use the College Demo Dispatch console above.
+              </div>
+            </div>
+
+            <!-- Actions row -->
+            <div class="response-actions-row">
+              <button type="button" class="btn btn-outline" id="refreshStatusBtn">
+                🔄 Refresh Contact Status
+              </button>
+              <a href="view-complaints.html" class="btn btn-outline">
+                🗺️ View Hazard Map
+              </a>
+              <button type="button" class="btn btn-primary" onclick="window.location.reload()">
+                + New Emergency Report
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ========================================================
+       FOOTER (Matching Homepage Footer)
+       ======================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-content" style="text-align: center; padding: 2.5rem 1rem; color: #64748b; font-size: 0.9rem;">
+      <p><strong>Civic Connect Emergency Accident Response</strong> • College Mini-Project Implementation</p>
+      <p style="margin-top: 0.35rem;">In immediate life danger, always contact emergency authorities directly at <strong>112</strong> (Police / Ambulance / Fire).</p>
+    </div>
+  </footer>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="api-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="notifications.js"></script>
+  <script src="emergency-report.js"></script>
+</body>
+</html>

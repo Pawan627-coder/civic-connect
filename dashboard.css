@@ -239,6 +239,194 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* --------------------------------------------------------
+   3A. CIVIC ACTION SECTION (INSPIRED BY HOME PAGE DESIGN)
+   -------------------------------------------------------- */
+.civic-action-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 2.25rem 2rem;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2rem;
+}
+
+.civic-action-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.civic-action-eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary-teal);
+  margin-bottom: 0.5rem;
+}
+
+.civic-action-heading {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+  line-height: 1.25;
+  margin-bottom: 0.65rem;
+  letter-spacing: -0.02em;
+}
+
+.civic-action-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.55;
+}
+
+.civic-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.civic-action-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 1.75rem 1.35rem;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
+}
+
+.civic-action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(7, 84, 107, 0.1);
+  border-color: rgba(7, 84, 107, 0.35);
+}
+
+.civic-action-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.15rem;
+}
+
+.civic-action-icon-box {
+  width: 50px;
+  height: 50px;
+  border-radius: 13px;
+  background-color: #e6f6f5;
+  color: var(--primary-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.civic-action-card:hover .civic-action-icon-box {
+  transform: scale(1.06);
+}
+
+.civic-action-icon-box.view-icon {
+  background-color: var(--primary-teal);
+  color: #ffffff;
+}
+
+.civic-action-card:hover .civic-action-icon-box.view-icon {
+  background-color: #054154;
+}
+
+.civic-action-icon-box.reminder-icon {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.civic-action-card:hover .civic-action-icon-box.reminder-icon {
+  background-color: #fde68a;
+}
+
+.civic-action-icon-box.feedback-icon {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.civic-action-card:hover .civic-action-icon-box.feedback-icon {
+  background-color: #d1fae5;
+}
+
+.civic-action-card-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+  margin-bottom: 0.65rem;
+  line-height: 1.3;
+}
+
+.civic-action-card-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+  flex-grow: 1;
+}
+
+.civic-action-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.civic-action-pill-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-teal);
+  background-color: #e6f6f5;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.civic-action-pill-tag.tag-status {
+  color: var(--primary-teal);
+  background-color: #e6f6f5;
+}
+
+.civic-action-pill-tag.tag-reminder {
+  color: #b45309;
+  background-color: #fef3c7;
+}
+
+.civic-action-pill-tag.tag-feedback {
+  color: #059669;
+  background-color: #ecfdf5;
+}
+
+.civic-action-btn {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+}
+
 /* User Complaints Cards List */
 .my-complaints-list {
   display: flex;
@@ -679,6 +867,26 @@
   .dashboard-layout-grid {
     grid-template-columns: 1fr;
   }
+
+  .civic-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.15rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .civic-actions-grid {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+
+  .civic-action-heading {
+    font-size: 1.45rem;
+  }
+
+  .civic-action-panel {
+    padding: 1.75rem 1.25rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -735,3 +943,19 @@
     text-align: left;
   }
 }
+
+@media (max-width: 480px) {
+  .civic-action-card {
+    padding: 1.4rem 1.15rem;
+  }
+
+  .civic-action-icon-box {
+    width: 44px;
+    height: 44px;
+  }
+
+  .civic-action-card-title {
+    font-size: 1.1rem;
+  }
+}
+

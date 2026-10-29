@@ -26,29 +26,122 @@ document.addEventListener('DOMContentLoaded', () => {
   const locationErrorMsg = document.getElementById('locationError');
   const locationStatusBadge = document.getElementById('locationStatusBadge');
   const useLocationBtn = document.getElementById('useLocationBtn');
+  const retryLocationBtn = document.getElementById('retryLocationBtn');
+  const locationAlertBox = document.getElementById('locationAlertBox');
+  const locationSourceDisplay = document.getElementById('locationSourceDisplay');
+  const locationAccuracyDisplay = document.getElementById('locationAccuracyDisplay');
+  const locationTimeDisplay = document.getElementById('locationTimeDisplay');
+  const locationSourceInput = document.getElementById('locationSourceInput');
+  const locationAccuracyInput = document.getElementById('locationAccuracyInput');
+  const locationCapturedAtInput = document.getElementById('locationCapturedAtInput');
+  const locationLandmarkInput = document.getElementById('locationLandmark');
+  const locateLandmarkBtn = document.getElementById('locateLandmarkBtn');
+  const landmarkStatusText = document.getElementById('landmarkStatusText');
+  const landmarkSyncBadge = document.getElementById('landmarkSyncBadge');
   const mapFallbackOverlay = document.getElementById('mapFallbackOverlay');
   const mapFallbackDesc = document.getElementById('mapFallbackDesc');
+
+  // Photo Evidence Elements
+  const cameraCaptureBtn = document.getElementById('cameraCaptureBtn');
+  const cameraFileInput = document.getElementById('cameraFileInput');
+  const galleryUploadBtn = document.getElementById('galleryUploadBtn');
+  const photoFileInput = document.getElementById('photoFileInput');
+  const photoDropzone = document.getElementById('photoDropzone');
+  const photoPreviewGrid = document.getElementById('photoPreviewGrid');
+  const photoErrorMsg = document.getElementById('photoError');
+  const photoSourceInput = document.getElementById('photoSourceInput');
+  const photoUploadedAtInput = document.getElementById('photoUploadedAtInput');
+
+  // Live Camera Viewfinder Modal Elements
+  const cameraModal = document.getElementById('cameraModal');
+  const cameraVideo = document.getElementById('cameraVideo');
+  const cameraCanvas = document.getElementById('cameraCanvas');
+  const cameraSnapBtn = document.getElementById('cameraSnapBtn');
+  const cameraSwitchBtn = document.getElementById('cameraSwitchBtn');
+  const cameraCancelBtn = document.getElementById('cameraCancelBtn');
+  const cameraModalCloseBtn = document.getElementById('cameraModalCloseBtn');
+  const cameraPermissionPrompt = document.getElementById('cameraPermissionPrompt');
+  const cameraStatusMsg = document.getElementById('cameraStatusMsg');
+  const cameraFlash = document.getElementById('cameraFlash');
+
+  // Pre-submission Review Modal Elements
+  const preSubmitConfirmModal = document.getElementById('preSubmitConfirmModal');
+  const preSubmitSummaryContainer = document.getElementById('preSubmitSummaryContainer');
+  const preSubmitModalCloseBtn = document.getElementById('preSubmitModalCloseBtn');
+  const preSubmitModalEditBtn = document.getElementById('preSubmitModalEditBtn');
+  const preSubmitModalConfirmBtn = document.getElementById('preSubmitModalConfirmBtn');
 
   let googleMap = null;
   let googleMarker = null;
   let googleGeocoder = null;
   let isGoogleMapsLoaded = false;
 
+  let leafletMap = null;
+  let leafletMarker = null;
+  let leafletAccuracyCircle = null;
+  let isLeafletLoaded = false;
+
+  // Active Location Verification State
+  let currentLocationSource = 'manual'; // 'gps' | 'manual'
+  let currentLocationAccuracy = null;
+  let currentLocationCapturedAt = null;
+
   // Default coordinate (India geographic center, zoom 5)
   const DEFAULT_LAT = 20.5937;
   const DEFAULT_LNG = 78.9629;
   const DEFAULT_ZOOM = 5;
 
+  // Initialize free interactive Leaflet + OpenStreetMap engine
+  function initLeafletMap() {
+    if (!mapElement || !window.L) return;
+    try {
+      if (mapFallbackOverlay) mapFallbackOverlay.style.display = 'none';
+
+      // Default center: Gorakhpur hub or India center
+      const initialLat = 26.7606;
+      const initialLng = 83.3732;
+
+      leafletMap = L.map('problemMap').setView([initialLat, initialLng], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(leafletMap);
+
+      leafletMarker = L.marker([initialLat, initialLng], { draggable: true }).addTo(leafletMap);
+      setMapMarker(initialLat, initialLng, false, 'manual', null, null, true);
+
+      // When user drags the pin, automatically reverse geocode to landmark
+      leafletMarker.on('dragend', function () {
+        const pos = leafletMarker.getLatLng();
+        setMapMarker(pos.lat, pos.lng, false, 'manual', null, null, false);
+      });
+
+      // When user clicks the map, move pin and update landmark address automatically
+      leafletMap.on('click', function (e) {
+        leafletMarker.setLatLng(e.latlng);
+        setMapMarker(e.latlng.lat, e.latlng.lng, false, 'manual', null, null, false);
+      });
+
+      isLeafletLoaded = true;
+      updateLocationStatus('Interactive Map Active: Tap GPS, click map, or type landmark', 'success');
+      console.log('[Leaflet Map]: Interactive OpenStreetMap successfully initialized.');
+    } catch (err) {
+      console.error('[Leaflet Map Error]:', err);
+      setupMapFallback('Unable to initialize interactive map. GPS geolocation remains fully active.');
+    }
+  }
+
   // Load Google Maps JavaScript API dynamically using key from backend
   async function loadGoogleMaps() {
     try {
-      const res = await fetch('/api/config/maps-key');
+      const fetchFn = window.civicFetch || fetch;
+      const res = await fetchFn('/api/config/maps-key');
       const data = await res.json();
       const apiKey = data.mapsApiKey;
 
-      if (!apiKey) {
-        console.warn('[Google Maps]: GOOGLE_MAPS_API_KEY is not configured in .env. Enabling interactive GPS fallback mode.');
-        setupMapFallback('Google Maps Platform API key is not configured in .env. GPS geolocation and coordinate pinpointing remain fully active.');
+      if (!apiKey || apiKey.trim() === '') {
+        console.info('[Map Notice]: GOOGLE_MAPS_API_KEY is not configured in .env. Activating Leaflet + OpenStreetMap engine.');
+        initLeafletMap();
         return;
       }
 
@@ -69,14 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
       script.async = true;
       script.defer = true;
       script.onerror = () => {
-        console.error('[Google Maps]: Failed to load Google Maps script.');
-        setupMapFallback('Unable to connect to Google Maps Platform. GPS geolocation and coordinate selection are active.');
+        console.warn('[Google Maps]: Failed to load script. Switching to Leaflet + OpenStreetMap.');
+        initLeafletMap();
       };
       document.head.appendChild(script);
 
     } catch (err) {
-      console.warn('[Google Maps Notice]: Could not fetch maps configuration:', err.message);
-      setupMapFallback('Could not contact server for map configuration. GPS geolocation is available.');
+      console.warn('[Map Notice]: Error loading map configuration, falling back to Leaflet:', err.message);
+      initLeafletMap();
     }
   }
 
@@ -104,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
       googleMap.addListener('click', (e) => {
         const lat = e.latLng.lat();
         const lng = e.latLng.lng();
-        setMapMarker(lat, lng, false);
+        setMapMarker(lat, lng, false, 'manual', null, null, false);
       });
 
       updateLocationStatus('Click on map or use GPS to select hazard location', '');
@@ -112,11 +205,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       console.error('[Google Maps]: Initialization error:', err);
-      setupMapFallback('Error loading Google Map viewport. GPS geolocation is available.');
+      initLeafletMap();
     }
   }
 
-  // Fallback interactive mode when Google Maps API key is not loaded
+  // Fallback mode if both maps fail
   function setupMapFallback(message) {
     if (mapFallbackOverlay) {
       mapFallbackOverlay.style.display = 'flex';
@@ -124,25 +217,182 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mapFallbackDesc && message) {
       mapFallbackDesc.textContent = message;
     }
-    updateLocationStatus('Maps API key not configured — use GPS button', 'error');
+    updateLocationStatus('Map viewport unavailable — use GPS button', 'error');
+  }
 
-    // Allow user to click anywhere inside map viewport to simulate coordinates
-    if (mapElement) {
-      mapElement.style.cursor = 'crosshair';
-      mapElement.addEventListener('click', (e) => {
-        if (!isGoogleMapsLoaded) {
-          // Provide realistic coordinates (e.g. New Delhi area default simulation)
-          const simulatedLat = 28.6139 + (Math.random() - 0.5) * 0.05;
-          const simulatedLng = 77.2090 + (Math.random() - 0.5) * 0.05;
-          setMapMarker(simulatedLat, simulatedLng, false);
-          updateLocationStatus('Location coordinates selected', 'success');
+  let reverseGeocodeAbortCtrl = null;
+  let forwardGeocodeAbortCtrl = null;
+
+  // Format Nominatim reverse geocode response into a concise, meaningful landmark string
+  function formatNominatimAddress(data) {
+    if (!data) return '';
+    const addr = data.address || {};
+    const parts = [];
+
+    // Prioritize landmark / building / amenity / tourism
+    const poi = addr.amenity || addr.building || addr.shop || addr.tourism || addr.historic || addr.leisure || addr.office;
+    if (poi) parts.push(poi);
+
+    // Road / Street
+    if (addr.road) parts.push(addr.road);
+
+    // Neighborhood / Suburb
+    const local = addr.neighbourhood || addr.suburb || addr.residential || addr.subdivision;
+    if (local && !parts.includes(local)) parts.push(local);
+
+    // City / Town / District
+    const city = addr.city || addr.town || addr.village || addr.county;
+    if (city && !parts.includes(city)) parts.push(city);
+
+    if (parts.length > 0) {
+      return parts.slice(0, 3).join(', ');
+    }
+
+    return (data.display_name || '').split(',').slice(0, 3).join(', ');
+  }
+
+  // Reverse Geocode: Map Pin (lat, lng) -> Address in Landmark input
+  function reverseGeocodeCoordinates(lat, lng) {
+    if (!locationLandmarkInput) return;
+
+    if (landmarkStatusText) {
+      landmarkStatusText.textContent = '📍 Finding address for pinned location...';
+      landmarkStatusText.style.color = 'var(--primary-teal)';
+    }
+
+    // 1. Use Google Maps Geocoder if active
+    if (googleGeocoder) {
+      googleGeocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results && results[0]) {
+          applyReverseGeocodedAddress(results[0].formatted_address);
         }
       });
+      return;
+    }
+
+    // 2. OpenStreetMap Nominatim reverse geocoder
+    if (reverseGeocodeAbortCtrl) {
+      try { reverseGeocodeAbortCtrl.abort(); } catch (e) {}
+    }
+    reverseGeocodeAbortCtrl = new AbortController();
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+      headers: { 'Accept': 'application/json' },
+      signal: reverseGeocodeAbortCtrl.signal
+    })
+      .then(res => res.json())
+      .then(data => {
+        const readableAddress = formatNominatimAddress(data);
+        if (readableAddress) {
+          applyReverseGeocodedAddress(readableAddress);
+        }
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        console.warn('[Reverse Geocode Notice]:', err.message);
+      });
+  }
+
+  function applyReverseGeocodedAddress(address) {
+    if (!locationLandmarkInput) return;
+    locationLandmarkInput.value = address;
+
+    // Subtle green flash animation so user clearly sees the address updated from map
+    locationLandmarkInput.classList.remove('landmark-updated-flash');
+    void locationLandmarkInput.offsetWidth; // force reflow
+    locationLandmarkInput.classList.add('landmark-updated-flash');
+
+    if (landmarkStatusText) {
+      landmarkStatusText.textContent = `✓ Landmark updated from map pin: ${address}`;
+      landmarkStatusText.style.color = '#15803d';
+    }
+    if (landmarkSyncBadge) {
+      landmarkSyncBadge.textContent = '✓ Pinned location synced';
+      landmarkSyncBadge.style.color = '#15803d';
     }
   }
 
-  // Set or update marker position and sync form inputs
-  function setMapMarker(lat, lng, panToLocation = false) {
+  // Forward Geocode: Landmark input text -> Map view, Pin & Lat/Long
+  function geocodeLandmarkToMap(addressQuery) {
+    const query = (addressQuery || '').trim();
+    if (!query || query.length < 3) return;
+
+    if (landmarkStatusText) {
+      landmarkStatusText.textContent = `🔍 Locating "${query}" on map...`;
+      landmarkStatusText.style.color = 'var(--primary-teal)';
+    }
+    if (landmarkSyncBadge) {
+      landmarkSyncBadge.textContent = '🔍 Locating...';
+      landmarkSyncBadge.style.color = 'var(--primary-teal)';
+    }
+
+    // 1. Google Maps Geocoder
+    if (googleGeocoder) {
+      googleGeocoder.geocode({ address: query }, (results, status) => {
+        if (status === 'OK' && results && results[0] && results[0].geometry) {
+          const loc = results[0].geometry.location;
+          applyLandmarkToMapCoordinates(loc.lat(), loc.lng(), results[0].formatted_address || query);
+        } else {
+          showLandmarkGeocodeNotFound(query);
+        }
+      });
+      return;
+    }
+
+    // 2. OpenStreetMap Nominatim Geocoder
+    if (forwardGeocodeAbortCtrl) {
+      try { forwardGeocodeAbortCtrl.abort(); } catch (e) {}
+    }
+    forwardGeocodeAbortCtrl = new AbortController();
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
+      headers: { 'Accept': 'application/json' },
+      signal: forwardGeocodeAbortCtrl.signal
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          applyLandmarkToMapCoordinates(lat, lng, data[0].display_name);
+        } else {
+          showLandmarkGeocodeNotFound(query);
+        }
+      })
+      .catch(err => {
+        if (err.name === 'AbortError') return;
+        console.warn('[Forward Geocode Notice]:', err.message);
+        showLandmarkGeocodeNotFound(query);
+      });
+  }
+
+  function applyLandmarkToMapCoordinates(lat, lng, foundLabel) {
+    // Pan map & place pin, pass skipReverseGeocode = true so we don't overwrite user's typed input
+    setMapMarker(lat, lng, true, 'manual', null, null, true);
+
+    if (landmarkStatusText) {
+      landmarkStatusText.textContent = `✓ Map pin & coordinates updated for: ${foundLabel.split(',').slice(0, 2).join(', ')}`;
+      landmarkStatusText.style.color = '#15803d';
+    }
+    if (landmarkSyncBadge) {
+      landmarkSyncBadge.textContent = '✓ Map pin synced';
+      landmarkSyncBadge.style.color = '#15803d';
+    }
+  }
+
+  function showLandmarkGeocodeNotFound(query) {
+    if (landmarkStatusText) {
+      landmarkStatusText.textContent = `⚠️ Could not find exact map coordinates for "${query}". You can drag the pin manually.`;
+      landmarkStatusText.style.color = '#b45309';
+    }
+    if (landmarkSyncBadge) {
+      landmarkSyncBadge.textContent = '📍 Drop pin manually';
+      landmarkSyncBadge.style.color = '#b45309';
+    }
+  }
+
+  // Set or update marker position, evidence source, accuracy & sync form inputs
+  function setMapMarker(lat, lng, panToLocation = false, source = 'manual', accuracy = null, capturedAt = null, skipReverseGeocode = false) {
     const formattedLat = parseFloat(lat).toFixed(6);
     const formattedLng = parseFloat(lng).toFixed(6);
 
@@ -166,9 +416,86 @@ document.addEventListener('DOMContentLoaded', () => {
       locationErrorMsg.classList.remove('visible');
     }
 
+    // Update location verification state
+    currentLocationSource = source;
+    currentLocationAccuracy = accuracy !== null && !isNaN(accuracy) ? Math.round(accuracy) : null;
+    currentLocationCapturedAt = capturedAt || new Date().toISOString();
+
+    if (locationSourceInput) locationSourceInput.value = source;
+    if (locationAccuracyInput) locationAccuracyInput.value = currentLocationAccuracy !== null ? currentLocationAccuracy : '';
+    if (locationCapturedAtInput) locationCapturedAtInput.value = currentLocationCapturedAt;
+
+    const timeStr = new Date(currentLocationCapturedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (locationTimeDisplay) {
+      locationTimeDisplay.textContent = timeStr;
+    }
+
+    if (source === 'gps') {
+      if (locationSourceDisplay) {
+        locationSourceDisplay.innerHTML = `<span class="source-badge gps">🛰️ GPS Verified</span>`;
+      }
+      if (locationAccuracyDisplay) {
+        const precLabel = currentLocationAccuracy <= 25 ? 'High Precision' : (currentLocationAccuracy <= 60 ? 'Moderate' : 'Coarse');
+        locationAccuracyDisplay.textContent = `±${currentLocationAccuracy}m (${precLabel})`;
+      }
+      if (locationAlertBox) {
+        if (currentLocationAccuracy > 50) {
+          locationAlertBox.className = 'location-alert-box warning';
+          locationAlertBox.innerHTML = `⚠️ <strong>Coarse GPS Accuracy (±${currentLocationAccuracy}m):</strong> Device reported approximate positioning. You can drag the map pin to calibrate exact spot.`;
+          locationAlertBox.style.display = 'flex';
+        } else {
+          locationAlertBox.className = 'location-alert-box success';
+          locationAlertBox.innerHTML = `✓ <strong>GPS Location Verified:</strong> High precision (±${currentLocationAccuracy}m) captured at ${timeStr}.`;
+          locationAlertBox.style.display = 'flex';
+        }
+      }
+      if (retryLocationBtn) retryLocationBtn.style.display = 'none';
+    } else {
+      // Manual selection
+      if (locationSourceDisplay) {
+        locationSourceDisplay.innerHTML = `<span class="source-badge manual">📍 Manually Selected Pin</span>`;
+      }
+      if (locationAccuracyDisplay) {
+        locationAccuracyDisplay.textContent = 'N/A (Manual Placement)';
+      }
+      if (locationAlertBox) {
+        locationAlertBox.className = 'location-alert-box info';
+        locationAlertBox.innerHTML = `📍 <strong>Manual Pin Placement:</strong> This coordinate was placed manually on the map (not GPS hardware verified). Cross-referenced by municipal review.`;
+        locationAlertBox.style.display = 'flex';
+      }
+      // Remove GPS accuracy circle if manually dragged
+      if (leafletAccuracyCircle && leafletMap) {
+        leafletMap.removeLayer(leafletAccuracyCircle);
+        leafletAccuracyCircle = null;
+      }
+    }
+
+    const numLat = parseFloat(formattedLat);
+    const numLng = parseFloat(formattedLng);
+
+    // Sync with Leaflet Map
+    if (leafletMarker && leafletMap) {
+      leafletMarker.setLatLng([numLat, numLng]);
+      if (panToLocation) {
+        leafletMap.setView([numLat, numLng], 16);
+      }
+
+      // Draw accuracy radius circle on Leaflet if GPS
+      if (source === 'gps' && currentLocationAccuracy) {
+        if (leafletAccuracyCircle) leafletMap.removeLayer(leafletAccuracyCircle);
+        leafletAccuracyCircle = L.circle([numLat, numLng], {
+          radius: currentLocationAccuracy,
+          color: currentLocationAccuracy > 50 ? '#f59e0b' : '#059669',
+          fillColor: currentLocationAccuracy > 50 ? '#fde68a' : '#10b981',
+          fillOpacity: 0.18,
+          weight: 1.5
+        }).addTo(leafletMap);
+      }
+    }
+
     // If Google Maps is loaded, update or create marker
     if (window.google && window.google.maps && googleMap) {
-      const position = { lat: parseFloat(formattedLat), lng: parseFloat(formattedLng) };
+      const position = { lat: numLat, lng: numLng };
 
       if (!googleMarker) {
         googleMarker = new google.maps.Marker({
@@ -179,9 +506,9 @@ document.addEventListener('DOMContentLoaded', () => {
           animation: google.maps.Animation.DROP
         });
 
-        // Update coordinates on drag end
+        // Update coordinates on drag end & reverse-geocode to landmark automatically
         googleMarker.addListener('dragend', (event) => {
-          setMapMarker(event.latLng.lat(), event.latLng.lng(), false);
+          setMapMarker(event.latLng.lat(), event.latLng.lng(), false, 'manual', null, null, false);
         });
       } else {
         googleMarker.setPosition(position);
@@ -191,18 +518,14 @@ document.addEventListener('DOMContentLoaded', () => {
         googleMap.panTo(position);
         googleMap.setZoom(16);
       }
-
-      // Reverse geocode to address if landmark input is empty
-      if (googleGeocoder && locationLandmarkInput && !locationLandmarkInput.value.trim()) {
-        googleGeocoder.geocode({ location: position }, (results, status) => {
-          if (status === 'OK' && results && results[0]) {
-            locationLandmarkInput.value = results[0].formatted_address;
-          }
-        });
-      }
     }
 
-    updateLocationStatus(`Pinned: ${formattedLat}, ${formattedLng}`, 'success');
+    // Automatically update Landmark/Area input from dropped pin (unless skipped because user is typing)
+    if (!skipReverseGeocode) {
+      reverseGeocodeCoordinates(numLat, numLng);
+    }
+
+    updateLocationStatus(`Pinned: ${formattedLat}, ${formattedLng} (${source.toUpperCase()})`, 'success');
   }
 
   // Start map loading
@@ -211,76 +534,104 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ========================================================
    * 2. BROWSER GEOLOCATION API ("USE MY CURRENT LOCATION")
+   * One-time GPS coordinates capture with accuracy in metres
    * ========================================================
    */
-  if (useLocationBtn) {
-    useLocationBtn.addEventListener('click', () => {
-      // 1. Check if browser supports Geolocation API
-      if (!('geolocation' in navigator)) {
-        updateLocationStatus('Geolocation not supported by your browser. Please click the map to pin manually.', 'error');
-        return;
+  function captureCurrentLocation() {
+    // 1. Check if browser supports Geolocation API
+    if (!('geolocation' in navigator)) {
+      updateLocationStatus('Geolocation not supported by your browser. Please click the map to pin manually.', 'error');
+      if (locationAlertBox) {
+        locationAlertBox.className = 'location-alert-box error';
+        locationAlertBox.innerHTML = '⚠️ <strong>Geolocation Unavailable:</strong> Your browser does not support the Geolocation API. Please click on the map to set coordinates manually.';
+        locationAlertBox.style.display = 'flex';
       }
+      return;
+    }
 
-      // 2. Set button to loading state
-      const originalBtnHtml = useLocationBtn.innerHTML;
-      useLocationBtn.disabled = true;
-      useLocationBtn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon">
-          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
-          <path d="M12 2a10 10 0 0 1 10 10"></path>
-        </svg>
-        Detecting GPS...
-      `;
-      updateLocationStatus('Requesting GPS coordinates...', '');
+    // 2. Set button to loading state
+    const originalBtnHtml = useLocationBtn.innerHTML;
+    useLocationBtn.disabled = true;
+    useLocationBtn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+        <path d="M12 2a10 10 0 0 1 10 10"></path>
+      </svg>
+      Detecting GPS...
+    `;
+    updateLocationStatus('Requesting GPS coordinates...', '');
 
-      // 3. Request current position with timeout & high accuracy
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // Success Callback
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
-          const accuracyMeters = Math.round(position.coords.accuracy);
+    if (locationAlertBox) {
+      locationAlertBox.className = 'location-alert-box info';
+      locationAlertBox.innerHTML = '🛰️ <strong>Acquiring GPS Signal:</strong> Requesting device position from browser location services...';
+      locationAlertBox.style.display = 'flex';
+    }
 
-          // Update marker and zoom in closely
-          setMapMarker(userLat, userLng, false);
+    // 3. Request current position with timeout & high accuracy
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // Success Callback
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        const accuracyMeters = Math.round(position.coords.accuracy);
+        const captureTime = new Date(position.timestamp || Date.now()).toISOString();
 
-          if (leafletMap) {
-            leafletMap.setView([userLat, userLng], 16, { animate: true });
-            if (locationMarker) {
-              locationMarker.bindPopup(`<strong>Your Current Location</strong><br>Accurate to ~${accuracyMeters} meters.`).openPopup();
-            }
-          }
+        // Update marker, accuracy circle and zoom in closely
+        setMapMarker(userLat, userLng, true, 'gps', accuracyMeters, captureTime);
 
-          updateLocationStatus(`✓ GPS detected (~${accuracyMeters}m accuracy)`, 'success');
-          useLocationBtn.disabled = false;
-          useLocationBtn.innerHTML = originalBtnHtml;
-        },
-        (error) => {
-          // Error Callback - gracefully handle user denial or timeout
-          useLocationBtn.disabled = false;
-          useLocationBtn.innerHTML = originalBtnHtml;
+        useLocationBtn.disabled = false;
+        useLocationBtn.innerHTML = originalBtnHtml;
+        if (retryLocationBtn) retryLocationBtn.style.display = 'none';
+      },
+      (error) => {
+        // Error Callback - gracefully handle user denial, timeout or unavailable
+        useLocationBtn.disabled = false;
+        useLocationBtn.innerHTML = originalBtnHtml;
+        if (retryLocationBtn) retryLocationBtn.style.display = 'inline-flex';
 
-          let friendlyMessage = 'Unable to get your location. Please click on the map to set a pin manually.';
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              friendlyMessage = 'Location permission was denied. Please click on the map to place a pin manually.';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              friendlyMessage = 'Location information is unavailable. Please click on the map manually.';
-              break;
-            case error.TIMEOUT:
-              friendlyMessage = 'Location request timed out. Please click on the map manually.';
-              break;
-          }
-          updateLocationStatus(friendlyMessage, 'error');
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+        let friendlyMessage = 'Unable to get your location. Please click on the map to set a pin manually.';
+        let alertHtml = '';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            friendlyMessage = 'Location permission was denied. Click map to place manual pin.';
+            alertHtml = '⚠️ <strong>Location Access Denied:</strong> Location permission was not granted. Please click on the map to place a pin manually, or allow location access in your browser address bar and click <strong>"Retry GPS"</strong>.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            friendlyMessage = 'Location information is unavailable. Click map to pin manually.';
+            alertHtml = '⚠️ <strong>GPS Signal Unavailable:</strong> Could not acquire satellite/network position. Please click anywhere on the map to place a manual pin.';
+            break;
+          case error.TIMEOUT:
+            friendlyMessage = 'Location request timed out. Click map or retry.';
+            alertHtml = '⏱️ <strong>Location Request Timed Out:</strong> GPS hardware took too long to respond. Tap <strong>"Retry GPS"</strong> or select location manually on the map.';
+            break;
+          default:
+            friendlyMessage = 'Location error occurred.';
+            alertHtml = '⚠️ <strong>Location Error:</strong> ' + (error.message || 'Unable to retrieve location.');
+            break;
         }
-      );
-    });
+
+        updateLocationStatus(friendlyMessage, 'error');
+        if (locationAlertBox) {
+          locationAlertBox.className = 'location-alert-box error';
+          locationAlertBox.innerHTML = alertHtml;
+          locationAlertBox.style.display = 'flex';
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 0
+      }
+    );
+  }
+
+  if (useLocationBtn) {
+    useLocationBtn.addEventListener('click', captureCurrentLocation);
+  }
+
+  if (retryLocationBtn) {
+    retryLocationBtn.addEventListener('click', captureCurrentLocation);
   }
 
   function updateLocationStatus(message, statusClass) {
@@ -322,19 +673,209 @@ document.addEventListener('DOMContentLoaded', () => {
    * 4. PHOTO UPLOAD, THUMBNAIL PREVIEWS & REMOVAL
    * ========================================================
    */
-  const photoDropzone = document.getElementById('photoDropzone');
-  const photoFileInput = document.getElementById('photoFileInput');
-  const photoPreviewGrid = document.getElementById('photoPreviewGrid');
-  const photoErrorMsg = document.getElementById('photoError');
-
   // In-memory array storing selected valid File objects
   let uploadedPhotos = [];
   const MAX_PHOTOS = 3;
   const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
   const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
+  // Camera State
+  let activeCameraStream = null;
+  let currentCameraFacingMode = 'environment'; // 'environment' (back camera) or 'user' (front camera)
+
+  // Request browser camera permission and show live viewfinder
+  async function openLiveCamera() {
+    if (!cameraModal) {
+      if (cameraFileInput) cameraFileInput.click();
+      return;
+    }
+
+    cameraModal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+
+    if (cameraPermissionPrompt) cameraPermissionPrompt.style.display = 'flex';
+    if (cameraStatusMsg) cameraStatusMsg.style.display = 'none';
+    if (cameraSnapBtn) cameraSnapBtn.disabled = true;
+
+    // Check mediaDevices support
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showCameraError('Camera API is not supported in this browser. Opening file chooser...');
+      setTimeout(() => {
+        closeLiveCamera();
+        if (cameraFileInput) cameraFileInput.click();
+      }, 1400);
+      return;
+    }
+
+    try {
+      await startCameraStream(currentCameraFacingMode);
+    } catch (err) {
+      console.warn('[Camera Initial Access Error]:', err);
+      // Fallback try without specific facingMode constraint
+      try {
+        await startCameraStream(null);
+      } catch (fallbackErr) {
+        handleCameraPermissionFailure(fallbackErr);
+      }
+    }
+  }
+
+  async function startCameraStream(facingMode) {
+    stopCameraTracks();
+
+    const constraints = {
+      video: facingMode ? { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } } : true,
+      audio: false
+    };
+
+    activeCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+    if (cameraVideo) {
+      cameraVideo.srcObject = activeCameraStream;
+      await cameraVideo.play();
+    }
+
+    if (cameraPermissionPrompt) cameraPermissionPrompt.style.display = 'none';
+    if (cameraSnapBtn) cameraSnapBtn.disabled = false;
+  }
+
+  function handleCameraPermissionFailure(err) {
+    let msg = 'Camera permission was denied. Please allow camera access in your browser or select an image file.';
+    if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      msg = 'No camera found on this device. You can choose a photo from your gallery instead.';
+    } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      msg = 'Camera permission denied. Please allow camera permissions in your browser address bar.';
+    }
+
+    if (cameraPermissionPrompt) cameraPermissionPrompt.style.display = 'none';
+    showCameraError(msg);
+
+    // Provide immediate fallback option
+    if (cameraFileInput) {
+      setTimeout(() => {
+        if (!cameraModal.hasAttribute('hidden') && confirm('Camera access unavailable. Would you like to select a photo from your files?')) {
+          closeLiveCamera();
+          cameraFileInput.click();
+        }
+      }, 1000);
+    }
+  }
+
+  function showCameraError(msg) {
+    if (cameraStatusMsg) {
+      cameraStatusMsg.textContent = msg;
+      cameraStatusMsg.style.backgroundColor = '#fee2e2';
+      cameraStatusMsg.style.color = '#991b1b';
+      cameraStatusMsg.style.display = 'block';
+    }
+  }
+
+  function stopCameraTracks() {
+    if (activeCameraStream) {
+      activeCameraStream.getTracks().forEach(track => {
+        try { track.stop(); } catch (e) {}
+      });
+      activeCameraStream = null;
+    }
+    if (cameraVideo) {
+      cameraVideo.srcObject = null;
+    }
+  }
+
+  function closeLiveCamera() {
+    stopCameraTracks();
+    if (cameraModal) cameraModal.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+  }
+
+  function snapPhotoFromCamera() {
+    if (!cameraVideo || !cameraCanvas) return;
+
+    const w = cameraVideo.videoWidth || 1280;
+    const h = cameraVideo.videoHeight || 720;
+
+    cameraCanvas.width = w;
+    cameraCanvas.height = h;
+    const ctx = cameraCanvas.getContext('2d');
+    ctx.drawImage(cameraVideo, 0, 0, w, h);
+
+    // Flash animation
+    if (cameraFlash) {
+      cameraFlash.classList.add('camera-flashing');
+      setTimeout(() => cameraFlash.classList.remove('camera-flashing'), 350);
+    }
+
+    cameraCanvas.toBlob((blob) => {
+      if (!blob) {
+        showCameraError('Failed to capture snapshot. Please try again.');
+        return;
+      }
+
+      const timestamp = Date.now();
+      const filename = `camera_hazard_${timestamp}.jpg`;
+      const file = new File([blob], filename, { type: 'image/jpeg', lastModified: timestamp });
+
+      closeLiveCamera();
+      handleFilesSelected([file], 'camera');
+    }, 'image/jpeg', 0.92);
+  }
+
+  // Camera button event bindings
+  if (cameraCaptureBtn) {
+    cameraCaptureBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openLiveCamera();
+    });
+  }
+
+  if (cameraSnapBtn) {
+    cameraSnapBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      snapPhotoFromCamera();
+    });
+  }
+
+  if (cameraSwitchBtn) {
+    cameraSwitchBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      currentCameraFacingMode = currentCameraFacingMode === 'environment' ? 'user' : 'environment';
+      if (cameraStatusMsg) cameraStatusMsg.style.display = 'none';
+      try {
+        await startCameraStream(currentCameraFacingMode);
+      } catch (err) {
+        console.warn('[Camera Switch Error]:', err);
+      }
+    });
+  }
+
+  if (cameraCancelBtn) cameraCancelBtn.addEventListener('click', closeLiveCamera);
+  if (cameraModalCloseBtn) cameraModalCloseBtn.addEventListener('click', closeLiveCamera);
+  if (cameraModal) {
+    cameraModal.addEventListener('click', (e) => {
+      if (e.target === cameraModal) closeLiveCamera();
+    });
+  }
+
+  // Fallback camera file input handler
+  if (cameraFileInput) {
+    cameraFileInput.addEventListener('change', () => {
+      if (cameraFileInput.files && cameraFileInput.files.length > 0) {
+        handleFilesSelected(cameraFileInput.files, 'camera');
+      }
+      cameraFileInput.value = '';
+    });
+  }
+
+  // Browse Gallery / Files button: opens file gallery
+  if (galleryUploadBtn && photoFileInput) {
+    galleryUploadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      photoFileInput.click();
+    });
+  }
+
   if (photoDropzone && photoFileInput) {
-    // Click dropzone to trigger hidden file input
+    // Click dropzone to trigger gallery file input
     photoDropzone.addEventListener('click', (e) => {
       if (e.target.closest('.photo-preview-item')) return;
       photoFileInput.click();
@@ -368,20 +909,20 @@ document.addEventListener('DOMContentLoaded', () => {
     photoDropzone.addEventListener('drop', (e) => {
       const droppedFiles = e.dataTransfer.files;
       if (droppedFiles && droppedFiles.length > 0) {
-        handleFilesSelected(droppedFiles);
+        handleFilesSelected(droppedFiles, 'upload');
       }
     });
 
     photoFileInput.addEventListener('change', () => {
       if (photoFileInput.files && photoFileInput.files.length > 0) {
-        handleFilesSelected(photoFileInput.files);
+        handleFilesSelected(photoFileInput.files, 'gallery');
       }
       photoFileInput.value = ''; // Reset so the same file can be selected again if removed
     });
   }
 
-  // Process newly selected files
-  function handleFilesSelected(fileList) {
+  // Process newly selected files with source tracking
+  function handleFilesSelected(fileList, source = 'upload') {
     clearPhotoError();
 
     const incomingFiles = Array.from(fileList);
@@ -405,6 +946,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Attach evidence source and timestamp
+      file.photoSource = source;
+      file.uploadedAt = new Date().toISOString();
+
       // Check duplicates by filename & size
       const isDuplicate = uploadedPhotos.some(existing => existing.name === file.name && existing.size === file.size);
       if (!isDuplicate) {
@@ -419,6 +964,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderPhotoPreviews() {
     if (!photoPreviewGrid) return;
     photoPreviewGrid.innerHTML = '';
+
+    if (uploadedPhotos.length > 0) {
+      if (photoSourceInput) photoSourceInput.value = uploadedPhotos[0].photoSource || 'upload';
+      if (photoUploadedAtInput) photoUploadedAtInput.value = uploadedPhotos[0].uploadedAt || new Date().toISOString();
+    } else {
+      if (photoSourceInput) photoSourceInput.value = 'upload';
+      if (photoUploadedAtInput) photoUploadedAtInput.value = '';
+    }
 
     uploadedPhotos.forEach((file, index) => {
       const previewCard = document.createElement('div');
@@ -435,16 +988,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         thumbImg.src = e.target.result;
+        file.dataUrl = e.target.result;
       };
       reader.readAsDataURL(file);
 
       thumbWrapper.appendChild(thumbImg);
+
+      const isCam = file.photoSource === 'camera';
+      const sourceTagHtml = `
+        <span class="photo-source-tag ${isCam ? 'camera' : 'gallery'}">
+          ${isCam ? '📷 Live Camera' : '🖼️ Gallery File'}
+        </span>
+      `;
 
       const metaInfo = document.createElement('div');
       metaInfo.className = 'preview-meta-info';
       metaInfo.innerHTML = `
         <span class="preview-filename" title="${file.name}">${file.name}</span>
         <span class="preview-filesize">${formatFileSize(file.size)}</span>
+        ${sourceTagHtml}
       `;
 
       // Remove photo button
@@ -507,7 +1069,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const severityErrorMsg = document.getElementById('severityError');
   const accuracyCheckbox = document.getElementById('accuracyConfirmation');
   const accuracyErrorMsg = document.getElementById('accuracyError');
-  const locationLandmarkInput = document.getElementById('locationLandmark');
   const submitBtn = document.getElementById('submitReportBtn');
   const resetBtn = document.getElementById('resetReportBtn');
 
@@ -655,6 +1216,49 @@ document.addEventListener('DOMContentLoaded', () => {
     accuracyCheckbox.addEventListener('change', validateAccuracy);
   }
 
+  // Auto-synchronize landmark/area input with map and coordinates
+  if (locationLandmarkInput) {
+    let landmarkDebounceTimer = null;
+
+    // Real-time typing updates the map pin & lat/long automatically
+    locationLandmarkInput.addEventListener('input', () => {
+      clearTimeout(landmarkDebounceTimer);
+      const val = locationLandmarkInput.value.trim();
+      if (val.length >= 3) {
+        if (landmarkSyncBadge) landmarkSyncBadge.textContent = '⏳ Locating on map...';
+        landmarkDebounceTimer = setTimeout(() => {
+          geocodeLandmarkToMap(val);
+        }, 650);
+      } else {
+        if (landmarkStatusText) landmarkStatusText.textContent = 'Drop a pin on map or type an address — both update automatically.';
+        if (landmarkSyncBadge) landmarkSyncBadge.textContent = '🔄 Auto-syncs with map';
+      }
+    });
+
+    // Pressing Enter immediately positions the pin & coordinates
+    locationLandmarkInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        clearTimeout(landmarkDebounceTimer);
+        geocodeLandmarkToMap(locationLandmarkInput.value.trim());
+      }
+    });
+
+    // On blur / change
+    locationLandmarkInput.addEventListener('change', () => {
+      clearTimeout(landmarkDebounceTimer);
+      geocodeLandmarkToMap(locationLandmarkInput.value.trim());
+    });
+  }
+
+  // Search/locate button next to landmark input
+  if (locateLandmarkBtn && locationLandmarkInput) {
+    locateLandmarkBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      geocodeLandmarkToMap(locationLandmarkInput.value.trim());
+    });
+  }
+
   // Form Submit Handler
   if (reportForm) {
     reportForm.addEventListener('submit', (e) => {
@@ -682,12 +1286,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Prevent duplicate clicks
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Analyzing & Submitting...';
-      }
-
       // Collect data to send to Express backend
       const selectedSeverity = document.querySelector('input[name="severityLevel"]:checked');
       let severityLabel = selectedSeverity ? selectedSeverity.value : 'Medium';
@@ -697,6 +1295,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const latVal = parseFloat(latInputHidden.value);
       const lngVal = parseFloat(lngInputHidden.value);
 
+      const locSource = (locationSourceInput && locationSourceInput.value) || currentLocationSource || 'manual';
+      const locAccuracy = (locationAccuracyInput && locationAccuracyInput.value) ? parseInt(locationAccuracyInput.value, 10) : currentLocationAccuracy;
+      const locCapturedAt = (locationCapturedAtInput && locationCapturedAtInput.value) || currentLocationCapturedAt || new Date().toISOString();
+
+      const pSource = (photoSourceInput && photoSourceInput.value) || (uploadedPhotos[0] && uploadedPhotos[0].photoSource) || 'upload';
+      const pUploadedAt = (photoUploadedAtInput && photoUploadedAtInput.value) || (uploadedPhotos[0] && uploadedPhotos[0].uploadedAt) || (uploadedPhotos.length > 0 ? new Date().toISOString() : null);
+
       const complaintPayload = {
         title: problemTitleInput.value.trim(),
         category: issueCategorySelect.value,
@@ -704,80 +1309,210 @@ document.addEventListener('DOMContentLoaded', () => {
         location: landmarkVal || 'Pinned Location',
         latitude: latVal,
         longitude: lngVal,
+        locationSource: locSource,
+        locationAccuracy: locAccuracy,
+        locationCapturedAt: locCapturedAt,
+        photoSource: pSource,
+        photoUploadedAt: pUploadedAt,
         severity: severityLabel,
-        reportedBy: "Civic User",
-        image: uploadedPhotos.length > 0 ? uploadedPhotos[0].dataUrl : ""
+        image: (uploadedPhotos.length > 0 && uploadedPhotos[0].dataUrl) ? uploadedPhotos[0].dataUrl : ""
       };
 
-      // Submit report to Express API
-      (async () => {
-        try {
-          const response = await fetch('/api/complaints', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(complaintPayload)
-          });
-
-          const result = await response.json();
-
-          if (response.status === 401) {
-            alert('Please log in to submit a complaint. Your report will be securely linked to your citizen dashboard.');
-            window.location.href = 'login.html';
-            return;
-          }
-
-          // Case 1: Duplicate complaint detected nearby by Gemini & geographic radius (Stage 10 Part 21)
-          if (result.duplicate) {
-            console.log('[Duplicate Detected]:', result);
-            showDuplicateNoticeModal(result);
-            resetReportForm();
-            return;
-          }
-
-          // Case 2: New complaint registered successfully
-          if (response.ok && result.success && result.data) {
-            console.log('[Express API]: Complaint registered successfully:', result.data);
-            showSuccessSubmissionModal(result.data, complaintPayload);
-            resetReportForm();
-          } else {
-            throw new Error(result.message || 'Server rejected submission');
-          }
-        } catch (err) {
-          console.warn('[Backend Notice]: Submitting via fallback mode:', err.message);
-          showSuccessSubmissionModal({
-            id: `CC-${Math.floor(1000 + Math.random() * 9000)}`,
-            title: complaintPayload.title,
-            category: complaintPayload.category,
-            severity: complaintPayload.severity,
-            location: { address: landmarkVal || 'GPS Coordinates pinned', latitude: latVal, longitude: lngVal },
-            aiAnalysis: {
-              dangerLevel: 'medium',
-              dangerScore: 50,
-              reason: 'Hazard recorded in offline/fallback mode. AI assessment queued.'
-            },
-            priority: {
-              level: 'MEDIUM',
-              score: 52
-            },
-            reportCount: 1
-          }, complaintPayload);
-          resetReportForm();
-        } finally {
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-              Submit Report
-            `;
-          }
-        }
-      })();
+      // Show confirmation summary before final submission
+      openPreSubmitModal(complaintPayload);
     });
   }
+
+  // Pre-Submission Review Modal
+  function openPreSubmitModal(payload) {
+    if (!preSubmitConfirmModal || !preSubmitSummaryContainer) {
+      executeComplaintSubmission(payload);
+      return;
+    }
+
+    const locSource = payload.locationSource === 'gps' ? '🛰️ GPS Hardware Verified' : '📍 Manually Selected Pin';
+    const locSourceClass = payload.locationSource === 'gps' ? 'gps' : 'manual';
+    const accuracyText = payload.locationAccuracy ? `±${payload.locationAccuracy} meters` : 'N/A (Manual placement)';
+    const capturedTime = payload.locationCapturedAt ? new Date(payload.locationCapturedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Just now';
+    const photoSourceText = payload.photoSource === 'camera' ? '📷 Live Camera Capture' : '🖼️ Device Gallery / Upload';
+    const photoTime = payload.photoUploadedAt ? new Date(payload.photoUploadedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Just now';
+
+    preSubmitSummaryContainer.innerHTML = `
+      <div class="presubmit-card">
+        <div class="presubmit-card-title">
+          <span>📋</span> Problem Overview
+        </div>
+        <div class="presubmit-grid">
+          <div class="presubmit-item">
+            <span class="presubmit-label">Category:</span>
+            <span class="presubmit-val"><strong>${escapeHtml(payload.category)}</strong></span>
+          </div>
+          <div class="presubmit-item">
+            <span class="presubmit-label">Severity:</span>
+            <span class="presubmit-val">${escapeHtml(payload.severity)}</span>
+          </div>
+          <div class="presubmit-item" style="grid-column: 1 / -1;">
+            <span class="presubmit-label">Title:</span>
+            <span class="presubmit-val">${escapeHtml(payload.title)}</span>
+          </div>
+          <div class="presubmit-item" style="grid-column: 1 / -1;">
+            <span class="presubmit-label">Description:</span>
+            <span class="presubmit-val" style="font-size: 0.82rem; color: #475569;">${escapeHtml(payload.description)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="presubmit-card">
+        <div class="presubmit-card-title">
+          <span>📍</span> Location Verification Evidence
+        </div>
+        <div class="presubmit-grid">
+          <div class="presubmit-item">
+            <span class="presubmit-label">Reported Source:</span>
+            <span class="presubmit-val"><span class="source-badge ${locSourceClass}">${locSource}</span></span>
+          </div>
+          <div class="presubmit-item">
+            <span class="presubmit-label">GPS Precision:</span>
+            <span class="presubmit-val">${accuracyText}</span>
+          </div>
+          <div class="presubmit-item">
+            <span class="presubmit-label">Coordinates:</span>
+            <span class="presubmit-val" style="font-family: monospace;">${payload.latitude.toFixed(5)}, ${payload.longitude.toFixed(5)}</span>
+          </div>
+          <div class="presubmit-item">
+            <span class="presubmit-label">Capture Timestamp:</span>
+            <span class="presubmit-val">${capturedTime}</span>
+          </div>
+          <div class="presubmit-item" style="grid-column: 1 / -1;">
+            <span class="presubmit-label">Address / Landmark:</span>
+            <span class="presubmit-val">${escapeHtml(payload.location || 'Pinned on map')}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="presubmit-card">
+        <div class="presubmit-card-title">
+          <span>📷</span> Photographic Evidence
+        </div>
+        <div class="presubmit-grid">
+          <div class="presubmit-item">
+            <span class="presubmit-label">Photo Source:</span>
+            <span class="presubmit-val">${photoSourceText}</span>
+          </div>
+          <div class="presubmit-item">
+            <span class="presubmit-label">Upload Timestamp:</span>
+            <span class="presubmit-val">${photoTime}</span>
+          </div>
+        </div>
+        ${payload.image ? `
+          <div class="presubmit-photo-preview">
+            <img src="${payload.image}" alt="Complaint thumbnail" class="presubmit-thumb">
+            <span style="font-size: 0.8rem; color: #64748b;">Photo evidence attached and ready for municipal review.</span>
+          </div>
+        ` : `
+          <p style="font-size: 0.8rem; color: #b45309; margin: 0.4rem 0 0;">⚠️ No photograph attached. Reports with photographic evidence are verified and acted upon much faster.</p>
+        `}
+      </div>
+
+      <div class="presubmit-disclaimer">
+        <strong>Municipal Evidence Notice:</strong> By clicking "Confirm &amp; Submit", your report will be sent to the municipal authority console with these exact coordinates, photo, and timestamps.
+      </div>
+    `;
+
+    preSubmitConfirmModal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+
+    preSubmitModalConfirmBtn.onclick = () => {
+      preSubmitConfirmModal.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+      executeComplaintSubmission(payload);
+    };
+
+    preSubmitModalEditBtn.onclick = () => {
+      preSubmitConfirmModal.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+    };
+
+    if (preSubmitModalCloseBtn) {
+      preSubmitModalCloseBtn.onclick = () => {
+        preSubmitConfirmModal.setAttribute('hidden', '');
+        document.body.style.overflow = '';
+      };
+    }
+  }
+
+  // Execute Submission to Express API
+  async function executeComplaintSubmission(complaintPayload) {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting & Analyzing...';
+    }
+
+    try {
+      const currentUser = await window.CivicAuth.getCurrentUser();
+      if (!currentUser) {
+        alert('Please log in before submitting a complaint. Your report will be securely linked to your citizen dashboard.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      complaintPayload.reportedBy = currentUser.name || "Civic User";
+
+      const fetchFn = window.civicFetch || fetch;
+      const response = await fetchFn('/api/complaints', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(complaintPayload)
+      });
+
+      const result = await response.json();
+
+      if (response.status === 401) {
+        alert('Please log in to submit a complaint. Your report will be securely linked to your citizen dashboard.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Case 1: Duplicate complaint detected nearby by Gemini & geographic radius (Stage 10 Part 21)
+      if (result.duplicate) {
+        console.log('[Duplicate Detected]:', result);
+        showDuplicateNoticeModal(result);
+        resetReportForm();
+        return;
+      }
+
+      // Case 2: New complaint registered successfully
+      if (response.ok && result.success && result.data) {
+        console.log('[Express API]: Complaint registered successfully:', result.data);
+
+        // Broadcast real-time event to other open tabs (e.g. Authority portal)
+        if (window.notifyNewComplaint) {
+          window.notifyNewComplaint(result.data);
+        }
+
+        showSuccessSubmissionModal(result.data, complaintPayload);
+        resetReportForm();
+      } else {
+        throw new Error(result.message || 'Server rejected submission');
+      }
+    } catch (err) {
+      console.error('[Submission Error]:', err.message);
+      alert('Could not submit complaint: ' + err.message + '\n\nPlease verify that the server is reachable and try again.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+          Review &amp; Submit
+        `;
+      }
+    }
+  }
+
 
 
   /* ========================================================
@@ -1020,6 +1755,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      if (cameraModal && !cameraModal.hasAttribute('hidden')) closeLiveCamera();
       if (demoModal && !demoModal.hasAttribute('hidden')) closeDemoModal();
       if (duplicateModal && !duplicateModal.hasAttribute('hidden')) closeDuplicateModal();
     }
@@ -1043,16 +1779,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Helper to escape HTML characters
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
+  // Use shared escapeHtml helper
+  const escapeHtml = window.escapeHtml || ((str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
 
   console.log('Civic Connect Report a Problem Controller with Google Maps & Gemini Duplicate Detection Initialized.');
 });

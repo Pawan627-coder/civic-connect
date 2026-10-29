@@ -20,277 +20,18 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ========================================================
-   * 1. COMPLAINTS DATASET (Live Database Store + Fallback)
-   * Populated dynamically from GET /api/complaints
+   * 1. COMPLAINTS DATASET (Live Database Store)
+   * Populated dynamically from GET /api/admin/complaints
    * ========================================================
    */
-  let complaints = [
-    {
-      id: "CC-1001",
-      title: "Large pothole cluster near main road",
-      category: "Road/Pothole",
-      description: "Deep asphalt erosion causing severe traffic congestion and near-misses for two-wheelers during rainy hours near Metro Pillar 42.",
-      location: "Gorakhpur, Uttar Pradesh",
-      date: "28 Sep 2026",
-      severity: "High",
-      status: "Under Verification",
-      verification: "Pending",
-      reportedBy: "Civic User",
-      image: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
-      supporters: 14,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1002",
-      title: "Four street lights not working along school road",
-      category: "Street Light",
-      description: "Streetlights have been completely dark for over a week, making evening transit unsafe for pedestrians near the girls secondary school.",
-      location: "Civil Lines, Gorakhpur, Uttar Pradesh",
-      date: "27 Sep 2026",
-      severity: "Medium",
-      status: "Reported",
-      verification: "Pending",
-      reportedBy: "Rahul Verma",
-      image: "",
-      supporters: 8,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1003",
-      title: "Severe sewage overflow flooding market entrance",
-      category: "Sewage",
-      description: "Blocked underground sewer main causing foul contaminated wastewater to pool across pedestrian walkway and store entrances.",
-      location: "Sector 18 Market, Noida, Uttar Pradesh",
-      date: "30 Sep 2026",
-      severity: "Critical",
-      status: "In Progress",
-      verification: "Verified",
-      reportedBy: "Pooja Sharma",
-      image: "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?w=600&auto=format&fit=crop&q=80",
-      supporters: 39,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1004",
-      title: "Deep trench left open after pipeline excavation",
-      category: "Road/Pothole",
-      description: "Excavation pit left without warning cones, reflective tape, or barricades. High hazard for night commuters and bicyclists.",
-      location: "Indira Nagar, Lucknow, Uttar Pradesh",
-      date: "01 Oct 2026",
-      severity: "Critical",
-      status: "Reported",
-      verification: "Pending",
-      reportedBy: "Anil Kumar",
-      image: "",
-      supporters: 22,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1005",
-      title: "Uncollected roadside municipal garbage dump",
-      category: "Garbage/Waste",
-      description: "Community solid waste bin overflowing for 5 consecutive days. Stray animals scattering trash onto active two-lane roadway.",
-      location: "Banjara Hills, Hyderabad, Telangana",
-      date: "29 Sep 2026",
-      severity: "Medium",
-      status: "Reported",
-      verification: "Pending",
-      reportedBy: "Sunita Reddy",
-      image: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
-      supporters: 17,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1006",
-      title: "Traffic signal completely dead at 4-way intersection",
-      category: "Traffic",
-      description: "Traffic control lights malfunctioned following power surge, leading to chaotic gridlock and high risk of vehicle collisions.",
-      location: "MG Road Junction, Bengaluru, Karnataka",
-      date: "25 Sep 2026",
-      severity: "Critical",
-      status: "Resolved",
-      verification: "Verified",
-      reportedBy: "Karthik Raja",
-      image: "",
-      supporters: 64,
-      resolvedDate: "26 Sep 2026",
-      resolvedBy: "Traffic Cell Admin",
-      resolutionNote: "Electronic controller motherboard replaced and signal timer sequence calibrated."
-    },
-    {
-      id: "CC-1007",
-      title: "Caved-in storm drainage slab near bus shelter",
-      category: "Road/Pothole",
-      description: "Reinforced drain slab fractured under heavy bus weight. Open pit created directly in the boarding queue area.",
-      location: "Civil Lines, Kanpur, Uttar Pradesh",
-      date: "27 Sep 2026",
-      severity: "High",
-      status: "Resolved",
-      verification: "Verified",
-      reportedBy: "Manoj Tiwari",
-      image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=80",
-      supporters: 48,
-      resolvedDate: "30 Sep 2026",
-      resolvedBy: "Public Works Admin",
-      resolutionNote: "Pre-cast heavy duty RCC slab installed and perimeter grouted flush with pavement."
-    },
-    {
-      id: "CC-1008",
-      title: "Severe waterlogging blocking railway subway underpass",
-      category: "Waterlogging",
-      description: "Stormwater runoff accumulated to 2.5 feet depth due to silted intake grates. Two-wheelers and sedans completely halted.",
-      location: "Shivaji Nagar Subway, Pune, Maharashtra",
-      date: "02 Oct 2026",
-      severity: "High",
-      status: "In Progress",
-      verification: "Verified",
-      reportedBy: "Meera Deshmukh",
-      image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-      supporters: 43,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1009",
-      title: "High-risk blind mountain turn without convex mirror",
-      category: "Accident",
-      description: "Narrow hair-pin turn has seen multiple sideswipes. Commuters unable to see oncoming passenger buses.",
-      location: "Mall Road, Shimla, Himachal Pradesh",
-      date: "02 Oct 2026",
-      severity: "High",
-      status: "Under Verification",
-      verification: "Verified",
-      reportedBy: "Vikram Negi",
-      image: "",
-      supporters: 29,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1010",
-      title: "Illegal advertisement hoarding obstructing stop sign",
-      category: "Other",
-      description: "Large vinyl promotional billboard erected directly in front of the municipal regulatory stop sign.",
-      location: "MI Road, Jaipur, Rajasthan",
-      date: "03 Oct 2026",
-      severity: "Low",
-      status: "Reported",
-      verification: "Pending",
-      reportedBy: "Gaurav Singh",
-      image: "",
-      supporters: 6,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1011",
-      title: "Faded zebra crossing & missing pedestrian signage",
-      category: "Traffic",
-      description: "Thermal markings totally erased by monsoon traffic near hospital gate. Patients and staff face difficulty crossing.",
-      location: "Cantt Road, Varanasi, Uttar Pradesh",
-      date: "01 Oct 2026",
-      severity: "Medium",
-      status: "In Progress",
-      verification: "Verified",
-      reportedBy: "Deepak Yadav",
-      image: "",
-      supporters: 15,
-      resolvedDate: "",
-      resolvedBy: "",
-      resolutionNote: ""
-    },
-    {
-      id: "CC-1012",
-      title: "Spam advertisement submission with abusive text",
-      category: "Other",
-      description: "Non-civic submission advertising commercial services. No municipal road hazard reported.",
-      location: "Unknown / Unspecified",
-      date: "24 Sep 2026",
-      severity: "Low",
-      status: "Rejected",
-      verification: "Rejected",
-      reportedBy: "Anonymous User",
-      image: "",
-      supporters: 0,
-      resolvedDate: "",
-      resolvedBy: "Civic Admin",
-      resolutionNote: "Ticket rejected: violates community standards and contains no valid road defect."
-    }
-  ];
+  let complaints = [];
 
   /* ========================================================
-   * 2. SAMPLE REGISTERED CITIZENS DATASET
+   * 2. REGISTERED CITIZENS DATASET
+   * Populated dynamically from GET /api/admin/dashboard
    * ========================================================
    */
-  const sampleUsers = [
-    {
-      id: "U001",
-      name: "Civic User",
-      email: "user@example.com",
-      reported: 8,
-      resolved: 5,
-      tokens: 24,
-      status: "Active"
-    },
-    {
-      id: "U002",
-      name: "Rahul Verma",
-      email: "rahul.verma@example.com",
-      reported: 4,
-      resolved: 2,
-      tokens: 14,
-      status: "Active"
-    },
-    {
-      id: "U003",
-      name: "Pooja Sharma",
-      email: "pooja.sharma@example.com",
-      reported: 6,
-      resolved: 4,
-      tokens: 21,
-      status: "Active"
-    },
-    {
-      id: "U004",
-      name: "Meera Deshmukh",
-      email: "meera.d@example.com",
-      reported: 5,
-      resolved: 3,
-      tokens: 18,
-      status: "Active"
-    },
-    {
-      id: "U005",
-      name: "Karthik Raja",
-      email: "karthik.raja@example.com",
-      reported: 12,
-      resolved: 9,
-      tokens: 46,
-      status: "Active"
-    },
-    {
-      id: "U006",
-      name: "Anonymous User",
-      email: "spam.test@example.com",
-      reported: 2,
-      resolved: 0,
-      tokens: 0,
-      status: "Flagged"
-    }
-  ];
+  let sampleUsers = [];
 
   /* ========================================================
    * 3. RECENT ADMIN AUDIT ACTIVITY LOG
@@ -342,9 +83,34 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterPriority = document.getElementById('filterPriority');
   const filterDanger = document.getElementById('filterDanger');
   const filterVerification = document.getElementById('filterVerification');
+  const filterLocality = document.getElementById('filterLocality');
+  const filterDate = document.getElementById('filterDate');
+  const filterSort = document.getElementById('filterSort');
+  const filterUnreviewed = document.getElementById('filterUnreviewed');
   const clearFiltersBtn = document.getElementById('adminClearFiltersBtn');
   const emptyResetFiltersBtn = document.getElementById('emptyResetFiltersBtn');
   const resultsCountBadge = document.getElementById('resultsCountBadge');
+
+  // Pagination elements & state
+  const pageSizeSelect = document.getElementById('pageSizeSelect');
+  const btnPrevPage = document.getElementById('btnPrevPage');
+  const btnNextPage = document.getElementById('btnNextPage');
+  const paginationPageIndicator = document.getElementById('paginationPageIndicator');
+  const paginationInfoText = document.getElementById('paginationInfoText');
+  let currentPage = 1;
+  let pageSize = (pageSizeSelect && parseInt(pageSizeSelect.value, 10)) || 10;
+
+  // Heatmap elements & state
+  const mapLocalityFilter = document.getElementById('mapLocalityFilter');
+  const btnViewHeatmap = document.getElementById('btnViewHeatmap');
+  const btnViewPins = document.getElementById('btnViewPins');
+  const btnViewBoth = document.getElementById('btnViewBoth');
+  const btnResetMapView = document.getElementById('btnResetMapView');
+  let mapInstance = null;
+  let heatLayerInstance = null;
+  let circlesLayerInstance = null;
+  let markersLayerInstance = null;
+  let currentMapMode = 'heat'; // 'heat', 'pins', 'both'
 
   // Table elements
   const complaintsTableBody = document.getElementById('complaintsTableBody');
@@ -375,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reviewModalBody = document.getElementById('reviewModalBody');
   const modalFooterActions = document.getElementById('modalFooterActions');
   const modalCloseBtn = document.getElementById('modalCloseBtn');
+  let modalMapInstance = null;
 
   // Photo Lightbox Modal
   const photoLightboxModal = document.getElementById('photoLightboxModal');
@@ -441,6 +208,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render Category Horizontal Bars
     renderCategoryStats(categoryCounts, total);
+
+    // Render Urgent Alerts & Citizen Reminders Queue
+    renderAlertsQueue(complaints);
   }
 
 
@@ -484,6 +254,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   /* ========================================================
+   * 6B. RENDER URGENT CIVIC ALERTS & ACTION QUEUE (CITIZEN REMINDERS)
+   * ========================================================
+   */
+  const alertsGrid = document.getElementById('alertsGrid');
+  const alertCountBadge = document.getElementById('alertCountBadge');
+
+  function renderAlertsQueue(allComplaints) {
+    if (!alertsGrid) return;
+    alertsGrid.innerHTML = '';
+
+    // Filter complaints that have citizen reminders or are critical unresolved
+    const urgentAlerts = (allComplaints || []).filter(c => 
+      c.status !== 'Resolved' && ((c.remindersCount && c.remindersCount > 0) || c.severity === 'Critical' || (c.priority && c.priority.level === 'Critical'))
+    );
+
+    // Sort: highest reminders first
+    urgentAlerts.sort((a, b) => ((b.remindersCount || 0) - (a.remindersCount || 0)));
+
+    if (alertCountBadge) {
+      alertCountBadge.textContent = `${urgentAlerts.length} Active Alert${urgentAlerts.length === 1 ? '' : 's'}`;
+    }
+
+    if (urgentAlerts.length === 0) {
+      alertsGrid.innerHTML = `
+        <div style="padding: 1.5rem; text-align: center; color: #64748b; background: #f8fafc; border-radius: 8px; grid-column: 1 / -1; border: 1px dashed #cbd5e1;">
+          <span style="font-size: 1.1rem; display: block; margin-bottom: 0.25rem;">✓ No Pending Citizen Reminders</span>
+          <span style="font-size: 0.85rem;">All reported hazards are under control. New citizen escalation notifications will appear here in real time.</span>
+        </div>
+      `;
+      return;
+    }
+
+    urgentAlerts.forEach(c => {
+      const card = document.createElement('div');
+      const hasReminders = (c.remindersCount && c.remindersCount > 0);
+      card.className = `alert-queue-card ${hasReminders ? 'has-reminders' : ''}`;
+      
+      const locStr = (c.location && typeof c.location === 'object' && c.location.address)
+        ? c.location.address
+        : (c.location || 'Municipal Ward Area');
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+          <span style="font-weight: 800; font-size: 0.82rem; color: #64748b;">${escapeHtml(c.id)} • ${escapeHtml(c.category)}</span>
+          <span style="background: ${hasReminders ? '#fee2e2' : '#fef3c7'}; color: ${hasReminders ? '#991b1b' : '#92400e'}; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 3px;">
+            ${hasReminders ? `🔔 ${c.remindersCount} Citizen Reminders` : '⚠️ Critical Hazard'}
+          </span>
+        </div>
+        <h4 style="font-size: 0.95rem; margin: 0; color: #0f172a; line-height: 1.35;">${escapeHtml(c.title)}</h4>
+        <div style="font-size: 0.8rem; color: #475569; display: flex; align-items: center; gap: 0.35rem;">
+          <span>📍</span>
+          <span>${escapeHtml(locStr)}</span>
+        </div>
+        ${c.lastReminderReason ? `
+          <div style="font-size: 0.76rem; background: #fff1f2; border: 1px dashed #fecdd3; padding: 5px 8px; border-radius: 4px; color: #9f1239;">
+            <strong>Citizen Escalation Notice:</strong> "${escapeHtml(c.lastReminderReason)}"
+          </div>
+        ` : ''}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 0.5rem; border-top: 1px solid #f1f5f9;">
+          <span class="status-badge ${getStatusBadgeClass(c.status)}" style="font-size: 0.72rem;">${escapeHtml(c.status)}</span>
+          <button type="button" class="btn btn-sm btn-primary" data-action="review" data-id="${c.id}" style="font-size: 0.75rem; padding: 5px 12px; font-weight: 700; cursor: pointer;">
+            Review &amp; Update Status &rarr;
+          </button>
+        </div>
+      `;
+
+      const reviewBtn = card.querySelector('[data-action="review"]');
+      if (reviewBtn) {
+        reviewBtn.addEventListener('click', () => {
+          openReviewModal(c.id);
+        });
+      }
+
+      alertsGrid.appendChild(card);
+    });
+  }
+
+
+  /* ========================================================
    * 7. RENDER COMPLAINTS TABLE (SEARCH + MULTI-FILTER)
    * ========================================================
    */
@@ -495,6 +344,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const selPriority = filterPriority ? filterPriority.value : 'all';
     const selDanger = filterDanger ? filterDanger.value : 'all';
     const selVer = filterVerification ? filterVerification.value : 'all';
+    const selLoc = filterLocality ? filterLocality.value : 'all';
+    const selDate = filterDate ? filterDate.value : 'all';
+    const selSort = filterSort ? filterSort.value : 'latest';
+    const selUnreviewed = filterUnreviewed ? filterUnreviewed.value : 'all';
 
     const filtered = complaints.filter(item => {
       // 1. Text Search matching ID, Title, Category, Location
@@ -535,15 +388,52 @@ document.addEventListener('DOMContentLoaded', () => {
       // 7. Verification Filter
       if (selVer !== 'all' && item.verification !== selVer) return false;
 
+      // 8. Locality / Area Filter
+      if (selLoc !== 'all') {
+        const locStr = (item.location && typeof item.location === 'object' && item.location.address)
+          ? item.location.address
+          : (typeof item.location === 'string' ? item.location : '');
+        if (!locStr.toLowerCase().includes(selLoc.toLowerCase())) return false;
+      }
+
+      // 9. Date Range Filter
+      if (selDate !== 'all') {
+        const itemDate = new Date(item.date || item.createdAt);
+        if (!isNaN(itemDate.getTime())) {
+          const now = new Date();
+          const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24);
+          if (selDate === 'today' && diffDays > 1.5) return false;
+          if (selDate === 'week' && diffDays > 7.5) return false;
+          if (selDate === 'month' && diffDays > 30.5) return false;
+        }
+      }
+
+      // 10. Review Status (New/Unreviewed Filter)
+      if (selUnreviewed === 'unreviewed' && item.isReviewed === true) return false;
+      if (selUnreviewed === 'reviewed' && item.isReviewed !== true) return false;
+
       return true;
     });
 
-    // Sort complaints by Priority score descending (Stage 10 Part 20)
-    // Civic Connect project-defined priority ranking (Danger 60% + Community 40%)
+    // Sort complaints (Default: Latest First by submission timestamp)
     filtered.sort((a, b) => {
-      const scoreA = (a.priority && a.priority.score !== undefined) ? a.priority.score : 0;
-      const scoreB = (b.priority && b.priority.score !== undefined) ? b.priority.score : 0;
-      return scoreB - scoreA;
+      if (selSort === 'priority') {
+        const scoreA = (a.priority && a.priority.score !== undefined) ? a.priority.score : 0;
+        const scoreB = (b.priority && b.priority.score !== undefined) ? b.priority.score : 0;
+        return scoreB - scoreA;
+      }
+      if (selSort === 'reminders') {
+        return (b.remindersCount || 0) - (a.remindersCount || 0);
+      }
+      if (selSort === 'oldest') {
+        const dateA = new Date(a.createdAt || a.submittedAt || a.date || 0).getTime();
+        const dateB = new Date(b.createdAt || b.submittedAt || b.date || 0).getTime();
+        return dateA - dateB;
+      }
+      // Default: Latest First (createdAt: -1)
+      const dateA = new Date(a.createdAt || a.submittedAt || a.date || 0).getTime();
+      const dateB = new Date(b.createdAt || b.submittedAt || b.date || 0).getTime();
+      return dateB - dateA;
     });
 
     return filtered;
@@ -554,11 +444,35 @@ document.addEventListener('DOMContentLoaded', () => {
     complaintsTableBody.innerHTML = '';
 
     const filtered = filterComplaints();
+    const totalItems = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalItems);
+    const paginatedItems = filtered.slice(startIndex, endIndex);
 
     // Results Counter
     if (resultsCountBadge) {
-      resultsCountBadge.textContent = `Showing ${filtered.length} of ${complaints.length} complaints (Sorted by Priority)`;
+      const selSort = filterSort ? filterSort.value : 'latest';
+      const sortLabel = selSort === 'priority' ? 'Sorted by Priority' : (selSort === 'oldest' ? 'Sorted Oldest First' : (selSort === 'reminders' ? 'Sorted by Reminders' : 'Sorted Newest First'));
+      resultsCountBadge.textContent = `Showing ${filtered.length} of ${complaints.length} complaints (${sortLabel})`;
     }
+
+    // Update Pagination Toolbar
+    if (paginationInfoText) {
+      paginationInfoText.textContent = totalItems > 0
+        ? `Showing ${startIndex + 1} to ${endIndex} of ${totalItems} complaints`
+        : `Showing 0 complaints`;
+    }
+
+    if (paginationPageIndicator) {
+      paginationPageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+
+    if (btnPrevPage) btnPrevPage.disabled = currentPage <= 1;
+    if (btnNextPage) btnNextPage.disabled = currentPage >= totalPages;
 
     // Toggle Empty State
     if (filtered.length === 0) {
@@ -568,10 +482,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (emptyTableState) emptyTableState.style.display = 'none';
 
-    // Populate Table Rows (Stage 10 Part 20 Columns)
-    filtered.forEach(item => {
+    // Populate Table Rows for current page slice (Streamlined 7-Column Layout)
+    paginatedItems.forEach(item => {
       const row = document.createElement('tr');
       row.setAttribute('data-id', item.id);
+      row.className = 'clickable-complaint-row';
+      row.title = "Click anywhere on row to review ticket details and citizen profile";
 
       const statusClass = getStatusBadgeClass(item.status);
       const verifyClass = getVerificationBadgeClass(item.verification);
@@ -583,79 +499,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Community weight values
       const reportCount = item.reportCount || 1;
-      const voteCount = item.supporters || (item.voters ? item.voters.length : 0);
-      const communityScore = (item.priority && item.priority.communityScore !== undefined) ? item.priority.communityScore : 50;
+      const voteCount = item.supporters || (item.voters ? item.voters.length : (item.supportersCount || 0));
 
       // Priority values
       const priorityLevel = (item.priority && item.priority.level) ? item.priority.level : (item.severity ? item.severity.toUpperCase() : 'MEDIUM');
       const priorityScore = (item.priority && item.priority.score !== undefined) ? item.priority.score : 50;
       const priorityClass = getPriorityBadgeClass(priorityLevel);
 
+      let locAddress = 'Municipal Area';
+      if (typeof item.location === 'string') {
+        locAddress = item.location;
+      } else if (item.location && typeof item.location === 'object') {
+        locAddress = item.location.address || (item.location.latitude ? `Coords (${item.location.latitude.toFixed(4)}, ${item.location.longitude.toFixed(4)})` : 'Gorakhpur Ward');
+      }
+
       row.innerHTML = `
-        <!-- Complaint ID -->
+        <!-- 1. Complaint ID -->
         <td>
-          <span class="tbl-id-badge">${escapeHtml(item.id)}</span>
+          <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+            <span class="tbl-id-badge">${escapeHtml(item.id)}</span>
+            ${!item.isReviewed ? `<span class="badge-new-complaint" title="Newly registered complaint — awaiting review">✨ NEW</span>` : ''}
+          </div>
+          ${(item.remindersCount && item.remindersCount > 0) ? `<span title="${item.remindersCount} citizen reminder(s)" style="display: block; font-size: 0.68rem; font-weight: 800; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; padding: 1px 5px; margin-top: 3px;">🔔 ${item.remindersCount} Reminders</span>` : ''}
         </td>
 
-        <!-- Problem Title -->
+        <!-- 2. Problem Title & Location -->
         <td>
-          <div class="tbl-title-cell" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
+          <div class="tbl-title-cell" title="${escapeHtml(item.title)}" style="font-weight: 700; color: var(--navy-blue); line-height: 1.35; margin-bottom: 3px;">
+            ${escapeHtml(item.title)}
+          </div>
+          <div style="font-size: 0.77rem; color: #64748b; display: flex; align-items: center; gap: 4px;" title="${escapeHtml(locAddress)}">
+            <span style="font-size: 0.85rem;">📍</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">${escapeHtml(locAddress)}</span>
+          </div>
         </td>
 
-        <!-- Category -->
+        <!-- 3. Category -->
         <td>
           <span class="card-category-badge" style="margin-bottom: 0;">${escapeHtml(item.category)}</span>
         </td>
 
-        <!-- AI Danger Level & Score (Stage 10 Part 20) -->
+        <!-- 4. AI Risk & Priority Score -->
         <td>
-          <span class="severity-badge ${dangerClass}" title="Gemini AI assessed risk score">
-            ${dangerLevel} (${dangerScore})
-          </span>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span class="severity-badge ${dangerClass}" style="font-size: 0.72rem; padding: 2px 6px;" title="Gemini AI assessed risk score">
+              AI: ${dangerLevel} (${dangerScore})
+            </span>
+            <span class="severity-badge ${priorityClass}" style="font-size: 0.72rem; padding: 2px 6px;">
+              Priority: ${priorityLevel} (${priorityScore}/100)
+            </span>
+          </div>
         </td>
 
-        <!-- Report Count (Stage 10 Part 20) -->
+        <!-- 5. Community Weight -->
         <td style="text-align: center;">
-          <strong style="color: #07546b; font-size: 0.95rem;">${reportCount}</strong>
+          <div style="font-size: 0.83rem; font-weight: 700; color: #07546b;">
+            ${reportCount} ${reportCount === 1 ? 'Report' : 'Reports'}
+          </div>
+          <div style="font-size: 0.75rem; color: #0284c7; font-weight: 600;">
+            ${voteCount} ${voteCount === 1 ? 'Vote' : 'Votes'}
+          </div>
         </td>
 
-        <!-- Vote Count (Stage 10 Part 20) -->
-        <td style="text-align: center;">
-          <strong style="color: #0284c7; font-size: 0.95rem;">${voteCount}</strong>
-        </td>
-
-        <!-- Community Score (Stage 10 Part 20) -->
-        <td style="text-align: center; font-size: 0.85rem; font-weight: 700; color: #166534;">
-          ${communityScore}
-        </td>
-
-        <!-- Priority Score & Level (Stage 10 Part 20) -->
-        <td>
-          <span class="severity-badge ${priorityClass}">
-            ${priorityLevel} (${priorityScore}/100)
-          </span>
-        </td>
-
-        <!-- Current Status -->
+        <!-- 6. Current Status & Verification -->
         <td>
           <span class="status-badge ${statusClass}">
             <span class="badge-dot"></span>
             ${escapeHtml(item.status)}
           </span>
-        </td>
-
-        <!-- Verification Status -->
-        <td>
-          <span class="verify-badge ${verifyClass}">
-            <span>${item.verification === 'Verified' ? '✓' : item.verification === 'Rejected' ? '✕' : '●'}</span>
-            ${escapeHtml(item.verification)}
+          <span class="verify-badge ${verifyClass}" style="margin-top: 3px; display: inline-flex; font-size: 0.69rem; padding: 1px 6px;">
+            ${item.verification === 'Verified' ? '✓ Verified' : item.verification === 'Needs Inspection' ? '🔍 Inspection' : item.verification === 'Insufficient Evidence' ? '⚠️ Insufficient' : item.verification === 'Rejected' ? '✕ Rejected' : '● Pending'}
           </span>
         </td>
 
-        <!-- Actions -->
+        <!-- 7. Actions -->
         <td style="text-align: center;">
           <button type="button" class="btn-table-review" data-id="${item.id}" aria-label="Review complaint ${item.id}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
@@ -664,18 +584,34 @@ document.addEventListener('DOMContentLoaded', () => {
         </td>
       `;
 
+      // Allow clicking anywhere on the complaint row to open review
+      row.addEventListener('click', (e) => {
+        // Only trigger if not already handled by child interactive elements
+        openReviewModal(item.id);
+      });
+
       complaintsTableBody.appendChild(row);
     });
   }
 
 
   /* ========================================================
-   * 8. REVIEW MODAL & REAL-TIME STATE TRANSITIONS
+   * 8. REVIEW MODAL, CITIZEN PROFILE & ANTI-FRAUD CONTROLLER
    * ========================================================
    */
   function openReviewModal(id) {
     const item = complaints.find(c => c.id === id);
     if (!item || !reviewModal || !reviewModalBody) return;
+
+    // Automatically mark complaint as reviewed when inspected by authority
+    if (!item.isReviewed) {
+      item.isReviewed = true;
+      item.reviewedAt = new Date().toISOString();
+      if (window.civicFetch) {
+        window.civicFetch(`/api/admin/complaints/${encodeURIComponent(id)}/review`, { method: 'PATCH' }).catch(() => {});
+      }
+      setTimeout(() => renderComplaints(), 50);
+    }
 
     activeComplaintId = id;
     if (modalComplaintIdDisplay) modalComplaintIdDisplay.textContent = item.id;
@@ -683,7 +619,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusClass = getStatusBadgeClass(item.status);
     const severityClass = getSeverityBadgeClass(item.severity);
     const verifyClass = getVerificationBadgeClass(item.verification);
-    const isPriority = item.severity === 'Critical' || item.severity === 'High';
 
     // Image section
     let imageHtml = '';
@@ -726,23 +661,125 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     }
 
-    // AI & Priority values (Stage 10 Part 20 & 23)
+    // AI & Priority values
     const dangerLevel = (item.aiAnalysis && item.aiAnalysis.dangerLevel) ? item.aiAnalysis.dangerLevel.toUpperCase() : 'MEDIUM';
     const dangerScore = (item.aiAnalysis && item.aiAnalysis.dangerScore !== undefined) ? item.aiAnalysis.dangerScore : 50;
     const aiReason = (item.aiAnalysis && item.aiAnalysis.reason) ? item.aiAnalysis.reason : 'Automated hazard risk assessment conducted based on complaint keywords and severity.';
     const reportCount = item.reportCount || 1;
-    const voteCount = item.supporters || (item.voters ? item.voters.length : 0);
+    const voteCount = item.supporters || (item.voters ? item.voters.length : (item.supportersCount || 0));
     const communityScore = (item.priority && item.priority.communityScore !== undefined) ? item.priority.communityScore : 50;
     const priorityLevel = (item.priority && item.priority.level) ? item.priority.level : (item.severity ? item.severity.toUpperCase() : 'MEDIUM');
     const priorityScore = (item.priority && item.priority.score !== undefined) ? item.priority.score : 50;
     const priorityClass = getPriorityBadgeClass(priorityLevel);
 
     let addressStr = item.location;
+    let latCoord = null;
+    let lngCoord = null;
     if (item.location && typeof item.location === 'object') {
       addressStr = item.location.address || 'GPS Coordinates';
       if (item.location.latitude && item.location.longitude) {
-        addressStr += ` (Lat: ${item.location.latitude.toFixed(5)}, Lng: ${item.location.longitude.toFixed(5)})`;
+        latCoord = parseFloat(item.location.latitude);
+        lngCoord = parseFloat(item.location.longitude);
+        addressStr += ` (Lat: ${latCoord.toFixed(5)}, Lng: ${lngCoord.toFixed(5)})`;
       }
+    } else if (item.latitude && item.longitude) {
+      latCoord = parseFloat(item.latitude);
+      lngCoord = parseFloat(item.longitude);
+    }
+
+    // Location & Evidence Verification Metadata
+    const locObj = (item.location && typeof item.location === 'object') ? item.location : {};
+    const locSource = locObj.source || item.locationSource || (latCoord && lngCoord ? 'manual' : 'text');
+    const locAccuracy = (locObj.accuracy !== undefined && locObj.accuracy !== null) ? parseFloat(locObj.accuracy) : (item.locationAccuracy !== undefined ? parseFloat(item.locationAccuracy) : null);
+    const locCapturedAt = locObj.capturedAt || item.locationCapturedAt;
+    const photoSource = item.photoSource || (item.image ? 'upload' : 'none');
+    const photoUploadedAt = item.photoUploadedAt;
+    const serverSubmittedAt = item.submittedAt || item.createdAt || item.date;
+
+    const isGps = locSource === 'gps';
+    const hasCoords = latCoord !== null && lngCoord !== null && !isNaN(latCoord) && !isNaN(lngCoord);
+
+    // Human-friendly date/time formatter
+    const formatTs = (ts) => {
+      if (!ts) return 'Not recorded';
+      try {
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return String(ts);
+        return d.toLocaleString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        });
+      } catch (e) {
+        return String(ts);
+      }
+    };
+
+    // Verification History Audit Trail HTML
+    const vHistory = Array.isArray(item.verificationHistory) ? item.verificationHistory : [];
+    let vHistoryHtml = '';
+    if (vHistory.length > 0) {
+      vHistoryHtml = `
+        <div class="vhistory-section">
+          <div class="vhistory-title">
+            <span>📜</span> Verification Audit History (${vHistory.length} Record${vHistory.length === 1 ? '' : 's'})
+          </div>
+          <ul class="vhistory-timeline">
+            ${vHistory.map(h => {
+              const hStatusClass = getVerificationBadgeClass(h.status || 'Pending');
+              return `
+                <li class="vhistory-item">
+                  <div class="vhistory-action-line">
+                    <span class="vhistory-action">${escapeHtml(h.action || h.status)}</span>
+                    <span class="verify-badge ${hStatusClass}" style="font-size: 0.68rem; padding: 1px 6px;">
+                      ${escapeHtml(h.status || 'Pending')}
+                    </span>
+                    <span class="vhistory-meta">
+                      by <strong>${escapeHtml(h.authorityName || 'Authority')}</strong> &bull; ${formatTs(h.timestamp)}
+                    </span>
+                  </div>
+                  ${h.notes ? `<div class="vhistory-notes">"${escapeHtml(h.notes)}"</div>` : ''}
+                </li>
+              `;
+            }).join('')}
+          </ul>
+        </div>
+      `;
+    } else {
+      vHistoryHtml = `
+        <div class="vhistory-section" style="background: #f8fafc; border: 1px dashed #cbd5e1; text-align: center; color: #64748b; font-size: 0.8rem; padding: 0.75rem;">
+          Initial verification pending. No prior authority review actions recorded yet.
+        </div>
+      `;
+    }
+
+    // Find citizen in registered sampleUsers list
+    let citizen = sampleUsers.find(u => {
+      const uId = (u.id || u._id || '').toString();
+      const uEmail = (u.email || '').toLowerCase();
+      const uName = (u.name || '').toLowerCase();
+      return (item.reporterId && uId === item.reporterId.toString()) ||
+             (item.reportedBy && uId === item.reportedBy.toString()) ||
+             (item.reporterEmail && uEmail === item.reporterEmail.toLowerCase()) ||
+             (item.reporterName && uName === item.reporterName.toLowerCase()) ||
+             (item.reportedBy && uName === item.reportedBy.toLowerCase());
+    });
+
+    if (!citizen) {
+      citizen = {
+        id: item.reporterId || 'user_anon',
+        name: item.reporterName || (typeof item.reportedBy === 'string' ? item.reportedBy : 'Civic Citizen'),
+        email: item.reporterEmail || 'citizen@civicconnect.org',
+        tokens: item.reporterTokens || 15,
+        reported: item.reportCount || 1,
+        resolved: 0,
+        status: item.reporterStatus || 'Active',
+        flaggedReason: ''
+      };
     }
 
     reviewModalBody.innerHTML = `
@@ -756,7 +793,82 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>
 
-      <!-- AI Danger Assessment & Priority Calculation (Stage 10 Part 20 & 23) -->
+      ${(item.remindersCount && item.remindersCount > 0) ? `
+        <div style="background-color: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; color: #9f1239;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <strong style="font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+              <span>🔔</span> Citizen Follow-Up Alert (${item.remindersCount} Reminder(s) Dispatched)
+            </strong>
+            <span style="font-size: 0.72rem; background: #be123c; color: white; padding: 2px 8px; border-radius: 9999px; font-weight: 800;">ACTION REQUIRED</span>
+          </div>
+          <p style="margin: 0; font-size: 0.85rem; line-height: 1.45;">
+            The reporting citizen has sent urgent follow-up notifications requesting immediate resolution update for this location.
+            ${item.lastReminderReason ? `<br><strong>Citizen Reason:</strong> "${escapeHtml(item.lastReminderReason)}"` : ''}
+          </p>
+        </div>
+      ` : ''}
+
+      <!-- Reporting Citizen Identity & Anti-Fraud Action Card -->
+      <div class="citizen-profile-card ${citizen.status === 'Flagged' ? 'flagged' : ''}" id="modalCitizenCard">
+        <div class="citizen-profile-header">
+          <strong style="color: var(--navy-blue); font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>👤</span> Reporting Citizen: <u>${escapeHtml(citizen.name)}</u>
+          </strong>
+          <span class="verify-badge ${citizen.status === 'Flagged' ? 'verify-rejected' : 'verify-verified'}" id="modalCitizenStatusBadge">
+            ${citizen.status === 'Flagged' ? '⚠️ Account Flagged' : '✓ Active Citizen'}
+          </span>
+        </div>
+
+        <div class="citizen-profile-grid">
+          <div>
+            <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Citizen Email</span>
+            <div style="font-size: 0.85rem; font-weight: 600; color: #1e293b; overflow: hidden; text-overflow: ellipsis;">
+              ${escapeHtml(citizen.email || 'N/A')}
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Citizen ID</span>
+            <div style="font-size: 0.82rem; font-family: monospace; color: #475569;">
+              ${escapeHtml(citizen.id || 'N/A')}
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Total Reported Tickets</span>
+            <div style="font-size: 0.85rem; font-weight: 700; color: #07546b;">
+              ${citizen.reported || 1} complaints
+            </div>
+          </div>
+          <div>
+            <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Reward Token Balance</span>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--primary-teal);" id="modalCitizenTokensDisplay">
+              🪙 ${citizen.tokens || 0} tokens
+            </div>
+          </div>
+        </div>
+
+        ${citizen.status === 'Flagged' && citizen.flaggedReason ? `
+          <div style="background: #fee2e2; border: 1px solid #fecaca; border-radius: 6px; padding: 0.45rem 0.75rem; font-size: 0.8rem; color: #991b1b; margin-bottom: 0.65rem;">
+            <strong>Flagged Reason:</strong> "${escapeHtml(citizen.flaggedReason)}"
+          </div>
+        ` : ''}
+
+        <div class="citizen-profile-actions">
+          ${citizen.status === 'Flagged' ? `
+            <button type="button" class="btn-unflag-citizen" id="modalUnflagCitizenBtn" data-uid="${escapeHtml(citizen.id)}">
+              ✓ Clear Flag &amp; Restore Citizen
+            </button>
+          ` : `
+            <button type="button" class="btn-flag-citizen" id="modalFlagCitizenBtn" data-uid="${escapeHtml(citizen.id)}">
+              ⚠️ Flag Citizen for False Complaint (-10 Tokens)
+            </button>
+          `}
+          <button type="button" class="btn btn-outline" id="modalJumpToCitizenListBtn" style="font-size: 0.75rem; padding: 0.35rem 0.7rem;" title="View all registered citizens in directory">
+            📋 View in Citizen Directory &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- AI Danger Assessment & Priority Calculation -->
       <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
           <strong style="color: var(--navy-blue); font-size: 0.95rem; display: flex; align-items: center; gap: 0.35rem;">
@@ -787,7 +899,14 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="modal-meta-value">${escapeHtml(item.category)}</span>
         </div>
         <div class="modal-meta-item">
-          <span class="modal-meta-label">Location / Landmark</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+            <span class="modal-meta-label">Location / Landmark</span>
+            ${(latCoord && lngCoord) ? `
+              <button type="button" class="btn-jump-map" id="modalJumpMapBtn">
+                🗺️ View on Heat Map
+              </button>
+            ` : ''}
+          </div>
           <span class="modal-meta-value">${escapeHtml(addressStr)}</span>
         </div>
         <div class="modal-meta-item">
@@ -796,7 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="modal-meta-item">
           <span class="modal-meta-label">Reported By</span>
-          <span class="modal-meta-value">${escapeHtml(item.reportedBy)}</span>
+          <span class="modal-meta-value">${escapeHtml(citizen.name)} (${escapeHtml(citizen.email || 'Registered Citizen')})</span>
         </div>
         <div class="modal-meta-item">
           <span class="modal-meta-label">Citizen Reports</span>
@@ -833,8 +952,188 @@ document.addEventListener('DOMContentLoaded', () => {
 
       <!-- Photo Evidence -->
       <div class="modal-photo-section">
-        <span class="modal-meta-label" style="display: block; margin-bottom: 0.4rem;">Photo Evidence</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <span class="modal-meta-label">Photo Evidence</span>
+          <span class="evidence-source-tag ${photoSource === 'camera' ? 'source-camera' : 'source-gallery'}" style="font-size: 0.72rem;">
+            ${photoSource === 'camera' ? '📷 Live Camera' : photoSource === 'gallery' ? '🖼️ Gallery File' : '📁 Uploaded File'}
+          </span>
+        </div>
         ${imageHtml}
+      </div>
+
+      <!-- Location & Evidence Verification (Stage 10 Part 21) -->
+      <div class="evidence-verification-card">
+        <div class="evidence-header">
+          <h4 class="evidence-title">
+            <span>📍</span> Location &amp; Evidence Verification
+          </h4>
+          <span class="verify-badge ${verifyClass}">
+            ${escapeHtml(item.verification)}
+          </span>
+        </div>
+
+        ${(isGps && locAccuracy && locAccuracy > 50) ? `
+          <div class="evidence-warning-banner">
+            <span>⚠️</span>
+            <div>
+              <strong>Coarse GPS Accuracy Warning (&plusmn;${Math.round(locAccuracy)}m):</strong>
+              Device reported accuracy radius exceeds 50 metres. Cross-reference nearby street landmarks and photographic evidence before scheduling field crews.
+            </div>
+          </div>
+        ` : ''}
+
+        ${(!isGps && hasCoords) ? `
+          <div class="evidence-warning-banner" style="background: #fffbeb; border-color: #fde68a; color: #92400e;">
+            <span>ℹ️</span>
+            <div>
+              <strong>Manually Placed Location:</strong>
+              Coordinates were selected manually on the map (no device GPS sensor fix). Review against description and visual photographic clues.
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="evidence-fairness-note">
+          <strong>Fairness Advisory:</strong> Missing GPS or manual pin selection does NOT imply a fraudulent complaint. Citizens may have strict privacy controls or submitted the report after leaving the hazard location. Human verification of the photograph and description is required.
+        </div>
+
+        <div class="evidence-grid">
+          <div class="evidence-item">
+            <span class="evidence-label">Location Source</span>
+            <div class="evidence-value">
+              ${isGps ? `
+                <span class="evidence-source-tag source-gps">🛰️ GPS Hardware Verified</span>
+              ` : `
+                <span class="evidence-source-tag source-manual">📍 Manually Selected Pin</span>
+              `}
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <span class="evidence-label">Reported Coordinates</span>
+            <div class="evidence-value" style="font-family: monospace; font-size: 0.82rem;">
+              ${hasCoords ? `${Number(latCoord).toFixed(5)}, ${Number(lngCoord).toFixed(5)}` : 'No coordinates'}
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <span class="evidence-label">GPS Precision / Accuracy</span>
+            <div class="evidence-value">
+              ${(locAccuracy !== null && locAccuracy !== undefined && !isNaN(locAccuracy)) ? `
+                <span class="evidence-accuracy-chip ${locAccuracy <= 50 ? 'acc-good' : 'acc-coarse'}">
+                  &plusmn;${Math.round(locAccuracy)} metres (${locAccuracy <= 50 ? 'High Precision' : 'Coarse Precision'})
+                </span>
+              ` : `
+                <span style="font-size: 0.8rem; color: #64748b;">N/A (Manual Pin)</span>
+              `}
+            </div>
+          </div>
+
+          <div class="evidence-item">
+            <span class="evidence-label">Photo Source</span>
+            <div class="evidence-value">
+              ${photoSource === 'camera' ? `
+                <span class="evidence-source-tag source-camera">📷 Live Camera Capture</span>
+              ` : photoSource === 'gallery' ? `
+                <span class="evidence-source-tag source-gallery">🖼️ Gallery / File Upload</span>
+              ` : `
+                <span class="evidence-source-tag source-gallery">📁 Uploaded File</span>
+              `}
+            </div>
+          </div>
+        </div>
+
+        <!-- Timestamps Cross-Verification Table -->
+        <div class="evidence-timestamps-comparison">
+          <strong style="display: block; font-size: 0.8rem; color: var(--navy-blue); margin-bottom: 0.4rem;">
+            🕒 Evidence Timestamps Cross-Check
+          </strong>
+          <table class="timestamps-table">
+            <tbody>
+              <tr>
+                <td class="ts-label">Location Captured:</td>
+                <td class="ts-value">${formatTs(locCapturedAt)}</td>
+              </tr>
+              <tr>
+                <td class="ts-label">Photo Selected / Uploaded:</td>
+                <td class="ts-value">${formatTs(photoUploadedAt)}</td>
+              </tr>
+              <tr>
+                <td class="ts-label">Official Server Submission:</td>
+                <td class="ts-value">${formatTs(serverSubmittedAt)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <span style="display: block; font-size: 0.72rem; color: #64748b; margin-top: 0.35rem; font-style: italic;">
+            Note: Client timestamps are recorded for contextual analysis; server submission timestamp represents the immutable official receipt.
+          </span>
+        </div>
+
+        <!-- Evidence Mini Map -->
+        <strong style="display: block; font-size: 0.8rem; color: var(--navy-blue); margin-bottom: 0.4rem;">
+          🗺️ Evidence Location Map View
+        </strong>
+        ${hasCoords ? `
+          <div class="modal-evidence-map-wrap">
+            <div id="modalEvidenceMap"></div>
+          </div>
+        ` : `
+          <div class="modal-evidence-map-wrap">
+            <div class="modal-evidence-map-fallback">
+              <span style="font-size: 1.8rem; margin-bottom: 0.35rem;">📍</span>
+              <strong style="color: var(--navy-blue); font-size: 0.9rem;">No Geographic Coordinates Recorded</strong>
+              <p style="margin: 0.25rem 0 0; font-size: 0.78rem; max-width: 320px;">
+                Citizen provided textual landmark address only (${escapeHtml(addressStr)}). Verify location from street description and photograph.
+              </p>
+            </div>
+          </div>
+        `}
+
+        <!-- Verification History Audit Trail -->
+        ${vHistoryHtml}
+      </div>
+
+      <!-- Municipal Action Plan: Assigned Official & Internal Notes -->
+      <div style="background-color: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <strong style="color: var(--navy-blue); font-size: 0.95rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>👷</span> Municipal Action Plan &amp; Official Assignment
+          </strong>
+          <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">Internal Authority Record</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin-bottom: 0.75rem;">
+          <div>
+            <label for="modalAssignOfficialInput" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--navy-blue); margin-bottom: 0.25rem;">
+              Assigned Field Official:
+            </label>
+            <input 
+              type="text" 
+              id="modalAssignOfficialInput" 
+              class="admin-search-input" 
+              style="padding: 0.45rem 0.65rem; font-size: 0.85rem; width: 100%; border-radius: 6px; border: 1.5px solid #cbd5e1; background: #fff;" 
+              placeholder="e.g. Officer R. Sharma (Ward 4)" 
+              value="${escapeHtml(item.assignedOfficial || '')}"
+            >
+          </div>
+          <div>
+            <label for="modalInternalNotesInput" style="display: block; font-size: 0.8rem; font-weight: 700; color: var(--navy-blue); margin-bottom: 0.25rem;">
+              Internal Municipal Notes:
+            </label>
+            <textarea 
+              id="modalInternalNotesInput" 
+              rows="2" 
+              class="admin-search-input" 
+              style="padding: 0.45rem 0.65rem; font-size: 0.85rem; width: 100%; border-radius: 6px; border: 1.5px solid #cbd5e1; background: #fff; resize: vertical;" 
+              placeholder="Internal notes, inspection date, contractor details..."
+            >${escapeHtml(item.internalNotes || '')}</textarea>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button type="button" class="btn btn-outline" id="modalSaveActionPlanBtn" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; font-weight: 700;">
+            💾 Save Official &amp; Notes
+          </button>
+        </div>
       </div>
 
       <!-- Resolution Panel if applicable -->
@@ -844,17 +1143,210 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render Modal Actions
     renderModalFooterActions(item);
 
-    // Setup Re-analyze AI button click event (Stage 10 Part 24)
+    // Setup Jump to Heat Map button
+    const jumpMapBtn = reviewModalBody.querySelector('#modalJumpMapBtn');
+    if (jumpMapBtn && latCoord && lngCoord) {
+      jumpMapBtn.addEventListener('click', () => {
+        closeReviewModal();
+        const mapSection = document.getElementById('heatmap-section');
+        if (mapSection) mapSection.scrollIntoView({ behavior: 'smooth' });
+        if (mapInstance) {
+          mapInstance.setView([latCoord, lngCoord], 15);
+          if (markersLayerInstance) {
+            markersLayerInstance.eachLayer(layer => {
+              const ll = layer.getLatLng();
+              if (Math.abs(ll.lat - latCoord) < 0.0001 && Math.abs(ll.lng - lngCoord) < 0.0001) {
+                layer.openPopup();
+              }
+            });
+          }
+        }
+      });
+    }
+
+    // Setup Flag Citizen Action (Anti-Fraud Penalty)
+    const flagBtn = reviewModalBody.querySelector('#modalFlagCitizenBtn');
+    if (flagBtn) {
+      flagBtn.addEventListener('click', async () => {
+        const reason = await openActionModal({
+          icon: '🚩',
+          title: 'Flag Citizen Account (Anti-Fraud Penalty)',
+          subtitle: `Citizen: ${citizen.name} (ID: ${citizen.id || citizen._id})`,
+          label: 'Enter penalty reason for false / spam reporting:',
+          defaultValue: "False or misleading hazard complaint submitted",
+          placeholder: 'Specify reason for account violation penalty...',
+          chips: [
+            "False or fake hazard photograph submitted",
+            "Duplicate spam report submissions",
+            "Offensive or abusive complaint content"
+          ],
+          confirmText: 'Flag & Penalize (-10 Tokens)',
+          confirmClass: 'btn-danger',
+          requireInput: true,
+          minLength: 5
+        });
+        if (reason === null) return;
+
+        flagBtn.disabled = true;
+        flagBtn.textContent = 'Flagging...';
+
+        try {
+          const flagRes = await window.civicFetch(`/api/admin/users/${citizen.id}/flag`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+              status: 'Flagged',
+              reason: reason.trim() || 'False complaint violation',
+              penaltyTokens: 10
+            })
+          });
+
+          if (flagRes && flagRes.ok) {
+            citizen.status = 'Flagged';
+            citizen.flaggedReason = reason;
+            citizen.tokens = Math.max(0, (citizen.tokens || 10) - 10);
+            item.reporterStatus = 'Flagged';
+
+            // Also offer to reject the false complaint
+            const rejectConfirm = await openConfirmModal({
+              icon: '❌',
+              title: 'Reject Complaint as False Report?',
+              message: `Do you also want to mark this complaint (${item.id}) as REJECTED due to false reporting?`,
+              confirmText: 'Reject Complaint',
+              confirmClass: 'btn-danger'
+            });
+            if (rejectConfirm) {
+              await window.civicFetch(`/api/admin/complaints/${item.id}/status`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                  status: 'Rejected',
+                  verification: 'Rejected',
+                  internalNotes: `Rejected as FALSE COMPLAINT by Admin. Reason: ${reason}`
+                })
+              });
+              item.status = 'Rejected';
+              item.verification = 'Rejected';
+            }
+
+            addActivity(`Admin penalized citizen ${citizen.name} (-10 tokens) and flagged account for false report ${item.id}`, 'reject');
+            refreshAllDashboardViews();
+            renderUsers();
+            openReviewModal(item.id);
+          } else {
+            alert('Could not update citizen flag status on server.');
+          }
+        } catch (err) {
+          alert('Error updating citizen: ' + err.message);
+        } finally {
+          if (flagBtn) flagBtn.disabled = false;
+        }
+      });
+    }
+
+    // Setup Unflag Citizen Action
+    const unflagBtn = reviewModalBody.querySelector('#modalUnflagCitizenBtn');
+    if (unflagBtn) {
+      unflagBtn.addEventListener('click', async () => {
+        const confirmed = await openConfirmModal({
+          icon: '🔄',
+          title: 'Restore Citizen Account',
+          message: `Restore citizen "${citizen.name}" account status to Active? Their penalties will be cleared.`,
+          confirmText: 'Restore to Active',
+          confirmClass: 'btn-success'
+        });
+        if (!confirmed) return;
+
+        unflagBtn.disabled = true;
+        unflagBtn.textContent = 'Restoring...';
+
+        try {
+          const res = await window.civicFetch(`/api/admin/users/${citizen.id}/flag`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'Active', reason: '' })
+          });
+
+          if (res && res.ok) {
+            citizen.status = 'Active';
+            citizen.flaggedReason = '';
+            item.reporterStatus = 'Active';
+            addActivity(`Admin restored citizen ${citizen.name} to Active status`, 'verify');
+            refreshAllDashboardViews();
+            renderUsers();
+            openReviewModal(item.id);
+            alert(`Citizen ${citizen.name} has been reinstated to Active status.`);
+          } else {
+            alert('Could not update citizen status on server.');
+          }
+        } catch (err) {
+          alert('Error updating citizen: ' + err.message);
+        } finally {
+          if (unflagBtn) unflagBtn.disabled = false;
+        }
+      });
+    }
+
+    // Setup Jump to Citizen Directory button
+    const jumpCitizenBtn = reviewModalBody.querySelector('#modalJumpToCitizenListBtn');
+    if (jumpCitizenBtn) {
+      jumpCitizenBtn.addEventListener('click', () => {
+        closeReviewModal();
+        const userSec = document.getElementById('users-section');
+        if (userSec) userSec.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          const userRow = document.querySelector(`tr[data-uid="${citizen.id}"]`);
+          if (userRow) {
+            userRow.style.backgroundColor = '#fef08a';
+            setTimeout(() => { userRow.style.backgroundColor = ''; }, 3000);
+          }
+        }, 400);
+      });
+    }
+
+    // Setup Save Action Plan (Official & Internal Notes)
+    const saveActionPlanBtn = reviewModalBody.querySelector('#modalSaveActionPlanBtn');
+    if (saveActionPlanBtn) {
+      saveActionPlanBtn.addEventListener('click', async () => {
+        const offInput = reviewModalBody.querySelector('#modalAssignOfficialInput');
+        const notesInput = reviewModalBody.querySelector('#modalInternalNotesInput');
+        const assignedOfficial = offInput ? offInput.value.trim() : '';
+        const internalNotes = notesInput ? notesInput.value.trim() : '';
+
+        saveActionPlanBtn.disabled = true;
+        saveActionPlanBtn.textContent = 'Saving...';
+        try {
+          const res = await window.civicFetch('/api/admin/complaints/' + item.id + '/status', {
+            method: 'PATCH',
+            body: JSON.stringify({ assignedOfficial, internalNotes })
+          });
+          if (res && res.ok) {
+            const json = await res.json();
+            if (json.data) Object.assign(item, json.data);
+            item.assignedOfficial = assignedOfficial;
+            item.internalNotes = internalNotes;
+            addActivity(`Admin updated action plan for ${item.id} (Official: ${assignedOfficial || 'None'})`, 'verify');
+            refreshAllDashboardViews();
+            alert('Official assignment and internal notes saved successfully!');
+          } else {
+            alert('Could not save action plan to server.');
+          }
+        } catch (err) {
+          alert('Error saving action plan: ' + err.message);
+        } finally {
+          if (saveActionPlanBtn) {
+            saveActionPlanBtn.disabled = false;
+            saveActionPlanBtn.textContent = '💾 Save Official & Notes';
+          }
+        }
+      });
+    }
+
+    // Setup Re-analyze AI button click event
     const reanalyzeBtn = reviewModalBody.querySelector('#reanalyzeAiBtn');
     if (reanalyzeBtn) {
       reanalyzeBtn.addEventListener('click', async () => {
         reanalyzeBtn.disabled = true;
         reanalyzeBtn.textContent = 'Calling Gemini AI...';
         try {
-          const res = await fetch(`/api/complaints/${item.id}/reanalyze`, {
-            method: 'POST',
-            credentials: 'include'
-          });
+          const res = await window.civicFetch(`/api/complaints/${item.id}/reanalyze`, { method: 'POST' });
           const json = await res.json();
           if (json.success && json.data) {
             Object.assign(item, json.data);
@@ -884,24 +1376,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     reviewModal.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
+
+    // Initialize Modal Evidence Leaflet Map Viewport
+    if (hasCoords && window.L) {
+      setTimeout(() => {
+        const mapContainer = document.getElementById('modalEvidenceMap');
+        if (mapContainer) {
+          if (modalMapInstance) {
+            try { modalMapInstance.remove(); } catch (e) {}
+            modalMapInstance = null;
+          }
+          try {
+            const mLat = parseFloat(latCoord);
+            const mLng = parseFloat(lngCoord);
+            modalMapInstance = L.map(mapContainer, {
+              center: [mLat, mLng],
+              zoom: 16,
+              scrollWheelZoom: false
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              attribution: '&copy; OpenStreetMap contributors',
+              maxZoom: 19
+            }).addTo(modalMapInstance);
+
+            const pinMarker = L.marker([mLat, mLng]).addTo(modalMapInstance);
+            pinMarker.bindPopup(`
+              <div style="font-size: 0.8rem; font-family: sans-serif; line-height: 1.4;">
+                <strong style="color: #07546b;">${escapeHtml(item.title)}</strong><br>
+                <span>${isGps ? '🛰️ Device GPS Fix' : '📍 Manual Map Placement'}</span>
+                ${(locAccuracy !== null && locAccuracy !== undefined && !isNaN(locAccuracy)) ? `<br><span>Accuracy: &plusmn;${Math.round(locAccuracy)}m</span>` : ''}
+              </div>
+            `);
+
+            if (isGps && locAccuracy && locAccuracy > 0) {
+              L.circle([mLat, mLng], {
+                radius: Math.min(parseFloat(locAccuracy), 1000),
+                color: locAccuracy <= 50 ? '#059669' : '#d97706',
+                fillColor: locAccuracy <= 50 ? '#10b981' : '#f59e0b',
+                fillOpacity: 0.15,
+                weight: 1.5
+              }).addTo(modalMapInstance);
+            }
+
+            modalMapInstance.invalidateSize();
+          } catch (mErr) {
+            console.warn('[Modal Evidence Map]: Initialization notice:', mErr.message);
+          }
+        }
+      }, 180);
+    }
   }
 
   function renderModalFooterActions(item) {
     if (!modalFooterActions) return;
 
+    const curPriority = (item.priority && item.priority.level) ? item.priority.level.toUpperCase() : (item.severity ? item.severity.toUpperCase() : 'MEDIUM');
+
     modalFooterActions.innerHTML = `
       <div style="font-size: 0.8rem; color: var(--text-muted);">
-        Update ticket state:
+        Verification &amp; Lifecycle Actions:
       </div>
       <div class="modal-action-buttons-group">
         ${item.verification !== 'Verified' ? `
-          <button type="button" class="btn btn-action-verify" id="modalVerifyBtn">
+          <button type="button" class="btn btn-action-verify" id="modalVerifyBtn" title="Confirm evidence matches reported civic issue">
             ✓ Verify Complaint
           </button>
         ` : ''}
 
+        ${item.verification !== 'Needs Inspection' ? `
+          <button type="button" class="btn btn-action-inspect" id="modalInspectBtn" title="Dispatch field supervisor for on-site physical check">
+            🔍 Mark for Inspection
+          </button>
+        ` : ''}
+
+        ${item.verification !== 'Insufficient Evidence' ? `
+          <button type="button" class="btn btn-action-insufficient" id="modalInsufficientBtn" title="Flag submission for insufficient photo or location evidence">
+            ⚠️ Insufficient Evidence
+          </button>
+        ` : ''}
+
         ${item.verification !== 'Rejected' && item.status !== 'Rejected' ? `
-          <button type="button" class="btn btn-action-reject" id="modalRejectBtn">
+          <button type="button" class="btn btn-action-reject" id="modalRejectBtn" title="Reject invalid or false civic complaint (requires mandatory reason)">
             ✕ Reject Complaint
           </button>
         ` : ''}
@@ -922,17 +1478,45 @@ document.addEventListener('DOMContentLoaded', () => {
           Close
         </button>
       </div>
+
+      <!-- Priority Override Control -->
+      <div style="margin-top: 0.85rem; padding-top: 0.75rem; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; width: 100%;">
+        <span style="font-size: 0.82rem; font-weight: 700; color: var(--navy-blue);">
+          Assign Priority:
+        </span>
+        <div style="display: flex; gap: 0.4rem; align-items: center;">
+          <select id="modalPrioritySelect" style="padding: 0.3rem 0.6rem; border-radius: 4px; border: 1.5px solid #cbd5e1; font-size: 0.82rem; font-weight: 600; background: #fff;">
+            <option value="LOW" ${curPriority === 'LOW' ? 'selected' : ''}>Low Priority</option>
+            <option value="MEDIUM" ${curPriority === 'MEDIUM' ? 'selected' : ''}>Medium Priority</option>
+            <option value="HIGH" ${curPriority === 'HIGH' ? 'selected' : ''}>High Priority</option>
+            <option value="CRITICAL" ${curPriority === 'CRITICAL' ? 'selected' : ''}>Critical Priority</option>
+          </select>
+          <button type="button" class="btn btn-outline" id="modalSavePriorityBtn" style="font-size: 0.8rem; padding: 0.3rem 0.65rem;">
+            Update Priority
+          </button>
+        </div>
+      </div>
     `;
 
-    // Bind action events
+    // Bind verification action events
     const verifyBtn = document.getElementById('modalVerifyBtn');
     if (verifyBtn) {
-      verifyBtn.addEventListener('click', () => verifyComplaint(item.id));
+      verifyBtn.addEventListener('click', () => submitVerificationDecision(item.id, 'Verified', 'Reported location and photo evidence verified.', 'Evidence Verified'));
+    }
+
+    const inspectBtn = document.getElementById('modalInspectBtn');
+    if (inspectBtn) {
+      inspectBtn.addEventListener('click', () => submitVerificationDecision(item.id, 'Needs Inspection', 'Field inspection required to verify ground conditions.', 'Marked for Field Inspection'));
+    }
+
+    const insufficientBtn = document.getElementById('modalInsufficientBtn');
+    if (insufficientBtn) {
+      insufficientBtn.addEventListener('click', () => submitVerificationDecision(item.id, 'Insufficient Evidence', 'Photo or location evidence is insufficient. Further citizen verification needed.', 'Flagged Insufficient Evidence'));
     }
 
     const rejectBtn = document.getElementById('modalRejectBtn');
     if (rejectBtn) {
-      rejectBtn.addEventListener('click', () => rejectComplaint(item.id));
+      rejectBtn.addEventListener('click', () => submitVerificationDecision(item.id, 'Rejected', '', 'Complaint Verification Rejected'));
     }
 
     const progressBtn = document.getElementById('modalProgressBtn');
@@ -945,6 +1529,16 @@ document.addEventListener('DOMContentLoaded', () => {
       resolveBtn.addEventListener('click', () => resolveComplaint(item.id));
     }
 
+    const savePriorityBtn = document.getElementById('modalSavePriorityBtn');
+    if (savePriorityBtn) {
+      savePriorityBtn.addEventListener('click', () => {
+        const selectEl = document.getElementById('modalPrioritySelect');
+        if (selectEl) {
+          updateComplaintPriority(item.id, selectEl.value);
+        }
+      });
+    }
+
     const closeBtn = document.getElementById('modalCloseActionBtn');
     if (closeBtn) {
       closeBtn.addEventListener('click', closeReviewModal);
@@ -952,6 +1546,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeReviewModal() {
+    if (modalMapInstance) {
+      try { modalMapInstance.remove(); } catch (e) {}
+      modalMapInstance = null;
+    }
     if (!reviewModal) return;
     reviewModal.setAttribute('hidden', '');
     document.body.style.overflow = '';
@@ -960,60 +1558,318 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ========================================================
    * 9. STATUS MANAGEMENT & VERIFICATION LOGIC (PERSISTENT)
-   * Syncs state with MongoDB backend via PATCH /api/complaints/:id/status
+   * Syncs verification state via PATCH /api/admin/complaints/:id/verify
    * ========================================================
    */
 
-  // 1. Verify Complaint
-  async function verifyComplaint(id) {
-    const item = complaints.find(c => c.id === id);
-    if (!item) return;
+  /**
+   * ========================================================
+   * IN-APP CIVIC ACTION & CONFIRMATION MODALS
+   * Replaces native browser prompt() & confirm() dialogs with
+   * responsive, accessible, themed in-app dialogs with quick chips
+   * ========================================================
+   */
+  function openActionModal({
+    icon = '📝',
+    title = 'Confirm Action',
+    subtitle = '',
+    label = 'Notes / Details:',
+    defaultValue = '',
+    placeholder = 'Type details...',
+    chips = [],
+    confirmText = 'Confirm & Proceed',
+    confirmClass = 'btn-primary',
+    requireInput = false,
+    minLength = 0,
+    hint = ''
+  }) {
+    return new Promise((resolve) => {
+      let modal = document.getElementById('civicActionModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'civicActionModal';
+        modal.className = 'civic-action-backdrop';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.innerHTML = `
+          <div class="civic-action-dialog">
+            <div class="modal-header">
+              <div class="modal-title-group" style="display: flex; align-items: center; gap: 0.6rem;">
+                <span class="modal-icon" id="actionModalIcon" style="font-size: 1.5rem;">⭐</span>
+                <div>
+                  <h3 class="modal-title" id="actionModalTitle" style="font-size: 1.1rem; font-weight: 700; margin: 0; color: #0f172a;">Action</h3>
+                  <span class="modal-subtitle-id" id="actionModalSubtitle" style="font-size: 0.8rem; color: #64748b;">Subtitle</span>
+                </div>
+              </div>
+              <button type="button" class="modal-close" id="actionModalCloseBtn" aria-label="Close" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8;">&times;</button>
+            </div>
+            <div class="modal-body">
+              <label class="civic-action-label" id="actionModalLabel" for="actionModalInput">Notes</label>
+              <div class="civic-action-chips" id="actionModalChips"></div>
+              <textarea id="actionModalInput" class="civic-action-textarea" rows="3"></textarea>
+              <div class="civic-action-error" id="actionModalError" style="display: none; color: #dc2626; font-size: 0.8rem; font-weight: 700; margin-top: 5px;"></div>
+              <div class="civic-action-hint" id="actionModalHint"></div>
+            </div>
+            <div class="modal-footer civic-action-footer">
+              <button type="button" class="btn btn-outline" id="actionModalCancelBtn">Cancel</button>
+              <button type="button" class="btn" id="actionModalConfirmBtn">Confirm</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
 
-    item.verification = "Verified";
-    if (item.status === "Reported") {
-      item.status = "Under Verification";
-    }
+      const iconEl = modal.querySelector('#actionModalIcon');
+      const titleEl = modal.querySelector('#actionModalTitle');
+      const subtitleEl = modal.querySelector('#actionModalSubtitle');
+      const labelEl = modal.querySelector('#actionModalLabel');
+      const chipsEl = modal.querySelector('#actionModalChips');
+      const inputEl = modal.querySelector('#actionModalInput');
+      const errorEl = modal.querySelector('#actionModalError');
+      const hintEl = modal.querySelector('#actionModalHint');
+      const cancelBtn = modal.querySelector('#actionModalCancelBtn');
+      const confirmBtn = modal.querySelector('#actionModalConfirmBtn');
+      const closeBtn = modal.querySelector('#actionModalCloseBtn');
 
-    // Persist verification & status change to MongoDB
-    try {
-      await fetch(`/api/complaints/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: item.status })
-      });
-    } catch (err) {
-      console.warn('[Backend Notice]: Could not reach API, updated in local state:', err.message);
-    }
+      iconEl.textContent = icon;
+      titleEl.textContent = title;
+      subtitleEl.textContent = subtitle;
+      labelEl.textContent = label;
+      inputEl.style.display = 'block';
+      inputEl.placeholder = placeholder;
+      inputEl.value = defaultValue;
+      hintEl.textContent = hint || (requireInput ? `* Mandatory field (minimum ${minLength} characters)` : '');
+      errorEl.style.display = 'none';
+      errorEl.textContent = '';
 
-    addActivity(`Admin verified ${item.id} (${item.category})`, 'verify');
-    refreshAllDashboardViews();
-    if (activeComplaintId === id) openReviewModal(id);
+      // Preset quick chips
+      chipsEl.innerHTML = '';
+      if (Array.isArray(chips) && chips.length > 0) {
+        chips.forEach(chipText => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'civic-chip-btn';
+          chip.textContent = chipText;
+          chip.addEventListener('click', () => {
+            inputEl.value = chipText;
+            inputEl.focus();
+            errorEl.style.display = 'none';
+          });
+          chipsEl.appendChild(chip);
+        });
+        chipsEl.style.display = 'flex';
+      } else {
+        chipsEl.style.display = 'none';
+      }
+
+      confirmBtn.className = `btn ${confirmClass}`;
+      confirmBtn.textContent = confirmText;
+
+      modal.removeAttribute('hidden');
+      modal.style.display = 'flex';
+      setTimeout(() => inputEl.focus(), 60);
+
+      function cleanup() {
+        modal.style.display = 'none';
+        modal.setAttribute('hidden', '');
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+        closeBtn.onclick = null;
+        document.removeEventListener('keydown', onKeyDown);
+      }
+
+      function handleConfirm() {
+        const val = inputEl.value.trim();
+        if (requireInput && val.length < minLength) {
+          errorEl.textContent = `Please enter at least ${minLength} characters.`;
+          errorEl.style.display = 'block';
+          inputEl.focus();
+          return;
+        }
+        cleanup();
+        resolve(val);
+      }
+
+      function handleCancel() {
+        cleanup();
+        resolve(null);
+      }
+
+      function onKeyDown(e) {
+        if (e.key === 'Escape') {
+          handleCancel();
+        } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          handleConfirm();
+        }
+      }
+
+      confirmBtn.onclick = handleConfirm;
+      cancelBtn.onclick = handleCancel;
+      closeBtn.onclick = handleCancel;
+      document.addEventListener('keydown', onKeyDown);
+    });
   }
 
-  // 2. Reject Complaint
-  async function rejectComplaint(id) {
+  function openConfirmModal({
+    icon = '❓',
+    title = 'Confirm Action',
+    message = 'Are you sure you want to proceed?',
+    confirmText = 'Yes, Proceed',
+    confirmClass = 'btn-primary'
+  }) {
+    return new Promise((resolve) => {
+      openActionModal({
+        icon,
+        title,
+        subtitle: '',
+        label: message,
+        defaultValue: '',
+        chips: [],
+        confirmText,
+        confirmClass,
+        requireInput: false,
+        hint: ''
+      }).then(val => {
+        resolve(val !== null);
+      });
+      const modal = document.getElementById('civicActionModal');
+      if (modal) {
+        const inputEl = modal.querySelector('#actionModalInput');
+        if (inputEl) inputEl.style.display = 'none';
+      }
+    });
+  }
+
+  // Submit Evidence Verification Decision (Authorized Authority Action)
+  async function submitVerificationDecision(id, targetStatus, defaultNotes = '', actionLabel = '') {
     const item = complaints.find(c => c.id === id);
     if (!item) return;
 
-    item.verification = "Rejected";
-    item.status = "Rejected";
+    let notes = '';
 
-    // Persist rejection to MongoDB
-    try {
-      await fetch(`/api/complaints/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: "Rejected" })
+    if (targetStatus === 'Rejected') {
+      const reason = await openActionModal({
+        icon: '❌',
+        title: 'Reject Complaint Verification',
+        subtitle: `Complaint #${item.id} — ${item.title || item.category}`,
+        label: 'Enter mandatory reason for rejecting this complaint:',
+        defaultValue: defaultNotes || "Photograph does not match reported location or invalid civic issue.",
+        placeholder: 'Specify why this complaint cannot be verified by the municipal authority...',
+        chips: [
+          "Photograph does not match reported location",
+          "Private property outside municipal jurisdiction",
+          "Duplicate report of existing active ticket",
+          "Insufficient evidence / unable to locate hazard"
+        ],
+        confirmText: 'Reject Complaint',
+        confirmClass: 'btn-danger',
+        requireInput: true,
+        minLength: 5,
+        hint: '* Required. The citizen will receive this explanation on their portal.'
       });
-    } catch (err) {
-      console.warn('[Backend Notice]: Could not reach API, updated in local state:', err.message);
+      if (reason === null) return; // User cancelled
+      notes = reason;
+    } else if (targetStatus === 'Needs Inspection') {
+      const input = await openActionModal({
+        icon: '🔍',
+        title: 'Schedule Field Inspection',
+        subtitle: `Complaint #${item.id} — ${item.title || item.category}`,
+        label: 'Field inspection instructions or notes for engineers:',
+        defaultValue: defaultNotes || "Field inspection scheduled to cross-verify physical hazard location.",
+        chips: [
+          "Field inspection scheduled with ward engineer",
+          "Physical structural measurement required",
+          "Inter-departmental road survey pending"
+        ],
+        confirmText: 'Schedule Inspection',
+        confirmClass: 'btn-action-inspect'
+      });
+      if (input === null) return;
+      notes = input;
+    } else if (targetStatus === 'Insufficient Evidence') {
+      const input = await openActionModal({
+        icon: '⚠️',
+        title: 'Request Additional Evidence',
+        subtitle: `Complaint #${item.id} — ${item.title || item.category}`,
+        label: 'Evidence deficiencies or instructions for citizen:',
+        defaultValue: defaultNotes || "Photograph angle or location accuracy unclear. Additional evidence needed.",
+        chips: [
+          "Photograph angle or clarity insufficient",
+          "Accurate GPS geotag coordinates required",
+          "Please upload clearer close-up photograph"
+        ],
+        confirmText: 'Request Evidence',
+        confirmClass: 'btn-action-insufficient'
+      });
+      if (input === null) return;
+      notes = input;
+    } else if (targetStatus === 'Verified') {
+      const input = await openActionModal({
+        icon: '✅',
+        title: 'Confirm Complaint Verification',
+        subtitle: `Complaint #${item.id} — ${item.title || item.category}`,
+        label: 'Verification note (optional):',
+        defaultValue: defaultNotes || "Reported location and photo evidence verified.",
+        chips: [
+          "Location and photo evidence verified via GIS overlay",
+          "Hazard confirmed in municipal transit corridor"
+        ],
+        confirmText: 'Verify Complaint',
+        confirmClass: 'btn-success'
+      });
+      if (input === null) return;
+      notes = input;
     }
 
-    addActivity(`Admin rejected ${item.id} (Invalid hazard submission)`, 'reject');
-    refreshAllDashboardViews();
-    if (activeComplaintId === id) openReviewModal(id);
+    try {
+      const res = await window.civicFetch(`/api/admin/complaints/${id}/verify`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          verification: targetStatus,
+          notes,
+          action: actionLabel
+        })
+      });
+
+      if (res && res.ok) {
+        const json = await res.json();
+        if (json.data) {
+          Object.assign(item, json.data);
+        } else {
+          item.verification = targetStatus;
+          item.verificationNotes = notes;
+        }
+
+        // Advance Reported -> Under Verification if verified
+        if (targetStatus === 'Verified' && item.status === 'Reported') {
+          item.status = 'Under Verification';
+        }
+
+        const actType = targetStatus === 'Rejected' ? 'reject' : 'verify';
+        addActivity(`Admin updated verification of ${item.id} to "${targetStatus}"`, actType);
+        refreshAllDashboardViews();
+        if (activeComplaintId === id) {
+          openReviewModal(id);
+        }
+        alert(`Verification updated successfully: ${targetStatus}`);
+      } else {
+        const errJson = res ? await res.json().catch(() => ({})) : {};
+        alert(errJson.message || 'Failed to update verification status on server.');
+      }
+    } catch (err) {
+      console.warn('[Admin Notice]: Error updating verification status:', err.message);
+      alert('Error updating verification status: ' + err.message);
+    }
+  }
+
+  // 1. Verify Complaint (Wrapper)
+  async function verifyComplaint(id) {
+    await submitVerificationDecision(id, 'Verified', 'Reported location and photo evidence verified.', 'Evidence Verified');
+  }
+
+  // 2. Reject Complaint (Wrapper)
+  async function rejectComplaint(id) {
+    await submitVerificationDecision(id, 'Rejected', '', 'Complaint Verification Rejected');
   }
 
   // 3. Update Status to In Progress
@@ -1026,16 +1882,17 @@ document.addEventListener('DOMContentLoaded', () => {
       item.verification = "Verified";
     }
 
-    // Persist status change to MongoDB
     try {
-      await fetch(`/api/complaints/${id}/status`, {
+      const res = await window.civicFetch('/api/admin/complaints/' + id + '/status', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ status: newStatus, ...extraData })
       });
+      if (res && res.ok) {
+        const json = await res.json();
+        if (json.data) Object.assign(item, json.data);
+      }
     } catch (err) {
-      console.warn('[Backend Notice]: Could not reach API, updated in local state:', err.message);
+      console.warn('[Admin Notice]: Network error updating status:', err.message);
     }
 
     addActivity(`Admin updated ${item.id} status to "${newStatus}"`, 'progress');
@@ -1043,38 +1900,474 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activeComplaintId === id) openReviewModal(id);
   }
 
-  // 4. Resolve Complaint
+  // 4. Resolve Complaint (In-App Action Dialog)
   async function resolveComplaint(id) {
     const item = complaints.find(c => c.id === id);
     if (!item) return;
+
+    const customNote = await openActionModal({
+      icon: '⭐',
+      title: 'Mark Complaint as Resolved',
+      subtitle: `Complaint #${item.id} — ${item.title || item.category}`,
+      label: 'Enter municipal resolution details & actions taken:',
+      defaultValue: item.resolutionNote || "Hazard inspected and road surface restored by municipal crew.",
+      placeholder: 'Describe remediation works, repair teams, or actions taken...',
+      chips: [
+        "Hazard inspected and repaired by municipal crew",
+        "Bitumen asphalt resurfacing completed",
+        "Streetlight controller replaced & functioning",
+        "Overflowing waste cleared and sanitized",
+        "Drain unclogged and desilted"
+      ],
+      confirmText: 'Confirm & Resolve',
+      confirmClass: 'btn-success',
+      hint: 'This message will be visible to the citizen and recorded in official municipal logs.'
+    });
+
+    if (customNote === null) return; // User cancelled
 
     item.status = "Resolved";
     item.verification = "Verified";
     item.resolvedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     item.resolvedBy = "Civic Admin (Ward Operations)";
-    if (!item.resolutionNote || item.resolutionNote.trim() === '') {
-      item.resolutionNote = "Hazard inspected by municipal road repair crew; remediation works successfully completed and verified.";
-    }
+    item.resolutionNote = customNote.trim() || "Remediation works successfully completed and verified.";
 
-    // Persist resolution to MongoDB
     try {
-      await fetch(`/api/complaints/${id}/status`, {
+      const res = await window.civicFetch('/api/admin/complaints/' + id + '/status', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           status: "Resolved",
           resolvedBy: item.resolvedBy,
           resolvedNote: item.resolutionNote
         })
       });
+      if (res && res.ok) {
+        const json = await res.json();
+        if (json.data) Object.assign(item, json.data);
+      }
     } catch (err) {
-      console.warn('[Backend Notice]: Could not reach API, updated in local state:', err.message);
+      console.warn('[Admin Notice]: Network error resolving complaint:', err.message);
     }
 
     addActivity(`Admin marked ${item.id} as Resolved`, 'resolve');
     refreshAllDashboardViews();
     if (activeComplaintId === id) openReviewModal(id);
+
+    // Broadcast real-time resolution notification to Citizen Portal
+    if (window.notifyComplaintResolved) {
+      window.notifyComplaintResolved(item);
+    }
+  }
+
+  // 5. Update Priority
+  async function updateComplaintPriority(id, newPriority) {
+    const item = complaints.find(c => c.id === id);
+    if (!item) return;
+
+    try {
+      const res = await window.civicFetch('/api/admin/complaints/' + id + '/priority', {
+        method: 'PATCH',
+        body: JSON.stringify({ priorityLevel: newPriority })
+      });
+      if (res && res.ok) {
+        const json = await res.json();
+        if (json.data && json.data.priority) {
+          item.priority = json.data.priority;
+        } else {
+          item.priority = { ...(item.priority || {}), level: newPriority };
+        }
+        addActivity(`Admin updated priority of ${item.id} to ${newPriority}`, 'progress');
+        refreshAllDashboardViews();
+        if (activeComplaintId === id) openReviewModal(id);
+      } else {
+        alert('Failed to update priority on server.');
+      }
+    } catch (err) {
+      console.warn('[Admin Notice]: Network error updating priority:', err.message);
+      alert('Network error updating priority: ' + err.message);
+    }
+  }
+
+  /* ========================================================
+   * 9B. AREA-WISE COMPLAINT HEAT MAP & GEO-HAZARD CLUSTERS
+   * High-Visibility Municipal Heatmap + Clustered Hazard Auras
+   * ========================================================
+   */
+  const MUNICIPAL_CENTER = [26.7615, 83.3735]; // Civil Lines Core, Gorakhpur
+  const MUNICIPAL_DEFAULT_ZOOM = 13;
+
+  function initAuthorityHeatMap() {
+    if (mapInstance) return;
+    const mapElement = document.getElementById('authorityHeatMap');
+    if (!mapElement || !window.L) return;
+
+    try {
+      // Initialize Leaflet Map focused on the active municipal core
+      mapInstance = L.map('authorityHeatMap', {
+        center: MUNICIPAL_CENTER,
+        zoom: MUNICIPAL_DEFAULT_ZOOM,
+        scrollWheelZoom: true
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+        maxZoom: 18
+      }).addTo(mapInstance);
+
+      circlesLayerInstance = L.layerGroup().addTo(mapInstance);
+      markersLayerInstance = L.layerGroup().addTo(mapInstance);
+
+      // Force recalculation of container dimensions
+      setTimeout(() => {
+        if (mapInstance) mapInstance.invalidateSize();
+      }, 250);
+
+      window.addEventListener('resize', () => {
+        if (mapInstance) mapInstance.invalidateSize();
+      });
+
+      console.log('[Authority Heat Map]: Leaflet map instance initialized with municipal focus.');
+    } catch (err) {
+      console.error('[Authority Heat Map]: Initialization failed:', err);
+    }
+  }
+
+  // Micro-offset generator for overlapping complaints in the same ward
+  function getAdjustedCoordinates(item, index) {
+    let rawLat = null, rawLng = null;
+    if (item.location && typeof item.location === 'object') {
+      rawLat = parseFloat(item.location.latitude);
+      rawLng = parseFloat(item.location.longitude);
+    } else if (item.latitude && item.longitude) {
+      rawLat = parseFloat(item.latitude);
+      rawLng = parseFloat(item.longitude);
+    }
+
+    if (isNaN(rawLat) || isNaN(rawLng)) return null;
+
+    // If identical to base seed coordinates (Metro Pillar 42), disperse along ward streets
+    const isBaseCivilLines = Math.abs(rawLat - 26.7606) < 0.0002 && Math.abs(rawLng - 83.3732) < 0.0002;
+    if (isBaseCivilLines) {
+      const offsets = [
+        [0, 0],              // CC-1001 Metro Pillar 42
+        [0.0022, 0.0018],    // North-East ward sector
+        [-0.0019, -0.0021],  // South-West market sector
+        [0.0015, -0.0024],   // North-West residential lane
+        [-0.0024, 0.0019],   // South-East transit road
+        [0.0031, -0.0008],   // North junction
+        [-0.0012, 0.0032],   // East commercial sector
+        [0.0008, -0.0030],   // West arterial road
+        [0.0026, 0.0028]     // North-East ring road
+      ];
+      const off = offsets[index % offsets.length];
+      return { lat: rawLat + off[0], lng: rawLng + off[1] };
+    }
+
+    return { lat: rawLat, lng: rawLng };
+  }
+
+  function populateLocalityFilters() {
+    const localityMap = {};
+    complaints.forEach(item => {
+      const addr = (item.location && typeof item.location === 'object' && item.location.address)
+        ? item.location.address
+        : (typeof item.location === 'string' ? item.location : '');
+      if (!addr) return;
+      const parts = addr.split(',').map(s => s.trim()).filter(Boolean);
+      let locKey = parts.length >= 2 ? parts[parts.length - 2] : parts[0];
+      if (locKey && locKey.length > 2) {
+        localityMap[locKey] = (localityMap[locKey] || 0) + 1;
+      }
+    });
+
+    const entries = Object.entries(localityMap).sort((a, b) => b[1] - a[1]);
+
+    if (mapLocalityFilter) {
+      const currentVal = mapLocalityFilter.value;
+      mapLocalityFilter.innerHTML = '<option value="all">All Municipal Areas (Gorakhpur Core)</option>';
+      entries.forEach(([loc, count]) => {
+        const opt = document.createElement('option');
+        opt.value = loc;
+        opt.textContent = `${loc} (${count} Hazard${count > 1 ? 's' : ''})`;
+        if (loc === currentVal) opt.selected = true;
+        mapLocalityFilter.appendChild(opt);
+      });
+    }
+
+    if (filterLocality) {
+      const currentVal = filterLocality.value;
+      filterLocality.innerHTML = '<option value="all">All Localities</option>';
+      entries.forEach(([loc, count]) => {
+        const opt = document.createElement('option');
+        opt.value = loc;
+        opt.textContent = `${loc} (${count})`;
+        if (loc === currentVal) opt.selected = true;
+        filterLocality.appendChild(opt);
+      });
+    }
+  }
+
+  function applyMapMode() {
+    if (!mapInstance) return;
+
+    if (currentMapMode === 'heat') {
+      // Heat Map: Show heat density gradient and radiant hazard auras
+      if (markersLayerInstance && mapInstance.hasLayer(markersLayerInstance)) {
+        mapInstance.removeLayer(markersLayerInstance);
+      }
+      if (circlesLayerInstance && !mapInstance.hasLayer(circlesLayerInstance)) {
+        circlesLayerInstance.addTo(mapInstance);
+      }
+      if (heatLayerInstance && !mapInstance.hasLayer(heatLayerInstance)) {
+        heatLayerInstance.addTo(mapInstance);
+      }
+    } else if (currentMapMode === 'pins') {
+      // Clustered Pins: Show numbered priority markers only
+      if (heatLayerInstance && mapInstance.hasLayer(heatLayerInstance)) {
+        mapInstance.removeLayer(heatLayerInstance);
+      }
+      if (circlesLayerInstance && mapInstance.hasLayer(circlesLayerInstance)) {
+        mapInstance.removeLayer(circlesLayerInstance);
+      }
+      if (markersLayerInstance && !mapInstance.hasLayer(markersLayerInstance)) {
+        markersLayerInstance.addTo(mapInstance);
+      }
+    } else if (currentMapMode === 'both') {
+      // Combined: Show heat gradient, hazard auras, and numbered pins together
+      if (heatLayerInstance && !mapInstance.hasLayer(heatLayerInstance)) {
+        heatLayerInstance.addTo(mapInstance);
+      }
+      if (circlesLayerInstance && !mapInstance.hasLayer(circlesLayerInstance)) {
+        circlesLayerInstance.addTo(mapInstance);
+      }
+      if (markersLayerInstance && !mapInstance.hasLayer(markersLayerInstance)) {
+        markersLayerInstance.addTo(mapInstance);
+      }
+    }
+
+    // Update active class on toolbar buttons
+    const modeBtns = [
+      { btn: btnViewHeatmap, mode: 'heat' },
+      { btn: btnViewPins, mode: 'pins' },
+      { btn: btnViewBoth, mode: 'both' }
+    ];
+    modeBtns.forEach(({ btn, mode }) => {
+      if (btn) {
+        if (btn.getAttribute('data-mode') === currentMapMode) btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+    });
+  }
+
+  function renderMapLayers() {
+    initAuthorityHeatMap();
+    if (!mapInstance) return;
+
+    const mapEmptyOverlay = document.getElementById('mapEmptyOverlay');
+    const selectedLoc = (mapLocalityFilter ? mapLocalityFilter.value : 'all').toLowerCase();
+
+    // Filter complaints having valid coordinates & matching selected locality
+    const geotagged = complaints.filter(item => {
+      let lat = null, lng = null;
+      if (item.location && typeof item.location === 'object') {
+        lat = item.location.latitude;
+        lng = item.location.longitude;
+      } else if (item.latitude && item.longitude) {
+        lat = item.latitude;
+        lng = item.longitude;
+      }
+      if (lat === null || lng === null || isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) return false;
+
+      if (selectedLoc !== 'all') {
+        const addr = (item.location && typeof item.location === 'object' && item.location.address)
+          ? item.location.address
+          : (typeof item.location === 'string' ? item.location : '');
+        if (!addr.toLowerCase().includes(selectedLoc)) return false;
+      }
+      return true;
+    });
+
+    if (geotagged.length === 0) {
+      if (mapEmptyOverlay) mapEmptyOverlay.style.display = 'flex';
+      if (markersLayerInstance) markersLayerInstance.clearLayers();
+      if (circlesLayerInstance) circlesLayerInstance.clearLayers();
+      if (heatLayerInstance && mapInstance.hasLayer(heatLayerInstance)) {
+        mapInstance.removeLayer(heatLayerInstance);
+      }
+      return;
+    }
+
+    if (mapEmptyOverlay) mapEmptyOverlay.style.display = 'none';
+
+    // Clear existing layers
+    if (markersLayerInstance) markersLayerInstance.clearLayers();
+    if (circlesLayerInstance) circlesLayerInstance.clearLayers();
+    if (heatLayerInstance && mapInstance.hasLayer(heatLayerInstance)) {
+      mapInstance.removeLayer(heatLayerInstance);
+      heatLayerInstance = null;
+    }
+
+    const heatPoints = [];
+    const bounds = [];
+
+    geotagged.forEach((item, index) => {
+      const coords = getAdjustedCoordinates(item, index);
+      if (!coords) return;
+
+      const numLat = coords.lat;
+      const numLng = coords.lng;
+
+      bounds.push([numLat, numLng]);
+
+      // Calculate severity and priority
+      const sev = String(item.severity || 'Medium').toLowerCase();
+      let pScore = 40;
+      if (item.priority && typeof item.priority.score === 'number') {
+        pScore = item.priority.score;
+      } else if (sev === 'critical') {
+        pScore = 85;
+      } else if (sev === 'high') {
+        pScore = 65;
+      } else if (sev === 'medium') {
+        pScore = 45;
+      } else {
+        pScore = 25;
+      }
+
+      // High-visibility intensity (0.45 to 1.0)
+      const intensity = Math.min(1.0, Math.max(0.45, pScore / 100));
+      heatPoints.push([numLat, numLng, intensity]);
+
+      // Color tokens matching project design system
+      let pinColor = '#eab308'; // Bright Gold/Yellow (Medium - clearly distinct from orange)
+      if (sev === 'critical') pinColor = '#dc2626';     // Red (Critical)
+      else if (sev === 'high') pinColor = '#ea580c';    // Orange (High)
+      else if (sev === 'low') pinColor = '#0284c7';     // Blue (Low)
+
+      const addrStr = (item.location && typeof item.location === 'object' && item.location.address)
+        ? item.location.address
+        : (typeof item.location === 'string' ? item.location : 'Municipal Zone');
+
+      // 1. Radiant Hazard Aura Circle (visible in Heat Map & Combined views)
+      const auraRadius = (sev === 'critical') ? 340 : ((sev === 'high') ? 280 : 220);
+      const hazardCircle = L.circle([numLat, numLng], {
+        radius: auraRadius,
+        color: pinColor,
+        weight: 2,
+        opacity: 0.85,
+        fillColor: pinColor,
+        fillOpacity: 0.38
+      });
+
+      hazardCircle.bindTooltip(`
+        <div style="font-family: inherit; font-size: 0.8rem; font-weight: 700; color: #0f172a; padding: 2px;">
+          🔥 <strong>${escapeHtml(item.id)}</strong> • ${escapeHtml(item.category)}
+          <div style="font-size: 0.72rem; color: ${pinColor}; font-weight: 800; margin-top: 2px;">
+            ${sev.toUpperCase()} PRIORITY (${pScore}/100)
+          </div>
+          <div style="font-size: 0.7rem; color: #64748b;">📍 ${escapeHtml(addrStr)}</div>
+        </div>
+      `, { sticky: true });
+
+      hazardCircle.on('click', () => openReviewModal(item.id));
+      circlesLayerInstance.addLayer(hazardCircle);
+
+      // 2. Interactive Numbered Priority Pin Marker
+      const pinIcon = L.divIcon({
+        className: 'admin-map-pin',
+        html: `
+          <div style="
+            background: ${pinColor};
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+          " title="${escapeHtml(item.id)}: ${escapeHtml(item.title)}">
+            ${pScore}
+          </div>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+
+      const marker = L.marker([numLat, numLng], { icon: pinIcon });
+
+      const popupHtml = `
+        <div style="font-family: inherit; max-width: 260px; padding: 4px;">
+          <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin-bottom: 2px;">
+            ${escapeHtml(item.id)} • ${escapeHtml(item.category)}
+          </div>
+          <h4 style="font-size: 0.88rem; margin: 0 0 6px 0; color: #0f172a; line-height: 1.3;">
+            ${escapeHtml(item.title)}
+          </h4>
+          <p style="font-size: 0.78rem; color: #475569; margin: 0 0 8px 0; line-height: 1.3;">
+            📍 ${escapeHtml(addrStr)}
+          </p>
+          <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+            <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: #f1f5f9; color: #334155;">
+              ${escapeHtml(item.status)}
+            </span>
+            <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; background: ${pinColor}20; color: ${pinColor};">
+              Priority: ${pScore}/100
+            </span>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary admin-map-inspect-btn" data-id="${escapeHtml(item.id)}" style="width: 100%; padding: 6px 10px; font-size: 0.8rem; cursor: pointer; border-radius: 6px; background-color: var(--primary-teal, #0f766e); color: #fff; border: none; font-weight: 600;">
+            Review Complaint &rarr;
+          </button>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
+      marker.on('popupopen', () => {
+        const btn = document.querySelector(`.admin-map-inspect-btn[data-id="${item.id}"]`);
+        if (btn) btn.addEventListener('click', () => openReviewModal(item.id));
+      });
+
+      markersLayerInstance.addLayer(marker);
+    });
+
+    // 3. High-Visibility Heatmap Density Layer
+    if (typeof L.heatLayer === 'function' && heatPoints.length > 0) {
+      heatLayerInstance = L.heatLayer(heatPoints, {
+        minOpacity: 0.65,
+        radius: 45,
+        blur: 24,
+        max: 0.85,
+        gradient: {
+          0.2: '#0284c7', // Low density (Sky Blue)
+          0.4: '#10b981', // Moderate (Emerald Green)
+          0.6: '#f59e0b', // Elevated (Amber Yellow)
+          0.75: '#ea580c', // High (Orange)
+          1.0: '#dc2626'  // Critical Hotspot (Red)
+        }
+      });
+    }
+
+    applyMapMode();
+
+    // Smart Camera Framing: Center on Municipal Core when viewing All Areas
+    if (selectedLoc === 'all') {
+      mapInstance.setView(MUNICIPAL_CENTER, MUNICIPAL_DEFAULT_ZOOM);
+    } else if (bounds.length > 0) {
+      if (bounds.length === 1) {
+        mapInstance.setView(bounds[0], 14);
+      } else {
+        mapInstance.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
+      }
+    }
+
+    setTimeout(() => {
+      if (mapInstance) mapInstance.invalidateSize();
+    }, 200);
   }
 
   // Helper to refresh all dashboard modules
@@ -1082,6 +2375,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStatistics();
     renderComplaints();
     renderActivityTimeline();
+    populateLocalityFilters();
+    renderMapLayers();
   }
 
 
@@ -1130,23 +2425,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sampleUsers.forEach(u => {
       const tr = document.createElement('tr');
+      const uid = u.id || u._id;
+      tr.setAttribute('data-uid', uid);
       const isFlagged = u.status === 'Flagged';
 
       tr.innerHTML = `
-        <td><span class="tbl-id-badge">${escapeHtml(u.id)}</span></td>
+        <td><span class="tbl-id-badge">${escapeHtml(uid)}</span></td>
         <td style="font-weight: 600; color: var(--navy-blue);">${escapeHtml(u.name)}</td>
         <td style="color: var(--text-muted); font-size: 0.85rem;">${escapeHtml(u.email)}</td>
-        <td style="text-align: center; font-weight: 700;">${u.reported}</td>
-        <td style="text-align: center; font-weight: 700; color: #065f46;">${u.resolved}</td>
+        <td style="text-align: center; font-weight: 700;">${u.reported !== undefined ? u.reported : 0}</td>
+        <td style="text-align: center; font-weight: 700; color: #065f46;">${u.resolved !== undefined ? u.resolved : 0}</td>
         <td style="text-align: center;">
           <span style="font-weight: 700; color: var(--primary-teal); background-color: var(--primary-teal-light); padding: 0.2rem 0.6rem; border-radius: var(--radius-pill);">
-            ${u.tokens} tokens
+            ${u.tokens !== undefined ? u.tokens : (u.rewardTokens || 0)} tokens
           </span>
         </td>
         <td style="text-align: center;">
           <span class="verify-badge ${isFlagged ? 'verify-rejected' : 'verify-verified'}">
-            ${escapeHtml(u.status)}
+            ${isFlagged ? '⚠️ Flagged' : '✓ Active'}
           </span>
+          ${isFlagged && u.flaggedReason ? `<span style="display: block; font-size: 0.68rem; color: #991b1b; margin-top: 2px;" title="${escapeHtml(u.flaggedReason)}">${escapeHtml(u.flaggedReason.length > 20 ? u.flaggedReason.slice(0, 20) + '...' : u.flaggedReason)}</span>` : ''}
+        </td>
+        <td style="text-align: center;">
+          ${isFlagged ? `
+            <button type="button" class="btn btn-sm btn-unflag-citizen-row" data-uid="${escapeHtml(uid)}" style="font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; color: #065f46; border: 1px solid #a7f3d0; background: #ecfdf5; cursor: pointer;">
+              ✓ Restore
+            </button>
+          ` : `
+            <button type="button" class="btn btn-sm btn-flag-citizen-row" data-uid="${escapeHtml(uid)}" style="font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; color: #b91c1c; border: 1px solid #fca5a5; background: #fff1f2; cursor: pointer;">
+              ⚠️ Flag
+            </button>
+          `}
         </td>
       `;
 
@@ -1181,37 +2490,9 @@ document.addEventListener('DOMContentLoaded', () => {
    * 13. BADGE HELPER FUNCTIONS
    * ========================================================
    */
-  function getStatusBadgeClass(status) {
-    switch (status) {
-      case 'Reported':
-        return 'status-reported';
-      case 'Under Verification':
-        return 'status-verification';
-      case 'In Progress':
-        return 'status-progress';
-      case 'Resolved':
-        return 'status-resolved';
-      case 'Rejected':
-        return 'status-rejected';
-      default:
-        return 'status-reported';
-    }
-  }
-
-  function getSeverityBadgeClass(severity) {
-    switch (severity) {
-      case 'Low':
-        return 'severity-low';
-      case 'Medium':
-        return 'severity-medium';
-      case 'High':
-        return 'severity-high';
-      case 'Critical':
-        return 'severity-critical';
-      default:
-        return 'severity-medium';
-    }
-  }
+  const getStatusBadgeClass = window.getStatusClass || ((s) => s === 'In Progress' ? 'status-progress' : (s === 'Resolved' ? 'status-resolved' : 'status-reported'));
+  const getSeverityBadgeClass = window.getSeverityClass || ((s) => `severity-${(s || 'medium').toLowerCase()}`);
+  const escapeHtml = window.escapeHtml || ((str) => str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : '');
 
   function getDangerBadgeClass(level) {
     switch (String(level).toLowerCase()) {
@@ -1235,6 +2516,10 @@ document.addEventListener('DOMContentLoaded', () => {
     switch (verification) {
       case 'Verified':
         return 'verify-verified';
+      case 'Needs Inspection':
+        return 'verify-inspection';
+      case 'Insufficient Evidence':
+        return 'verify-insufficient';
       case 'Pending':
         return 'verify-pending';
       case 'Rejected':
@@ -1242,16 +2527,6 @@ document.addEventListener('DOMContentLoaded', () => {
       default:
         return 'verify-pending';
     }
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
   }
 
 
@@ -1270,6 +2545,7 @@ document.addEventListener('DOMContentLoaded', () => {
           searchClearBtn.classList.remove('visible');
         }
       }
+      currentPage = 1;
       renderComplaints();
     });
   }
@@ -1279,19 +2555,24 @@ document.addEventListener('DOMContentLoaded', () => {
     searchClearBtn.addEventListener('click', () => {
       if (searchInput) searchInput.value = '';
       searchClearBtn.classList.remove('visible');
+      currentPage = 1;
       renderComplaints();
     });
   }
 
-  // Filter dropdown listeners (Priority & Danger included)
-  [filterCategory, filterStatus, filterSeverity, filterPriority, filterDanger, filterVerification].forEach(dropdown => {
+  // Filter dropdown listeners (Category, Status, Severity, Priority, Danger, Verification, Locality, Date, Sort, Unreviewed)
+  [filterCategory, filterStatus, filterSeverity, filterPriority, filterDanger, filterVerification, filterLocality, filterDate, filterSort, filterUnreviewed].forEach(dropdown => {
     if (dropdown) {
-      dropdown.addEventListener('change', renderComplaints);
+      dropdown.addEventListener('change', () => {
+        currentPage = 1;
+        renderComplaints();
+      });
     }
   });
 
   // Clear all filters function
   function resetAllFilters() {
+    currentPage = 1;
     if (searchInput) searchInput.value = '';
     if (searchClearBtn) searchClearBtn.classList.remove('visible');
     if (filterCategory) filterCategory.value = 'all';
@@ -1300,11 +2581,78 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterPriority) filterPriority.value = 'all';
     if (filterDanger) filterDanger.value = 'all';
     if (filterVerification) filterVerification.value = 'all';
+    if (filterLocality) filterLocality.value = 'all';
+    if (filterDate) filterDate.value = 'all';
+    if (filterSort) filterSort.value = 'latest';
+    if (filterUnreviewed) filterUnreviewed.value = 'all';
     renderComplaints();
   }
 
   if (clearFiltersBtn) clearFiltersBtn.addEventListener('click', resetAllFilters);
   if (emptyResetFiltersBtn) emptyResetFiltersBtn.addEventListener('click', resetAllFilters);
+
+  // Pagination Toolbar Listeners (Next, Previous, Page Size)
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener('change', (e) => {
+      pageSize = parseInt(e.target.value, 10) || 10;
+      currentPage = 1;
+      renderComplaints();
+    });
+  }
+
+  if (btnPrevPage) {
+    btnPrevPage.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderComplaints();
+      }
+    });
+  }
+
+  if (btnNextPage) {
+    btnNextPage.addEventListener('click', () => {
+      const filtered = filterComplaints();
+      const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderComplaints();
+      }
+    });
+  }
+
+  // Heatmap Toolbar Listeners
+  if (btnViewHeatmap) {
+    btnViewHeatmap.addEventListener('click', () => {
+      currentMapMode = 'heat';
+      applyMapMode();
+    });
+  }
+  if (btnViewPins) {
+    btnViewPins.addEventListener('click', () => {
+      currentMapMode = 'pins';
+      applyMapMode();
+    });
+  }
+  if (btnViewBoth) {
+    btnViewBoth.addEventListener('click', () => {
+      currentMapMode = 'both';
+      applyMapMode();
+    });
+  }
+  if (mapLocalityFilter) {
+    mapLocalityFilter.addEventListener('change', () => {
+      renderMapLayers();
+    });
+  }
+  if (btnResetMapView) {
+    btnResetMapView.addEventListener('click', () => {
+      if (mapLocalityFilter) mapLocalityFilter.value = 'all';
+      renderMapLayers();
+    });
+  }
+
+  // Globally accessible review modal trigger
+  window.adminReviewComplaint = openReviewModal;
 
   // Review button delegation on complaints table
   if (complaintsTableBody) {
@@ -1313,6 +2661,92 @@ document.addEventListener('DOMContentLoaded', () => {
       if (reviewBtn) {
         const id = reviewBtn.getAttribute('data-id');
         if (id) openReviewModal(id);
+      }
+    });
+  }
+
+  // Citizen table Flag / Restore event delegation
+  if (usersTableBody) {
+    usersTableBody.addEventListener('click', async (e) => {
+      const flagBtn = e.target.closest('.btn-flag-citizen-row');
+      if (flagBtn) {
+        const uid = flagBtn.getAttribute('data-uid');
+        const user = sampleUsers.find(u => (u.id || u._id) === uid);
+        if (!user) return;
+        const reason = await openActionModal({
+          icon: '🚩',
+          title: 'Flag Citizen Account',
+          subtitle: `Citizen: ${user.name} (${user.email || uid})`,
+          label: 'Enter penalty reason for false / spam reporting:',
+          defaultValue: "False or misleading hazard complaint submitted",
+          placeholder: 'Specify reason for account violation penalty...',
+          chips: [
+            "False or fake hazard photograph submitted",
+            "Duplicate spam report submissions",
+            "Offensive or abusive complaint content"
+          ],
+          confirmText: 'Flag & Penalize (-10 Tokens)',
+          confirmClass: 'btn-danger',
+          requireInput: true,
+          minLength: 5
+        });
+        if (reason === null) return;
+        flagBtn.disabled = true;
+        try {
+          const res = await window.civicFetch(`/api/admin/users/${uid}/flag`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'Flagged', reason: reason.trim() || 'Flagged by Administrator', penaltyTokens: 10 })
+          });
+          if (res && res.ok) {
+            user.status = 'Flagged';
+            user.flaggedReason = reason;
+            user.tokens = Math.max(0, (user.tokens || 10) - 10);
+            addActivity(`Admin penalized citizen ${user.name} (-10 tokens) and flagged account`, 'reject');
+            renderUsers();
+          } else {
+            alert('Could not flag citizen on server.');
+          }
+        } catch (err) {
+          alert('Error flagging user: ' + err.message);
+        } finally {
+          if (flagBtn) flagBtn.disabled = false;
+        }
+        return;
+      }
+
+      const unflagBtn = e.target.closest('.btn-unflag-citizen-row');
+      if (unflagBtn) {
+        const uid = unflagBtn.getAttribute('data-uid');
+        const user = sampleUsers.find(u => (u.id || u._id) === uid);
+        if (!user) return;
+        const confirmed = await openConfirmModal({
+          icon: '🔄',
+          title: 'Restore Citizen Account',
+          message: `Restore citizen "${user.name}" to Active status? Their penalties will be cleared.`,
+          confirmText: 'Restore to Active',
+          confirmClass: 'btn-success'
+        });
+        if (!confirmed) return;
+        unflagBtn.disabled = true;
+        try {
+          const res = await window.civicFetch(`/api/admin/users/${uid}/flag`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'Active', reason: '' })
+          });
+          if (res && res.ok) {
+            user.status = 'Active';
+            user.flaggedReason = '';
+            addActivity(`Admin restored citizen ${user.name} to Active status`, 'verify');
+            renderUsers();
+            alert(`Citizen ${user.name} has been restored to Active status.`);
+          } else {
+            alert('Could not restore citizen on server.');
+          }
+        } catch (err) {
+          alert('Error restoring user: ' + err.message);
+        } finally {
+          if (unflagBtn) unflagBtn.disabled = false;
+        }
       }
     });
   }
@@ -1353,32 +2787,105 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminUser = await window.CivicAuth.requireAdmin();
     if (!adminUser) return;
 
+    // 2. Auth verified: Reveal admin dashboard smoothly
+    document.body.classList.remove('auth-pending-guard');
+
     // Display admin user name in header/profile if element exists
     const adminNameEl = document.querySelector('.admin-profile-name') || document.querySelector('.admin-user-title');
     if (adminNameEl) {
       adminNameEl.textContent = adminUser.name;
     }
 
+    // Hook up logout button in header
+    const logoutBtn = document.getElementById('adminLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.CivicAuth.logout();
+      });
+    }
+
     try {
-      console.log('[Admin Dashboard]: Fetching tickets from Express API /api/complaints ...');
-      const response = await fetch('/api/complaints', { credentials: 'include' });
-      if (response.ok) {
+      console.log('[Admin Dashboard]: Fetching tickets from Express API /api/admin/complaints ...');
+      const response = await window.civicFetch('/api/admin/complaints');
+      if (response && response.ok) {
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
           complaints = result.data;
           console.log(`[Admin Dashboard]: Loaded ${complaints.length} tickets from ${result.source || 'MongoDB Atlas'}.`);
+        } else {
+          complaints = [];
+        }
+      } else {
+        console.warn('[Admin Dashboard]: Could not load complaints, status:', response ? response.status : 'No response');
+        complaints = [];
+      }
+
+      // Also load registered users from persistent backend
+      const statsResponse = await window.civicFetch('/api/admin/dashboard');
+      if (statsResponse && statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        if (statsData.users && Array.isArray(statsData.users)) {
+          sampleUsers = statsData.users;
         }
       }
     } catch (err) {
-      console.warn('[Admin Dashboard]: Backend API unreachable, using local fallback:', err.message);
+      console.warn('[Admin Dashboard]: Backend API unreachable:', err.message);
+      complaints = [];
     } finally {
       refreshAllDashboardViews();
+      renderUsers();
     }
   }
 
   // Initialize
   loadAdminComplaints();
   renderUsers();
+
+  // Live complaint registration event listener from real-time notifications engine
+  window.addEventListener('civic:new-complaint', (event) => {
+    if (!event.detail || !event.detail.complaint) return;
+    const newComplaint = event.detail.complaint;
+
+    // Check if complaint already exists in memory
+    const existingIdx = complaints.findIndex(c => c.id === newComplaint.id);
+    if (existingIdx !== -1) {
+      complaints[existingIdx] = { ...complaints[existingIdx], ...newComplaint };
+    } else {
+      complaints.unshift(newComplaint);
+    }
+
+    addActivity(`New citizen complaint ${newComplaint.id} registered: "${newComplaint.title}"`, 'progress');
+    refreshAllDashboardViews();
+
+    // Pulse highlight row in complaints table
+    setTimeout(() => {
+      const row = document.querySelector(`tr[data-id="${newComplaint.id}"]`);
+      if (row) {
+        row.classList.add('civic-highlight-pulse');
+        setTimeout(() => row.classList.remove('civic-highlight-pulse'), 3500);
+      }
+    }, 200);
+  });
+
+  // Live reminder alert listener
+  window.addEventListener('civic:reminder-alert', (event) => {
+    if (!event.detail || !event.detail.complaint) return;
+    const alertComplaint = event.detail.complaint;
+    const existing = complaints.find(c => c.id === alertComplaint.id);
+    if (existing) {
+      existing.remindersCount = (existing.remindersCount || 0) + 1;
+      existing.lastReminderAt = new Date().toISOString();
+      if (event.detail.notification && event.detail.notification.data) {
+        existing.lastReminderReason = event.detail.notification.data.reason || existing.lastReminderReason;
+      }
+    }
+    renderAlertsQueue(complaints);
+    renderComplaints();
+  });
+
+  // Expose global hook for notification click integration
+  window.adminReviewComplaint = (id) => openReviewModal(id);
 
   console.log('Civic Connect Municipal Admin Dashboard Initialized with Role-Based Access Control.');
 });

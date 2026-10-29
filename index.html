@@ -13,6 +13,9 @@
 
   <!-- External Stylesheet -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Real-time Notifications Stylesheet -->
+  <link rel="stylesheet" href="notifications.css">
 </head>
 <body>
 
@@ -44,12 +47,11 @@
       <!-- Desktop Navigation Menu -->
       <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
         <ul class="nav-links">
-          <li><a href="#hero" class="nav-link active">Home</a></li>
+          <li><a href="#hero" class="nav-link active" aria-current="page">Home</a></li>
           <li><a href="report-problem.html" class="nav-link">Report Problem</a></li>
           <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
-          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-          <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
-          <li><a href="#about" class="nav-link">About Us</a></li>
+          <li><a href="emergency-report.html" class="nav-link" style="color: #dc2626; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;"><span style="width: 7px; height: 7px; background-color: #dc2626; border-radius: 50%; display: inline-block;"></span> Emergency</a></li>
+          <li class="nav-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html" class="nav-link" id="navDashboardLink">Dashboard</a></li>
         </ul>
         <div class="nav-actions">
           <a href="login.html" class="btn btn-outline-nav">Login</a>
@@ -94,6 +96,24 @@
             track real-time repairs, and create safer streets for everyone.
           </p>
 
+          <!-- Emergency Accident Response Entry Card -->
+          <div class="hero-emergency-card" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #f87171; border-radius: 12px; padding: 1.15rem 1.35rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.12);">
+            <div style="flex: 1; min-width: 250px;">
+              <div style="display: inline-flex; align-items: center; gap: 0.4rem; color: #991b1b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                <span style="width: 8px; height: 8px; background: #dc2626; border-radius: 50%;"></span>
+                Immediate Road Safety Priority
+              </div>
+              <h3 style="font-size: 1.1rem; font-weight: 800; color: #7f1d1d; margin: 0 0 0.25rem;">Witnessed a Road Accident?</h3>
+              <p style="font-size: 0.85rem; color: #991b1b; margin: 0; line-height: 1.4;">
+                Transmit crash location instantly to identify nearest police stations, trauma hospitals & alert response services.
+                <em style="display: block; font-size: 0.76rem; color: #b91c1c; margin-top: 2px;">⚠️ For genuine emergencies only. If lives are in immediate threat, call 112 directly.</em>
+              </p>
+            </div>
+            <a href="emergency-report.html" class="btn" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #ffffff; font-weight: 800; font-size: 0.95rem; padding: 0.75rem 1.25rem; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); white-space: nowrap;">
+              <span>🚨</span> EMERGENCY ACCIDENT REPORT
+            </a>
+          </div>
+
           <!-- Primary CTA Buttons -->
           <div class="hero-actions">
             <a href="report-problem.html" class="btn btn-primary" id="heroReportBtn">
@@ -128,62 +148,66 @@
           </div>
         </div>
 
-        <!-- Interactive Visual Preview Card -->
-        <div class="hero-visual">
-          <div class="preview-card">
-            <div class="preview-card-header">
-              <div class="preview-tag">
-                <span class="status-indicator live-pulse"></span>
-                Active Civic Report Preview
-              </div>
-              <span class="demo-badge">Sample Demo</span>
-            </div>
-            <div class="preview-card-body">
-              <div class="preview-issue-meta">
-                <span class="category-chip">Pothole Hazard</span>
-                <span class="ticket-id">#CC-8429</span>
-              </div>
-              <h3 class="preview-issue-title">Deep Pothole on 14th Main Crossroad</h3>
-              <p class="preview-issue-location">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
+        <!-- 3. HOW CIVIC CONNECT WORKS (Moved into Right Hero Column) -->
+        <div class="hero-visual" id="how-it-works">
+          <div class="section-header hero-how-it-works-header">
+            <span class="section-subtitle">Simple 3-Step Process</span>
+            <h2 class="section-title">How Civic Connect Works</h2>
+          </div>
+
+          <div class="steps-container">
+            <!-- Step 1 -->
+            <div class="step-card">
+              <div class="step-badge-number">01</div>
+              <div class="step-icon-wrapper">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
                 </svg>
-                Near City Central Metro, Ward 28
-              </p>
-
-              <!-- Progress bar mockup -->
-              <div class="timeline-stepper">
-                <div class="timeline-step completed">
-                  <div class="step-bullet">✓</div>
-                  <span class="step-label">Reported</span>
-                </div>
-                <div class="timeline-line active"></div>
-                <div class="timeline-step active">
-                  <div class="step-bullet">2</div>
-                  <span class="step-label">In Review</span>
-                </div>
-                <div class="timeline-line"></div>
-                <div class="timeline-step">
-                  <div class="step-bullet">3</div>
-                  <span class="step-label">Dispatched</span>
-                </div>
-                <div class="timeline-line"></div>
-                <div class="timeline-step">
-                  <div class="step-bullet">4</div>
-                  <span class="step-label">Resolved</span>
-                </div>
               </div>
+              <h3 class="step-title">Report a Problem</h3>
+              <p class="step-description">
+                Notice a dangerous pothole, overflowing drain, or missing road sign? Take a photo, confirm your location on the map, and add a brief description.
+              </p>
+              <div class="step-footer">
+                <span class="step-check">✓ Geolocation tagging</span>
+              </div>
+            </div>
 
-              <div class="preview-card-footer">
-                <div class="officer-note">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="16" x2="12" y2="12"/>
-                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                  </svg>
-                  <span>Inspection assigned to Ward Engineering Cell</span>
-                </div>
+            <!-- Step 2 -->
+            <div class="step-card">
+              <div class="step-badge-number">02</div>
+              <div class="step-icon-wrapper">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <h3 class="step-title">Track Progress</h3>
+              <p class="step-description">
+                Your ticket is automatically routed to the responsible civic ward office. You can track status changes from inspection to work order issuance in real time.
+              </p>
+              <div class="step-footer">
+                <span class="step-check">✓ Ward officer assignment</span>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+              <div class="step-badge-number">03</div>
+              <div class="step-icon-wrapper">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+              </div>
+              <h3 class="step-title">Get It Resolved</h3>
+              <p class="step-description">
+                Maintenance crews perform repairs and post verified completion photos. The ticket is marked resolved and the community enjoys safer transit.
+              </p>
+              <div class="step-footer">
+                <span class="step-check">✓ Verified completion proof</span>
               </div>
             </div>
           </div>
@@ -192,392 +216,130 @@
     </section>
 
     <!-- ========================================================
-         3. FEATURES SECTION
-         Four cards: Easy Reporting, Track Complaints, Community Support, Transparent Updates
+         5. CIVIC ACTION SECTION (ROAD PROBLEM MANAGEMENT)
+         Inspired by Civic Connect Reference Design
+         ======================================================== -->
+    <!-- ========================================================
+         3. FEATURES SECTION (FOUR CIVIC ACTION OPTIONS)
+         1. Report Problem  2. View Complaint  3. Send Reminder  4. Give Feedback
          ======================================================== -->
     <section class="features-section" id="features">
+      <span id="recent-complaints" style="display:block; position:relative; top:-80px; visibility:hidden;"></span>
       <div class="container">
+        <!-- Section Header -->
         <div class="section-header text-center">
-          <span class="section-subtitle">Empowering Every Resident</span>
+          <span class="section-subtitle">EMPOWERING EVERY RESIDENT</span>
           <h2 class="section-title">Designed for Quick, Accountable Civic Action</h2>
           <p class="section-lead">
             Every feature in Civic Connect is built to eliminate bureaucratic red tape and give communities an active voice in city infrastructure.
           </p>
         </div>
 
+        <!-- Four Feature Options Grid -->
         <div class="features-grid">
-          <!-- Feature 1: Easy Reporting -->
-          <article class="feature-card">
-            <div class="feature-icon-box">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="12" y1="18" x2="12" y2="12"/>
-                <line x1="9" y1="15" x2="15" y2="15"/>
-              </svg>
-            </div>
-            <h3 class="feature-card-title">Easy Reporting</h3>
-            <p class="feature-card-text">
-              Pin exact GPS coordinates, upload photos directly from your phone or camera, and describe road damage in simple steps. No lengthy forms or complex paperwork.
-            </p>
-            <div class="feature-tag">Under 60 Seconds</div>
-          </article>
-
-          <!-- Feature 2: Track Complaints -->
-          <article class="feature-card">
-            <div class="feature-icon-box">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </div>
-            <h3 class="feature-card-title">Track Complaints</h3>
-            <p class="feature-card-text">
-              Follow every ticket milestone from initial review by the road safety division to repair crew dispatch. Get notifications right down to project completion.
-            </p>
-            <div class="feature-tag">Live Status Updates</div>
-          </article>
-
-          <!-- Feature 3: Community Support -->
-          <article class="feature-card">
-            <div class="feature-icon-box">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-            </div>
-            <h3 class="feature-card-title">Community Support</h3>
-            <p class="feature-card-text">
-              Neighbors can upvote reports in their local area, highlighting urgent hazards. Collective community votes help municipal bodies prioritize the most critical repairs.
-            </p>
-            <div class="feature-tag">Neighborhood Upvoting</div>
-          </article>
-
-          <!-- Feature 4: Transparent Updates -->
-          <article class="feature-card">
-            <div class="feature-icon-box">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-            </div>
-            <h3 class="feature-card-title">Transparent Updates</h3>
-            <p class="feature-card-text">
-              Public audit trail with resolution timelines, designated repair contractors, and before-and-after photo verification so citizens know their voices made a difference.
-            </p>
-            <div class="feature-tag">Public Accountability</div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================
-         4. HOW IT WORKS SECTION
-         Three clear sequential steps: Report, Track, and Resolve
-         ======================================================== -->
-    <section class="how-it-works-section" id="how-it-works">
-      <div class="container">
-        <div class="section-header text-center">
-          <span class="section-subtitle">Simple 3-Step Process</span>
-          <h2 class="section-title">How Civic Connect Works</h2>
-          <p class="section-lead">
-            Taking action against dangerous road hazards shouldn't be complicated. Here is how your report turns into real repair work.
-          </p>
-        </div>
-
-        <div class="steps-container">
-          <!-- Step 1 -->
-          <div class="step-card">
-            <div class="step-badge-number">01</div>
-            <div class="step-icon-wrapper">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-            </div>
-            <h3 class="step-title">Report a Problem</h3>
-            <p class="step-description">
-              Notice a dangerous pothole, overflowing drain, or missing road sign? Take a photo, confirm your location on the map, and add a brief description.
-            </p>
-            <div class="step-footer">
-              <span class="step-check">✓ Geolocation tagging</span>
-            </div>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="step-card">
-            <div class="step-badge-number">02</div>
-            <div class="step-icon-wrapper">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
-            </div>
-            <h3 class="step-title">Track Progress</h3>
-            <p class="step-description">
-              Your ticket is automatically routed to the responsible civic ward office. You can track status changes from inspection to work order issuance in real time.
-            </p>
-            <div class="step-footer">
-              <span class="step-check">✓ Ward officer assignment</span>
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="step-card">
-            <div class="step-badge-number">03</div>
-            <div class="step-icon-wrapper">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 12 11 14 15 10"/>
-              </svg>
-            </div>
-            <h3 class="step-title">Get It Resolved</h3>
-            <p class="step-description">
-              Maintenance crews perform repairs and post verified completion photos. The ticket is marked resolved and the community enjoys safer transit.
-            </p>
-            <div class="step-footer">
-              <span class="step-check">✓ Verified completion proof</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================================
-         5. RECENT COMPLAINTS SECTION (SAMPLE/DEMO DATA)
-         Clearly labeled sample records with filter tabs and upvoting
-         ======================================================== -->
-    <section class="complaints-section" id="recent-complaints">
-      <div class="container">
-        <div class="section-header text-center">
-          <div class="demo-notice-banner">
-            <span class="demo-icon">ℹ️</span>
-            <span><strong>Sample Demonstration Records:</strong> Below are mock examples illustrating how submitted community issues will appear. Real complaints will populate here once backend is connected in Stage 2.</span>
-          </div>
-          <span class="section-subtitle">Community Transparency</span>
-          <h2 class="section-title">Recent Road Complaints</h2>
-          <p class="section-lead">
-            Explore active and resolved road problems reported by community members across municipal wards.
-          </p>
-        </div>
-
-        <!-- Filter Controls (Vanilla JS interactive) -->
-        <div class="filter-bar">
-          <button type="button" class="filter-btn active" data-filter="all">All Demo Complaints (4)</button>
-          <button type="button" class="filter-btn" data-filter="under-review">Under Review (1)</button>
-          <button type="button" class="filter-btn" data-filter="in-progress">In Progress (2)</button>
-          <button type="button" class="filter-btn" data-filter="resolved">Resolved (1)</button>
-        </div>
-
-        <!-- Complaints Cards Grid -->
-        <div class="complaints-grid" id="complaintsGrid">
           
-          <!-- Sample Card 1: In Progress -->
-          <article class="complaint-card" data-category="in-progress">
-            <div class="complaint-card-top">
-              <span class="complaint-id">#DEMO-1042</span>
-              <span class="status-badge status-progress">
-                <span class="dot"></span> In Progress
-              </span>
+          <!-- Option 1: Report Problem -->
+          <article class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="feature-action-icon" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
             </div>
-            <div class="complaint-category">Pothole Hazard</div>
-            <h3 class="complaint-title">Large Cluster of Potholes on MG Road</h3>
-            <p class="complaint-desc">
-              Deep asphalt erosion causing severe traffic congestion and near-misses for two-wheelers during rainy hours near Metro Pillar 42.
+            <h3 class="feature-card-title">Report Problem</h3>
+            <p class="feature-card-text">
+              Allow citizens to report civic issues such as damaged roads, garbage accumulation, water leakage, drainage problems, and broken streetlights.
             </p>
-            <div class="complaint-meta">
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
+            <div class="feature-card-footer">
+              <span class="feature-tag">Under 60 Seconds</span>
+              <a href="report-problem.html" class="btn btn-primary feature-btn" id="homeActionReportProblem">
+                <span>Report Problem</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
-                <span>Central Ward, MG Road</span>
-              </div>
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <span>Reported 2 days ago</span>
-              </div>
-            </div>
-            <div class="complaint-card-footer">
-              <button type="button" class="upvote-btn" data-votes="38" aria-label="Support this issue">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="18 15 12 9 6 15"/>
-                </svg>
-                <span class="upvote-text">Upvote</span>
-                <span class="vote-count">38</span>
-              </button>
-              <span class="contractor-tag">Repair crew assigned</span>
+              </a>
             </div>
           </article>
 
-          <!-- Sample Card 2: Under Review -->
-          <article class="complaint-card" data-category="under-review">
-            <div class="complaint-card-top">
-              <span class="complaint-id">#DEMO-1045</span>
-              <span class="status-badge status-review">
-                <span class="dot"></span> Under Review
-              </span>
+          <!-- Option 2: View Complaint -->
+          <article class="feature-card">
+            <div class="feature-icon-box" aria-hidden="true">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="feature-action-icon" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
             </div>
-            <div class="complaint-category">Street Lighting & Safety</div>
-            <h3 class="complaint-title">Broken Streetlights & Exposed Cable</h3>
-            <p class="complaint-desc">
-              Four consecutive streetlights out along the school zone corridor. Exposed electrical wiring near the pedestrian curb poses danger.
+            <h3 class="feature-card-title">View Complaint</h3>
+            <p class="feature-card-text">
+              Allow citizens to view their submitted complaints, complaint ID, current status, submission date, and progress updates.
             </p>
-            <div class="complaint-meta">
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
+            <div class="feature-card-footer">
+              <span class="feature-tag">Live Status Updates</span>
+              <a href="view-complaints.html" class="btn btn-outline feature-btn" id="homeActionViewComplaint">
+                <span>View Complaint</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
-                <span>South Ward, Sector 4 Cross</span>
-              </div>
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <span>Reported 1 day ago</span>
-              </div>
-            </div>
-            <div class="complaint-card-footer">
-              <button type="button" class="upvote-btn" data-votes="52" aria-label="Support this issue">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="18 15 12 9 6 15"/>
-                </svg>
-                <span class="upvote-text">Upvote</span>
-                <span class="vote-count">52</span>
-              </button>
-              <span class="contractor-tag">Site inspection pending</span>
+              </a>
             </div>
           </article>
 
-          <!-- Sample Card 3: Resolved -->
-          <article class="complaint-card" data-category="resolved">
-            <div class="complaint-card-top">
-              <span class="complaint-id">#DEMO-1038</span>
-              <span class="status-badge status-resolved">
-                <span class="dot"></span> Resolved
-              </span>
+          <!-- Option 3: Send Reminder -->
+          <article class="feature-card">
+            <div class="feature-icon-box reminder-icon" aria-hidden="true">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="feature-action-icon" aria-hidden="true">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
             </div>
-            <div class="complaint-category">Drainage & Manhole</div>
-            <h3 class="complaint-title">Caved-in Stormwater Drain Manhole</h3>
-            <p class="complaint-desc">
-              Reinforced concrete cover cracked and collapsed inward into the sewer main. Hazard barricaded and replaced with heavy-duty cast iron slab.
+            <h3 class="feature-card-title">Send Reminder</h3>
+            <p class="feature-card-text">
+              Allow citizens to send reminders for pending or delayed complaints that have not been resolved.
             </p>
-            <div class="complaint-meta">
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
+            <div class="feature-card-footer">
+              <span class="feature-tag">Municipal Nudge</span>
+              <button type="button" class="btn btn-outline feature-btn" id="homeActionSendReminder">
+                <span>Send Reminder</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
-                <span>North Zone, Market Road</span>
-              </div>
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <span>Fixed on Oct 01</span>
-              </div>
-            </div>
-            <div class="complaint-card-footer">
-              <button type="button" class="upvote-btn upvoted" data-votes="89" aria-label="Support this issue">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="18 15 12 9 6 15"/>
-                </svg>
-                <span class="upvote-text">Upvoted</span>
-                <span class="vote-count">89</span>
               </button>
-              <span class="contractor-tag tag-resolved">✓ Verified & Cleared</span>
             </div>
           </article>
 
-          <!-- Sample Card 4: In Progress -->
-          <article class="complaint-card" data-category="in-progress">
-            <div class="complaint-card-top">
-              <span class="complaint-id">#DEMO-1051</span>
-              <span class="status-badge status-progress">
-                <span class="dot"></span> In Progress
-              </span>
+          <!-- Option 4: Give Feedback -->
+          <article class="feature-card">
+            <div class="feature-icon-box feedback-icon" aria-hidden="true">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="feature-action-icon" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <polygon points="12 6.5 13.2 9 15.8 9.3 13.9 11.2 14.4 13.8 12 12.5 9.6 13.8 10.1 11.2 8.2 9.3 10.8 9" fill="currentColor"></polygon>
+              </svg>
             </div>
-            <div class="complaint-category">Traffic Sign & Crosswalk</div>
-            <h3 class="complaint-title">Faded Zebra Crossing & Broken Speed Breaker</h3>
-            <p class="complaint-desc">
-              Vehicles speeding near government hospital entrance due to obliterated paint markings and broken rumble strips.
+            <h3 class="feature-card-title">Give Feedback</h3>
+            <p class="feature-card-text">
+              Allow citizens to provide feedback and rate their experience with the complaint resolution process.
             </p>
-            <div class="complaint-meta">
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
+            <div class="feature-card-footer">
+              <span class="feature-tag">Citizen Rating</span>
+              <button type="button" class="btn btn-outline feature-btn" id="homeActionGiveFeedback">
+                <span>Give Feedback</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                 </svg>
-                <span>East Ward, Hospital Link Rd</span>
-              </div>
-              <div class="meta-item">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <span>Reported 3 days ago</span>
-              </div>
-            </div>
-            <div class="complaint-card-footer">
-              <button type="button" class="upvote-btn" data-votes="24" aria-label="Support this issue">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="18 15 12 9 6 15"/>
-                </svg>
-                <span class="upvote-text">Upvote</span>
-                <span class="vote-count">24</span>
               </button>
-              <span class="contractor-tag">Repainting scheduled</span>
             </div>
           </article>
+
         </div>
       </div>
     </section>
 
-    <!-- ========================================================
-         6. REPORT PROBLEM CALL-TO-ACTION (STAGE 1 PREVIEW)
-         Clear explanation for Stage 1 vs Stage 2 functionality
-         ======================================================== -->
-    <section class="cta-section" id="report-problem">
-      <div class="container">
-        <div class="cta-card">
-          <div class="cta-content">
-            <span class="cta-badge">Stage 1 Architecture Preview</span>
-            <h2 class="cta-title">Ready to Report a Hazard in Your Neighborhood?</h2>
-            <p class="cta-text">
-              In this first stage of Civic Connect, we have established our complete frontend design and component layout. 
-              Interactive report submissions, image uploads, and live GPS geolocation will be connected in <strong>Stage 2</strong>.
-            </p>
-            <div class="cta-actions">
-              <a href="report-problem.html" class="btn btn-cta-primary">
-                Launch Report Form
-              </a>
-              <a href="#how-it-works" class="btn btn-cta-secondary">
-                Review How It Works
-              </a>
-            </div>
-          </div>
-          <div class="cta-decoration">
-            <div class="cta-stat-box">
-              <div class="stat-number">3 Min</div>
-              <div class="stat-text">Average report submission time</div>
-            </div>
-            <div class="cta-stat-box">
-              <div class="stat-number">100%</div>
-              <div class="stat-text">Public transparency guarantee</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+
 
     <!-- ========================================================
          7. ABOUT US SECTION
@@ -683,9 +445,9 @@
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
             <li><a href="#hero">Home</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#recent-complaints">Recent Complaints</a></li>
+            <li><a href="report-problem.html">Report Problem</a></li>
+            <li><a href="view-complaints.html">View Complaints</a></li>
+            <li class="footer-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html">Dashboard</a></li>
             <li><a href="#about">About Our Mission</a></li>
           </ul>
         </div>
@@ -739,10 +501,10 @@
           <a href="report-problem.html" class="legal-link">Report Problem</a>
           <span class="divider">•</span>
           <a href="view-complaints.html" class="legal-link">View Complaints</a>
-          <span class="divider">•</span>
-          <a href="dashboard.html" class="legal-link">Dashboard</a>
-          <span class="divider">•</span>
-          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+          <span class="divider auth-only-divider" style="display: none;">•</span>
+          <a href="dashboard.html" class="legal-link footer-dashboard-link" data-auth="required" style="display: none;">Dashboard</a>
+          <span class="divider auth-admin-divider" style="display: none;">•</span>
+          <a href="admin-dashboard.html" class="legal-link footer-admin-link" data-auth="admin-only" style="display: none;">Admin Dashboard</a>
           <span class="divider">•</span>
           <a href="#" class="legal-link" id="privacyLink">Privacy Policy</a>
           <span class="divider">•</span>
@@ -787,8 +549,159 @@
     </div>
   </div>
 
+  <!-- ========================================================
+       8B. SEND REMINDER ESCALATION MODAL DIALOG
+       ======================================================== -->
+  <div class="modal-backdrop" id="reminderModal" role="dialog" aria-modal="true" aria-labelledby="modalReminderTitle" hidden>
+    <div class="modal-dialog" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">🔔</span>
+          <div>
+            <h3 class="modal-title" id="modalReminderTitle">Send Municipal Reminder</h3>
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+              Escalate pending road repairs directly to ward maintenance supervisors.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="reminderCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <form id="reminderForm">
+        <div class="modal-body">
+          <div id="reminderFeedback" class="alert-box" style="display: none; margin-bottom: 1.25rem;"></div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="reminderComplaintSelect" class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--navy-blue);">
+              Select Active Road Complaint <span style="color: #dc2626;">*</span>
+            </label>
+            <select id="reminderComplaintSelect" class="form-select" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; background-color: #ffffff;">
+              <option value="" disabled selected>Loading active road complaints...</option>
+            </select>
+            <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 0.3rem;">
+              Only unresolved road tickets can be escalated to the Public Works department.
+            </span>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="reminderReasonSelect" class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--navy-blue);">
+              Escalation Reason <span style="color: #dc2626;">*</span>
+            </label>
+            <select id="reminderReasonSelect" class="form-select" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; background-color: #ffffff;">
+              <option value="SLA_BREACH" selected>Repair delayed beyond expected 7-day timeline</option>
+              <option value="SAFETY_HAZARD">Hazard worsening (traffic accidents / near-misses)</option>
+              <option value="WATERLOGGING">Heavy rainfall causing severe waterlogging over pothole</option>
+              <option value="DARK_STREET">Broken streetlight causing nighttime transit danger</option>
+              <option value="URGENT_INSPECTION">Urgent site inspection requested by neighborhood</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label for="reminderNotes" class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--navy-blue);">
+              Urgency Message / Notes (Optional)
+            </label>
+            <textarea id="reminderNotes" rows="3" class="form-textarea" placeholder="Add specific details, e.g. 'Pothole has widened after yesterday's rain and two-wheelers are skidding...'" style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; resize: vertical;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); background-color: #f8fafc; border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg);">
+          <button type="button" class="btn btn-outline" id="reminderCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="reminderSubmitBtn">
+            <span>Dispatch Reminder</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       8C. GIVE FEEDBACK & RESOLUTION RATING MODAL DIALOG
+       ======================================================== -->
+  <div class="modal-backdrop" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="modalFeedbackTitle" hidden>
+    <div class="modal-dialog" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">⭐</span>
+          <div>
+            <h3 class="modal-title" id="modalFeedbackTitle">Citizen Feedback & Rating</h3>
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin: 0.2rem 0 0;">
+              Rate your experience with the complaint resolution process.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="feedbackCloseBtn" aria-label="Close dialog">&times;</button>
+      </div>
+      <form id="feedbackForm">
+        <div class="modal-body">
+          <div id="feedbackStatusBanner" class="alert-box" style="display: none; margin-bottom: 1.25rem;"></div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="feedbackComplaintSelect" class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--navy-blue);">
+              Select Complaint / Service <span style="color: #dc2626;">*</span>
+            </label>
+            <select id="feedbackComplaintSelect" class="form-select" required style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; background-color: #ffffff;">
+              <option value="" disabled selected>Loading complaints...</option>
+            </select>
+            <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 0.3rem;">
+              Rate a specific complaint resolution or share overall service feedback.
+            </span>
+          </div>
+
+          <!-- Star Rating Selector -->
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--navy-blue);">
+              Resolution Rating <span style="color: #dc2626;">*</span>
+            </label>
+            <div id="starRatingGroup" style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <span class="star-rating-item" data-value="1" style="font-size: 1.8rem; color: #f59e0b; transition: transform 0.15s ease;" title="1 Star - Poor">★</span>
+              <span class="star-rating-item" data-value="2" style="font-size: 1.8rem; color: #f59e0b; transition: transform 0.15s ease;" title="2 Stars - Fair">★</span>
+              <span class="star-rating-item" data-value="3" style="font-size: 1.8rem; color: #f59e0b; transition: transform 0.15s ease;" title="3 Stars - Good">★</span>
+              <span class="star-rating-item" data-value="4" style="font-size: 1.8rem; color: #f59e0b; transition: transform 0.15s ease;" title="4 Stars - Very Good">★</span>
+              <span class="star-rating-item" data-value="5" style="font-size: 1.8rem; color: #f59e0b; transition: transform 0.15s ease;" title="5 Stars - Excellent">★</span>
+              <span id="starRatingLabel" style="font-size: 0.88rem; font-weight: 600; color: var(--navy-blue); margin-left: 0.5rem;">5 / 5 (Excellent)</span>
+            </div>
+            <input type="hidden" id="feedbackRatingValue" name="rating" value="5">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="feedbackAspectSelect" class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--navy-blue);">
+              Feedback Category
+            </label>
+            <select id="feedbackAspectSelect" class="form-select" style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; background-color: #ffffff;">
+              <option value="Speed of Resolution" selected>Speed of Resolution</option>
+              <option value="Repair Quality">Repair Quality & Workmanship</option>
+              <option value="Communication Updates">Staff & System Communication</option>
+              <option value="Platform Usability">Platform Usability & Ease of Use</option>
+              <option value="Overall Experience">Overall Civic Experience</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.5rem;">
+            <label for="feedbackComment" class="form-label" style="display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.4rem; color: var(--navy-blue);">
+              Comments & Suggestions
+            </label>
+            <textarea id="feedbackComment" rows="3" class="form-textarea" placeholder="Share your experience with the repair work or suggest improvements for our municipal team..." style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; resize: vertical;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); background-color: #f8fafc; border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg);">
+          <button type="button" class="btn btn-outline" id="feedbackCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="feedbackSubmitBtn">
+            <span>Submit Feedback</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- External Vanilla JavaScript -->
+  <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="auth.js"></script>
+  <script src="notifications.js"></script>
 </body>
 </html>

@@ -11,302 +11,15 @@ const Complaint = require('../models/Complaint');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const geminiService = require('../services/geminiService');
+const persistentStore = require('../utils/persistentStore');
 const { calculatePriority, calculateDistanceMeters } = require('../utils/priorityCalculator');
+const notificationService = require('../services/notificationService');
 
 // Seed complaints with realistic geographic coordinates across Indian urban hubs
-const INITIAL_SEED_REPORTS = [
-  {
-    id: "CC-1001",
-    title: "Large pothole cluster near main road",
-    category: "Road/Pothole",
-    description: "Deep asphalt erosion causing severe traffic congestion and near-misses for two-wheelers during rainy hours near Metro Pillar 42.",
-    location: {
-      address: "Metro Pillar 42, Civil Lines, Gorakhpur, UP",
-      latitude: 26.7606,
-      longitude: 83.3732
-    },
-    date: "28 Sep 2026",
-    severity: "High",
-    status: "Under Verification",
-    verification: "Pending",
-    reporterName: "Civic Citizen",
-    reportCount: 3,
-    image: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "High",
-      dangerScore: 72,
-      reason: "Deep asphalt pothole cluster in high-transit lane causes sudden vehicle swerving.",
-      keywords: ["pothole", "asphalt", "traffic", "swerving"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "High",
-      score: 65,
-      dangerScore: 72,
-      communityScore: 54
-    },
-    resolvedDate: "",
-    resolvedBy: "",
-    resolutionNote: ""
-  },
-  {
-    id: "CC-1002",
-    title: "Four street lights not working along school road",
-    category: "Street Light",
-    description: "Streetlights have been completely dark for over a week, making evening transit unsafe for pedestrians near the girls secondary school.",
-    location: {
-      address: "Civil Lines School Corridor, Gorakhpur, UP",
-      latitude: 26.7635,
-      longitude: 83.3758
-    },
-    date: "27 Sep 2026",
-    severity: "Medium",
-    status: "Reported",
-    verification: "Pending",
-    reporterName: "Rahul Verma",
-    reportCount: 1,
-    image: "",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "Medium",
-      dangerScore: 42,
-      reason: "Reduced night visibility in pedestrian school corridor.",
-      keywords: ["street light", "darkness", "school"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "Medium",
-      score: 35,
-      dangerScore: 42,
-      communityScore: 25
-    },
-    resolvedDate: "",
-    resolvedBy: "",
-    resolutionNote: ""
-  },
-  {
-    id: "CC-1003",
-    title: "Severe sewage overflow flooding market entrance",
-    category: "Sewage",
-    description: "Blocked underground sewer main causing foul contaminated wastewater to pool across pedestrian walkway and store entrances.",
-    location: {
-      address: "Sector 18 Market Gate 2, Noida, UP",
-      latitude: 28.5708,
-      longitude: 77.3260
-    },
-    date: "30 Sep 2026",
-    severity: "Critical",
-    status: "In Progress",
-    verification: "Verified",
-    reporterName: "Pooja Sharma",
-    reportCount: 5,
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?w=600&auto=format&fit=crop&q=80",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "High",
-      dangerScore: 70,
-      reason: "Contaminated wastewater spill poses acute public sanitation hazard.",
-      keywords: ["sewage", "flooding", "market"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "High",
-      score: 72,
-      dangerScore: 70,
-      communityScore: 75
-    },
-    resolvedDate: "",
-    resolvedBy: "",
-    resolutionNote: ""
-  },
-  {
-    id: "CC-1004",
-    title: "Deep trench left open after pipeline excavation",
-    category: "Road/Pothole",
-    description: "Excavation pit left without warning cones, reflective tape, or barricades. High hazard for night commuters and bicyclists.",
-    location: {
-      address: "Indira Nagar Main Arterial, Lucknow, UP",
-      latitude: 26.8833,
-      longitude: 80.9984
-    },
-    date: "01 Oct 2026",
-    severity: "Critical",
-    status: "Reported",
-    verification: "Pending",
-    reporterName: "Anil Kumar",
-    reportCount: 4,
-    image: "",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "Critical",
-      dangerScore: 88,
-      reason: "Unbarricaded deep excavation pit presents catastrophic fall and collision risk.",
-      keywords: ["open pit", "excavation", "barricade"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "Critical",
-      score: 83,
-      dangerScore: 88,
-      communityScore: 75
-    },
-    resolvedDate: "",
-    resolvedBy: "",
-    resolutionNote: ""
-  },
-  {
-    id: "CC-1005",
-    title: "Uncollected roadside municipal garbage dump",
-    category: "Garbage/Waste",
-    description: "Community solid waste bin overflowing for 5 consecutive days. Stray animals scattering trash onto active two-lane roadway.",
-    location: {
-      address: "Road No 12, Banjara Hills, Hyderabad, Telangana",
-      latitude: 17.4156,
-      longitude: 78.4350
-    },
-    date: "29 Sep 2026",
-    severity: "Medium",
-    status: "Reported",
-    verification: "Pending",
-    reporterName: "Sunita Reddy",
-    reportCount: 2,
-    image: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "Low",
-      dangerScore: 30,
-      reason: "Solid waste overflow on sidewalk without active structural blockage.",
-      keywords: ["garbage", "waste", "sidewalk"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "Low",
-      score: 28,
-      dangerScore: 30,
-      communityScore: 25
-    },
-    resolvedDate: "",
-    resolvedBy: "",
-    resolutionNote: ""
-  },
-  {
-    id: "CC-1006",
-    title: "Traffic signal completely dead at 4-way intersection",
-    category: "Traffic",
-    description: "Traffic control lights malfunctioned following power surge, leading to chaotic gridlock and high risk of vehicle collisions.",
-    location: {
-      address: "MG Road & Brigade Rd Junction, Bengaluru, Karnataka",
-      latitude: 12.9740,
-      longitude: 77.6080
-    },
-    date: "25 Sep 2026",
-    severity: "Critical",
-    status: "Resolved",
-    verification: "Verified",
-    reporterName: "Karthik Raja",
-    reportCount: 8,
-    image: "",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "High",
-      dangerScore: 76,
-      reason: "Non-functional signal lights at major intersection cause high-speed cross-traffic gridlock.",
-      keywords: ["signal", "intersection", "collision"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "High",
-      score: 75,
-      dangerScore: 76,
-      communityScore: 74
-    },
-    resolvedDate: "26 Sep 2026",
-    resolvedBy: "Traffic Cell Admin",
-    resolutionNote: "Electronic controller motherboard replaced and signal timer sequence calibrated."
-  },
-  {
-    id: "CC-1007",
-    title: "Caved-in storm drainage slab near bus shelter",
-    category: "Road/Pothole",
-    description: "Reinforced drain slab fractured under heavy bus weight. Open pit created directly in the boarding queue area.",
-    location: {
-      address: "Civil Lines Bus Terminal, Kanpur, UP",
-      latitude: 26.4725,
-      longitude: 80.3456
-    },
-    date: "27 Sep 2026",
-    severity: "High",
-    status: "Resolved",
-    verification: "Verified",
-    reporterName: "Manoj Tiwari",
-    reportCount: 6,
-    image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600&auto=format&fit=crop&q=80",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "High",
-      dangerScore: 74,
-      reason: "Fractured concrete drainage cover in pedestrian boarding zone presents severe limb hazard.",
-      keywords: ["manhole", "slab", "drainage"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "High",
-      score: 74,
-      dangerScore: 74,
-      communityScore: 74
-    },
-    resolvedDate: "30 Sep 2026",
-    resolvedBy: "Public Works Admin",
-    resolutionNote: "Pre-cast heavy duty RCC slab installed and perimeter grouted flush with pavement."
-  },
-  {
-    id: "CC-1008",
-    title: "Severe waterlogging blocking railway subway underpass",
-    category: "Waterlogging",
-    description: "Stormwater runoff accumulated to 2.5 feet depth due to silted intake grates. Two-wheelers and sedans completely halted.",
-    location: {
-      address: "Shivaji Nagar Railway Underpass, Pune, Maharashtra",
-      latitude: 18.5314,
-      longitude: 73.8446
-    },
-    date: "02 Oct 2026",
-    severity: "High",
-    status: "In Progress",
-    verification: "Verified",
-    reporterName: "Meera Deshmukh",
-    reportCount: 3,
-    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-    supporters: [],
-    aiAnalysis: {
-      dangerLevel: "High",
-      dangerScore: 70,
-      reason: "2.5ft stagnant floodwaters submerging vehicle intake exhausts under low-visibility subway.",
-      keywords: ["waterlogging", "subway", "flooding"],
-      duplicateConfidence: 0
-    },
-    priority: {
-      level: "High",
-      score: 64,
-      dangerScore: 70,
-      communityScore: 54
-    },
-    resolvedDate: "",
-    resolvedBy: "",
-    resolutionNote: ""
-  }
-];
-
-// In-Memory store for offline fallback mode
-let inMemoryComplaints = INITIAL_SEED_REPORTS.map((r, i) => ({
-  ...r,
-  reportedBy: `user_seed_${i}`,
-  reporters: [`user_seed_${i}`],
-  supporters: []
-}));
+const INITIAL_SEED_REPORTS = persistentStore.getComplaints();
 
 /**
- * Helper: Find or create default citizen account for initial seed reports
+ * Helper: Find or create default citizen account for initial seed reports in MongoDB Atlas
  */
 async function getOrCreateSeedCitizen() {
   try {
@@ -442,8 +155,9 @@ async function generateNextComplaintId() {
     }
   } else {
     let maxNum = 1000;
-    inMemoryComplaints.forEach(c => {
-      const match = c.id.match(/^CC-(\d+)$/);
+    const complaints = persistentStore.getComplaints();
+    complaints.forEach(c => {
+      const match = c.id && c.id.match(/^CC-(\d+)$/);
       if (match) {
         const num = parseInt(match[1], 10);
         if (num > maxNum) maxNum = num;
@@ -460,7 +174,7 @@ async function generateNextComplaintId() {
  */
 exports.getAllComplaints = async (req, res) => {
   try {
-    const { category, status, priority, danger } = req.query;
+    const { category, status, priority, danger, search, q, sort, unreviewedOnly } = req.query;
 
     if (mongoose.connection.readyState === 1) {
       const filter = {};
@@ -476,11 +190,34 @@ exports.getAllComplaints = async (req, res) => {
       if (danger && danger !== 'all') {
         filter['aiAnalysis.dangerLevel'] = new RegExp(`^${danger}$`, 'i');
       }
+      if (unreviewedOnly === 'true' || unreviewedOnly === true) {
+        filter.isReviewed = { $ne: true };
+      }
 
-      // Sort by priority score descending by default
+      const searchTerm = search || q;
+      if (searchTerm && searchTerm.trim() !== '') {
+        const regex = new RegExp(searchTerm.trim(), 'i');
+        filter.$or = [
+          { title: regex },
+          { description: regex },
+          { id: regex },
+          { 'location.address': regex }
+        ];
+      }
+
+      // Latest-first default database sort (createdAt: -1, _id: -1)
+      let sortQuery = { createdAt: -1, _id: -1 };
+      if (sort === 'priority') {
+        sortQuery = { 'priority.score': -1, createdAt: -1 };
+      } else if (sort === 'oldest') {
+        sortQuery = { createdAt: 1, _id: 1 };
+      } else if (sort === 'votes') {
+        sortQuery = { 'supporters.length': -1, createdAt: -1 };
+      }
+
       const complaints = await Complaint.find(filter)
-        .populate('reportedBy', 'name')
-        .sort({ 'priority.score': -1, createdAt: -1 });
+        .populate('reportedBy', 'name email status rewardTokens flaggedReason')
+        .sort(sortQuery);
 
       const sanitized = complaints.map(doc => {
         const item = doc.toObject();
@@ -488,7 +225,13 @@ exports.getAllComplaints = async (req, res) => {
         item.voteCount = item.supportersCount;
         item.supporters = item.supportersCount;
         item.reportCount = item.reportCount || 1;
-        item.reportedBy = item.reporterName || (doc.reportedBy && doc.reportedBy.name) || 'Civic User';
+        const rep = doc.reportedBy;
+        item.reporterId = (rep && (rep._id || rep.id)) ? (rep._id || rep.id).toString() : (item.reportedBy ? item.reportedBy.toString() : '');
+        item.reporterName = item.reporterName || (rep && rep.name) || 'Civic Citizen';
+        item.reporterEmail = (rep && rep.email) || item.reporterEmail || '';
+        item.reporterStatus = (rep && rep.status) || 'Active';
+        item.reporterTokens = (rep && rep.rewardTokens !== undefined) ? rep.rewardTokens : 0;
+        item.reportedBy = item.reporterName;
         return item;
       });
 
@@ -499,36 +242,67 @@ exports.getAllComplaints = async (req, res) => {
         data: sanitized
       });
     } else {
-      // In-Memory Fallback
-      let result = [...inMemoryComplaints];
+      // Persistent File Store Fallback
+      let result = [...persistentStore.getComplaints()];
 
       if (category && category !== 'all') {
-        result = result.filter(c => c.category.toLowerCase() === category.toLowerCase());
+        result = result.filter(c => c.category && c.category.toLowerCase() === category.toLowerCase());
       }
       if (status && status !== 'all') {
-        result = result.filter(c => c.status.toLowerCase() === status.toLowerCase());
+        result = result.filter(c => c.status && c.status.toLowerCase() === status.toLowerCase());
       }
       if (priority && priority !== 'all') {
-        result = result.filter(c => c.priority && c.priority.level.toLowerCase() === priority.toLowerCase());
+        result = result.filter(c => c.priority && c.priority.level && c.priority.level.toLowerCase() === priority.toLowerCase());
       }
       if (danger && danger !== 'all') {
-        result = result.filter(c => c.aiAnalysis && c.aiAnalysis.dangerLevel.toLowerCase() === danger.toLowerCase());
+        result = result.filter(c => c.aiAnalysis && c.aiAnalysis.dangerLevel && c.aiAnalysis.dangerLevel.toLowerCase() === danger.toLowerCase());
+      }
+      if (unreviewedOnly === 'true' || unreviewedOnly === true) {
+        result = result.filter(c => c.isReviewed !== true);
       }
 
-      result.sort((a, b) => ((b.priority && b.priority.score) || 0) - ((a.priority && a.priority.score) || 0));
+      const searchTerm = search || q;
+      if (searchTerm && searchTerm.trim() !== '') {
+        const term = searchTerm.trim().toLowerCase();
+        result = result.filter(c =>
+          (c.title && c.title.toLowerCase().includes(term)) ||
+          (c.description && c.description.toLowerCase().includes(term)) ||
+          (c.id && c.id.toLowerCase().includes(term)) ||
+          (c.location && c.location.address && c.location.address.toLowerCase().includes(term))
+        );
+      }
 
-      const formatted = result.map(c => ({
-        ...c,
-        supportersCount: Array.isArray(c.supporters) ? c.supporters.length : 0,
-        voteCount: Array.isArray(c.supporters) ? c.supporters.length : 0,
-        supporters: Array.isArray(c.supporters) ? c.supporters.length : (c.supporters || 0),
-        reportCount: c.reportCount || 1,
-        reportedBy: c.reporterName || 'Civic User'
-      }));
+      // Sort: Latest first by default
+      if (sort === 'priority') {
+        result.sort((a, b) => ((b.priority && b.priority.score) || 0) - ((a.priority && a.priority.score) || 0));
+      } else if (sort === 'oldest') {
+        result.sort((a, b) => new Date(a.createdAt || a.submittedAt || 0) - new Date(b.createdAt || b.submittedAt || 0));
+      } else {
+        result.sort((a, b) => new Date(b.createdAt || b.submittedAt || 0) - new Date(a.createdAt || a.submittedAt || 0));
+      }
+
+      const allUsers = persistentStore.getUsers();
+      const formatted = result.map(c => {
+        const repId = (c.reportedBy && c.reportedBy.toString()) || (c.reporters && c.reporters[0] && c.reporters[0].toString()) || '';
+        const rep = allUsers.find(u => (u.id || u._id || '').toString() === repId || (u.name && c.reporterName && u.name.toLowerCase() === c.reporterName.toLowerCase()));
+        return {
+          ...c,
+          supportersCount: Array.isArray(c.supporters) ? c.supporters.length : 0,
+          voteCount: Array.isArray(c.supporters) ? c.supporters.length : 0,
+          supporters: Array.isArray(c.supporters) ? c.supporters.length : (c.supporters || 0),
+          reportCount: c.reportCount || 1,
+          reporterId: rep ? (rep.id || rep._id) : (c.reportedBy || ''),
+          reporterName: rep ? rep.name : (c.reporterName || 'Civic Citizen'),
+          reporterEmail: rep ? rep.email : (c.reporterEmail || ''),
+          reporterStatus: rep ? (rep.status || 'Active') : 'Active',
+          reporterTokens: rep ? (rep.rewardTokens || 0) : 0,
+          reportedBy: rep ? rep.name : (c.reporterName || 'Civic Citizen')
+        };
+      });
 
       return res.status(200).json({
         success: true,
-        source: "In-Memory Fallback",
+        source: "Persistent Store",
         count: formatted.length,
         data: formatted
       });
@@ -545,12 +319,12 @@ exports.getAllComplaints = async (req, res) => {
 
 
 /**
- * 2. GET /api/complaints/mine
+ * 2. GET /api/complaints/mine AND /api/users/me/complaints
  * Private personal feed of reports submitted by the logged-in citizen
  */
 exports.getMyComplaints = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.id || req.user._id;
 
     if (mongoose.connection.readyState === 1) {
       const myComplaints = await Complaint.find({
@@ -558,7 +332,7 @@ exports.getMyComplaints = async (req, res) => {
           { reportedBy: userId },
           { reporters: userId }
         ]
-      }).sort({ createdAt: -1 });
+      }).sort({ createdAt: -1, _id: -1 });
 
       const sanitized = myComplaints.map(doc => {
         const item = doc.toObject();
@@ -577,9 +351,14 @@ exports.getMyComplaints = async (req, res) => {
         data: sanitized
       });
     } else {
-      const userComplaints = inMemoryComplaints.filter(
-        c => c.reportedBy === userId || (c.reporters && c.reporters.includes(userId)) || c.reporterName === req.user.name
+      const all = persistentStore.getComplaints();
+      const userComplaints = all.filter(
+        c => (c.reportedBy && c.reportedBy.toString() === userId.toString()) ||
+             (c.reporters && c.reporters.map(r => r.toString()).includes(userId.toString()))
       );
+
+      // Latest first
+      userComplaints.sort((a, b) => new Date(b.createdAt || b.submittedAt || 0) - new Date(a.createdAt || a.submittedAt || 0));
 
       const formatted = userComplaints.map(c => ({
         ...c,
@@ -592,7 +371,7 @@ exports.getMyComplaints = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        source: "In-Memory Fallback",
+        source: "Persistent Store",
         count: formatted.length,
         data: formatted
       });
@@ -641,7 +420,7 @@ exports.getComplaintById = async (req, res) => {
         data: item
       });
     } else {
-      const complaint = inMemoryComplaints.find(c => c.id.toLowerCase() === id.toLowerCase());
+      const complaint = persistentStore.findComplaintById(id);
       if (!complaint) {
         return res.status(404).json({
           success: false,
@@ -651,7 +430,7 @@ exports.getComplaintById = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        source: "In-Memory Fallback",
+        source: "Persistent Store",
         data: {
           ...complaint,
           supportersCount: Array.isArray(complaint.supporters) ? complaint.supporters.length : 0,
@@ -682,7 +461,22 @@ exports.getComplaintById = async (req, res) => {
  */
 exports.createComplaint = async (req, res) => {
   try {
-    const { title, category, description, severity, image, location, latitude, longitude, address } = req.body;
+    const {
+      title,
+      category,
+      description,
+      severity,
+      image,
+      location,
+      latitude,
+      longitude,
+      address,
+      locationSource,
+      locationAccuracy,
+      locationCapturedAt,
+      photoSource,
+      photoUploadedAt
+    } = req.body;
 
     // Validate required fields
     if (!title || !category || !description) {
@@ -692,30 +486,80 @@ exports.createComplaint = async (req, res) => {
       });
     }
 
+    if (title.trim().length < 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Title must be at least 5 characters"
+      });
+    }
+
+    if (description.trim().length < 10) {
+      return res.status(400).json({
+        success: false,
+        message: "Description must be at least 10 characters"
+      });
+    }
+
     // Extract coordinates safely
     let lat = null;
     let lng = null;
     let addr = "";
+    let locSource = 'manual';
+    let locAccuracy = null;
+    let locCapturedAt = null;
 
     if (location && typeof location === 'object') {
       lat = parseFloat(location.latitude);
       lng = parseFloat(location.longitude);
       addr = location.address || "";
+      if (location.source) locSource = location.source;
+      if (location.accuracy !== undefined && location.accuracy !== null) locAccuracy = parseFloat(location.accuracy);
+      if (location.capturedAt) locCapturedAt = new Date(location.capturedAt);
     } else {
       lat = parseFloat(latitude);
       lng = parseFloat(longitude);
       addr = address || (typeof location === 'string' ? location : "");
     }
 
-    if (isNaN(lat) || isNaN(lng)) {
+    if (locationSource) locSource = locationSource;
+    if (locationAccuracy !== undefined && locationAccuracy !== null) locAccuracy = parseFloat(locationAccuracy);
+    if (locationCapturedAt) locCapturedAt = new Date(locationCapturedAt);
+
+    // Normalize location source
+    locSource = (locSource && locSource.toString().toLowerCase() === 'gps') ? 'gps' : 'manual';
+    if (locAccuracy !== null && (isNaN(locAccuracy) || locAccuracy < 0)) {
+      locAccuracy = null;
+    }
+
+    // Validate coordinates range
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       return res.status(400).json({
         success: false,
-        message: "Valid latitude and longitude coordinates are required for hazard mapping and duplicate checking."
+        message: "Valid latitude (-90 to 90) and longitude (-180 to 180) coordinates are required for hazard mapping."
       });
     }
 
-    const reporterId = req.user.id;
-    const reporterName = req.user.name;
+    // Photo metadata & validation
+    let pSource = 'upload';
+    if (photoSource) {
+      const cleanPSource = photoSource.toString().toLowerCase();
+      if (cleanPSource === 'camera') pSource = 'camera';
+      else if (cleanPSource === 'gallery') pSource = 'gallery';
+      else pSource = 'upload';
+    }
+    let pUploadedAt = photoUploadedAt ? new Date(photoUploadedAt) : (image ? new Date() : null);
+
+    // Validate image format / size if provided
+    let cleanImage = image ? image.trim() : "";
+    if (cleanImage && cleanImage.length > 8 * 1024 * 1024) {
+      return res.status(400).json({
+        success: false,
+        message: "Uploaded image exceeds maximum allowable payload size (5MB)."
+      });
+    }
+
+    const reporterId = req.user.id || req.user._id;
+    const reporterName = req.user.name || "Civic User";
     const cleanTitle = title.trim();
     const cleanDesc = description.trim();
     const cleanCategory = category.trim();
@@ -729,7 +573,6 @@ exports.createComplaint = async (req, res) => {
     let candidates = [];
 
     if (mongoose.connection.readyState === 1) {
-      // Find unresolved complaints in similar category
       const activeNearby = await Complaint.find({
         status: { $nin: ['Resolved', 'Rejected'] },
         category: cleanCategory
@@ -749,8 +592,7 @@ exports.createComplaint = async (req, res) => {
         };
       }).filter(c => c.distanceMeters <= radiusMeters);
     } else {
-      // In-Memory candidates filter
-      candidates = inMemoryComplaints
+      candidates = persistentStore.getComplaints()
         .filter(c => c.status !== 'Resolved' && c.status !== 'Rejected' && c.category === cleanCategory)
         .map(c => {
           const cLat = c.location ? c.location.latitude : null;
@@ -772,20 +614,17 @@ exports.createComplaint = async (req, res) => {
      * STEP B: GEMINI SEMANTIC DUPLICATE EVALUATION
      * -------------------------------------------------------- */
     if (candidates.length > 0) {
-      console.log(`ℹ️  [AI Check]: Found ${candidates.length} nearby complaint candidate(s) within ${radiusMeters}m. Analyzing with Gemini...`);
+      console.log(`ℹ️  [AI Check]: Found ${candidates.length} nearby candidate(s) within ${radiusMeters}m.`);
       
       const duplicateResult = await geminiService.checkDuplicateWithGemini(
         { title: cleanTitle, description: cleanDesc, category: cleanCategory },
         candidates
       );
 
-      console.log(`[AI Result]: Duplicate=${duplicateResult.isDuplicate}, Confidence=${duplicateResult.confidence}%, Matched=${duplicateResult.matchedComplaintId}`);
-
       if (duplicateResult.isDuplicate && duplicateResult.confidence >= confidenceThreshold && duplicateResult.matchedComplaintId) {
         const matchedCandidate = candidates.find(c => c.id === duplicateResult.matchedComplaintId) || candidates[0];
         const existing = matchedCandidate.doc;
 
-        // Check if user already reported this problem
         const existingReporters = existing.reporters || [];
         const hasUserAlreadyReported = existingReporters.some(id => id && id.toString() === reporterId.toString());
 
@@ -794,7 +633,6 @@ exports.createComplaint = async (req, res) => {
             existing.reportCount = (existing.reportCount || 1) + 1;
             existing.reporters.push(reporterId);
 
-            // Recalculate priority with increased reportCount
             const updatedPriority = calculatePriority({
               dangerScore: existing.aiAnalysis ? existing.aiAnalysis.dangerScore : 50,
               reportCount: existing.reportCount,
@@ -803,19 +641,22 @@ exports.createComplaint = async (req, res) => {
             existing.priority = updatedPriority;
 
             await existing.save();
-
-            // Reward citizen 2 tokens for corroborating an existing civic problem
             await User.findByIdAndUpdate(reporterId, { $inc: { rewardTokens: 2 } });
           } else {
-            existing.reportCount = (existing.reportCount || 1) + 1;
-            if (!existing.reporters) existing.reporters = [];
-            existing.reporters.push(reporterId);
-
-            existing.priority = calculatePriority({
+            const reportCount = (existing.reportCount || 1) + 1;
+            const reporters = [...(existing.reporters || []), reporterId];
+            const updatedPriority = calculatePriority({
               dangerScore: existing.aiAnalysis ? existing.aiAnalysis.dangerScore : 50,
-              reportCount: existing.reportCount,
+              reportCount,
               voteCount: existing.supporters ? existing.supporters.length : 0
             });
+
+            persistentStore.updateComplaint(existing.id, {
+              reportCount,
+              reporters,
+              priority: updatedPriority
+            });
+            persistentStore.incrementUserTokens(reporterId, 2);
           }
         }
 
@@ -824,13 +665,13 @@ exports.createComplaint = async (req, res) => {
           duplicate: true,
           message: "Similar complaint already exists in this immediate area. Your report has been added to this existing issue.",
           complaintId: existing.id,
-          reportCount: existing.reportCount,
+          reportCount: (existing.reportCount || 1),
           data: {
             id: existing.id,
             title: existing.title,
             category: existing.category,
             location: existing.location,
-            reportCount: existing.reportCount,
+            reportCount: (existing.reportCount || 1),
             supportersCount: existing.supporters ? existing.supporters.length : 0,
             priority: existing.priority,
             aiAnalysis: existing.aiAnalysis,
@@ -853,7 +694,6 @@ exports.createComplaint = async (req, res) => {
       longitude: lng
     });
 
-    // Calculate transparent priority formula
     const priority = calculatePriority({
       dangerScore: aiAnalysis.dangerScore,
       reportCount: 1,
@@ -875,11 +715,21 @@ exports.createComplaint = async (req, res) => {
       location: {
         address: addr || `Coordinates (${lat.toFixed(4)}, ${lng.toFixed(4)})`,
         latitude: lat,
-        longitude: lng
+        longitude: lng,
+        source: locSource,
+        accuracy: locAccuracy,
+        capturedAt: locCapturedAt ? locCapturedAt.toISOString() : null
       },
       severity: severity || "Medium",
-      status: "Reported",
+      status: "Under Verification",
       verification: "Pending",
+      photoSource: pSource,
+      photoUploadedAt: pUploadedAt ? pUploadedAt.toISOString() : null,
+      submittedAt: new Date().toISOString(),
+      verificationNotes: "",
+      verifiedAt: null,
+      verifiedBy: "",
+      verificationHistory: [],
       reportedBy: reporterId,
       reporterName: reporterName,
       reportCount: 1,
@@ -887,23 +737,30 @@ exports.createComplaint = async (req, res) => {
       supporters: [],
       aiAnalysis,
       priority,
-      image: image ? image.trim() : "",
+      image: cleanImage,
       date: todayStr,
       resolvedDate: "",
       resolvedBy: "",
-      resolutionNote: ""
+      resolutionNote: "",
+      isReviewed: false,
+      reviewedAt: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     if (mongoose.connection.readyState === 1) {
       const newDoc = await Complaint.create(complaintData);
-
-      // Reward citizen with 5 Civic Tokens for filing a new report
       await User.findByIdAndUpdate(reporterId, { $inc: { rewardTokens: 5 } });
 
       const responseData = newDoc.toObject();
       responseData.supporters = 0;
       responseData.supportersCount = 0;
       responseData.voteCount = 0;
+
+      // Broadcast real-time confirmation to Citizen who registered it
+      notificationService.broadcastComplaintRegistered(responseData);
+      // Broadcast real-time notification to Authority Portal
+      notificationService.broadcastNewComplaint(responseData);
 
       return res.status(201).json({
         success: true,
@@ -913,13 +770,20 @@ exports.createComplaint = async (req, res) => {
         data: responseData
       });
     } else {
-      // In-Memory Fallback
-      inMemoryComplaints.unshift(complaintData);
+      // Persistent Store
+      persistentStore.addComplaint(complaintData);
+      persistentStore.incrementUserTokens(reporterId, 5);
+
+      // Broadcast real-time confirmation to Citizen who registered it
+      notificationService.broadcastComplaintRegistered(complaintData);
+      // Broadcast real-time notification to Authority Portal
+      notificationService.broadcastNewComplaint(complaintData);
+
       return res.status(201).json({
         success: true,
         duplicate: false,
-        source: "In-Memory Fallback",
-        message: `Complaint ${complaintData.id} registered successfully (in-memory mode)`,
+        source: "Persistent Store",
+        message: `Complaint ${complaintData.id} registered successfully!`,
         data: {
           ...complaintData,
           supporters: 0,
@@ -946,7 +810,7 @@ exports.createComplaint = async (req, res) => {
 exports.supportComplaint = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.id || req.user._id;
 
     if (mongoose.connection.readyState === 1) {
       const complaint = await Complaint.findOne({
@@ -960,7 +824,6 @@ exports.supportComplaint = async (req, res) => {
         });
       }
 
-      // Check if citizen already voted
       const alreadyVoted = complaint.supporters.some(
         supporterId => supporterId.toString() === userId.toString()
       );
@@ -975,10 +838,8 @@ exports.supportComplaint = async (req, res) => {
         });
       }
 
-      // Add vote
       complaint.supporters.push(userId);
 
-      // Dynamically recalculate community score & final priority
       const updatedPriority = calculatePriority({
         dangerScore: complaint.aiAnalysis ? complaint.aiAnalysis.dangerScore : 50,
         reportCount: complaint.reportCount || 1,
@@ -987,8 +848,6 @@ exports.supportComplaint = async (req, res) => {
       complaint.priority = updatedPriority;
 
       await complaint.save();
-
-      // Award 1 token to citizen for participating in community civic voting
       await User.findByIdAndUpdate(userId, { $inc: { rewardTokens: 1 } });
 
       return res.status(200).json({
@@ -1002,8 +861,7 @@ exports.supportComplaint = async (req, res) => {
         data: complaint
       });
     } else {
-      // In-Memory Fallback
-      const complaint = inMemoryComplaints.find(c => c.id.toLowerCase() === id.toLowerCase());
+      const complaint = persistentStore.findComplaintById(id);
       if (!complaint) {
         return res.status(404).json({
           success: false,
@@ -1032,9 +890,15 @@ exports.supportComplaint = async (req, res) => {
       });
       complaint.priority = updatedPriority;
 
+      persistentStore.updateComplaint(complaint.id, {
+        supporters: complaint.supporters,
+        priority: updatedPriority
+      });
+      persistentStore.incrementUserTokens(userId, 1);
+
       return res.status(200).json({
         success: true,
-        source: "In-Memory Fallback",
+        source: "Persistent Store",
         message: `Endorsement recorded! Priority updated to ${updatedPriority.level} (${updatedPriority.score}/100)`,
         voteCount: complaint.supporters.length,
         supportersCount: complaint.supporters.length,
@@ -1068,7 +932,7 @@ exports.reanalyzeComplaint = async (req, res) => {
     if (mongoose.connection.readyState === 1) {
       complaint = await Complaint.findOne({ id: { $regex: new RegExp(`^${id}$`, 'i') } });
     } else {
-      complaint = inMemoryComplaints.find(c => c.id.toLowerCase() === id.toLowerCase());
+      complaint = persistentStore.findComplaintById(id);
     }
 
     if (!complaint) {
@@ -1081,7 +945,6 @@ exports.reanalyzeComplaint = async (req, res) => {
     const lat = complaint.location ? complaint.location.latitude : 20.5937;
     const lng = complaint.location ? complaint.location.longitude : 78.9629;
 
-    // Call Gemini
     const freshAnalysis = await geminiService.analyzeComplaint({
       title: complaint.title,
       category: complaint.category,
@@ -1093,7 +956,6 @@ exports.reanalyzeComplaint = async (req, res) => {
 
     complaint.aiAnalysis = freshAnalysis;
 
-    // Recalculate priority
     const voteCount = Array.isArray(complaint.supporters) ? complaint.supporters.length : 0;
     complaint.priority = calculatePriority({
       dangerScore: freshAnalysis.dangerScore,
@@ -1103,18 +965,23 @@ exports.reanalyzeComplaint = async (req, res) => {
 
     if (mongoose.connection.readyState === 1) {
       await complaint.save();
+    } else {
+      persistentStore.updateComplaint(complaint.id, {
+        aiAnalysis: freshAnalysis,
+        priority: complaint.priority
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: `Gemini AI assessment refreshed: Danger ${freshAnalysis.dangerLevel} (${freshAnalysis.dangerScore}/100), Priority ${complaint.priority.level}`,
+      message: `Complaint ${complaint.id} re-analyzed by Gemini AI. Danger Score: ${freshAnalysis.dangerScore}/100`,
       data: complaint
     });
   } catch (error) {
     console.error('Error in reanalyzeComplaint:', error);
     res.status(500).json({
       success: false,
-      message: "Error reanalyzing complaint with Gemini AI",
+      message: "Error running Gemini re-analysis",
       error: error.message
     });
   }
@@ -1122,13 +989,13 @@ exports.reanalyzeComplaint = async (req, res) => {
 
 
 /**
- * 7. PATCH /api/complaints/:id/status
- * Administrative status update (Protected: Admin Role Only)
+ * 7. PATCH /api/complaints/:id/status AND /api/admin/complaints/:id/status
+ * Admin-Only: Transition complaint status and record audit log
  */
 exports.updateComplaintStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, resolvedNote, resolvedBy } = req.body;
+    const { status, resolvedBy, resolvedNote, note, assignedOfficial, internalNotes, internalNote, verification } = req.body;
 
     const ALLOWED_STATUSES = [
       "Reported",
@@ -1138,14 +1005,14 @@ exports.updateComplaintStatus = async (req, res) => {
       "Rejected"
     ];
 
-    if (!status || !ALLOWED_STATUSES.includes(status)) {
+    if (status && !ALLOWED_STATUSES.includes(status)) {
       return res.status(400).json({
         success: false,
         message: `Invalid status. Allowed statuses: ${ALLOWED_STATUSES.join(', ')}`
       });
     }
 
-    const adminName = req.user.name || "Civic Admin";
+    const adminName = req.user.name || "Civic Authority Officer";
 
     if (mongoose.connection.readyState === 1) {
       const complaint = await Complaint.findOne({
@@ -1159,24 +1026,41 @@ exports.updateComplaintStatus = async (req, res) => {
         });
       }
 
-      complaint.status = status;
+      if (status) {
+        complaint.status = status;
 
-      if (status === "Resolved") {
-        complaint.verification = "Verified";
-        complaint.resolvedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        complaint.resolvedBy = resolvedBy || `${adminName} (Ward Operations)`;
-        if (resolvedNote && resolvedNote.trim()) {
-          complaint.resolutionNote = resolvedNote.trim();
-        } else if (!complaint.resolutionNote) {
-          complaint.resolutionNote = "Hazard inspected and road surface restored by municipal crew.";
+        if (status === "Resolved") {
+          complaint.verification = "Verified";
+          complaint.resolvedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+          complaint.resolvedBy = resolvedBy || `${adminName} (Ward Operations)`;
+          if (resolvedNote && resolvedNote.trim()) {
+            complaint.resolutionNote = resolvedNote.trim();
+          } else if (note && note.trim()) {
+            complaint.resolutionNote = note.trim();
+          } else if (!complaint.resolutionNote) {
+            complaint.resolutionNote = "Hazard inspected and road surface restored by municipal crew.";
+          }
+        } else if (status === "Rejected") {
+          complaint.verification = "Rejected";
+        } else if (status === "In Progress" || status === "Under Verification") {
+          complaint.verification = "Verified";
         }
-      } else if (status === "Rejected") {
-        complaint.verification = "Rejected";
-      } else if (status === "In Progress" && complaint.verification === "Pending") {
-        complaint.verification = "Verified";
-      } else if (status === "Under Verification" && complaint.verification === "Pending") {
-        complaint.verification = "Verified";
       }
+
+      if (verification && ['Pending', 'Verified', 'Rejected'].includes(verification)) {
+        complaint.verification = verification;
+      }
+      if (assignedOfficial !== undefined) {
+        complaint.assignedOfficial = assignedOfficial.trim();
+      }
+      if (internalNotes !== undefined) {
+        complaint.internalNotes = internalNotes.trim();
+      } else if (internalNote !== undefined) {
+        complaint.internalNotes = internalNote.trim();
+      }
+
+      complaint.isReviewed = true;
+      complaint.reviewedAt = new Date();
 
       await complaint.save();
 
@@ -1185,15 +1069,26 @@ exports.updateComplaintStatus = async (req, res) => {
       item.supporters = item.supportersCount;
       item.voteCount = item.supportersCount;
 
+      // Broadcast real-time notification to Citizen Portal
+      if (status === 'Resolved') {
+        notificationService.broadcastComplaintResolved(item);
+      } else if (status) {
+        notificationService.broadcastStatusUpdate(item, status);
+      }
+
+      if (assignedOfficial && assignedOfficial.trim()) {
+        notificationService.broadcastOfficialAssigned(item, assignedOfficial.trim());
+      }
+
       return res.status(200).json({
         success: true,
         source: "MongoDB Atlas",
-        message: `Complaint ${complaint.id} status updated to ${status} by Administrator ${adminName}`,
+        message: `Complaint ${complaint.id} updated successfully by Authority ${adminName}`,
         data: item
       });
     } else {
-      // In-Memory Fallback
-      const complaint = inMemoryComplaints.find(c => c.id.toLowerCase() === id.toLowerCase());
+      // Persistent Store
+      const complaint = persistentStore.findComplaintById(id);
       if (!complaint) {
         return res.status(404).json({
           success: false,
@@ -1201,26 +1096,60 @@ exports.updateComplaintStatus = async (req, res) => {
         });
       }
 
-      complaint.status = status;
-      if (status === "Resolved") {
-        complaint.verification = "Verified";
-        complaint.resolvedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        complaint.resolvedBy = resolvedBy || `${adminName} (Ward Operations)`;
-        complaint.resolutionNote = resolvedNote || "Hazard inspected and repaired.";
-      } else if (status === "Rejected") {
-        complaint.verification = "Rejected";
+      const updates = {
+        isReviewed: true,
+        reviewedAt: new Date().toISOString()
+      };
+      if (status) {
+        updates.status = status;
+        if (status === "Resolved") {
+          updates.verification = "Verified";
+          updates.resolvedDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+          updates.resolvedBy = resolvedBy || `${adminName} (Ward Operations)`;
+          updates.resolutionNote = (resolvedNote && resolvedNote.trim()) || (note && note.trim()) || complaint.resolutionNote || "Hazard inspected and repaired.";
+        } else if (status === "Rejected") {
+          updates.verification = "Rejected";
+        } else if (status === "In Progress" || status === "Under Verification") {
+          updates.verification = "Verified";
+        }
+      }
+
+      if (verification && ['Pending', 'Verified', 'Rejected'].includes(verification)) {
+        updates.verification = verification;
+      }
+      if (assignedOfficial !== undefined) {
+        updates.assignedOfficial = assignedOfficial.trim();
+      }
+      if (internalNotes !== undefined) {
+        updates.internalNotes = internalNotes.trim();
+      } else if (internalNote !== undefined) {
+        updates.internalNotes = internalNote.trim();
+      }
+
+      const saved = persistentStore.updateComplaint(id, updates);
+      const item = {
+        ...saved,
+        supportersCount: Array.isArray(saved.supporters) ? saved.supporters.length : 0,
+        supporters: Array.isArray(saved.supporters) ? saved.supporters.length : (saved.supporters || 0),
+        voteCount: Array.isArray(saved.supporters) ? saved.supporters.length : 0
+      };
+
+      // Broadcast real-time notification to Citizen Portal
+      if (status === 'Resolved') {
+        notificationService.broadcastComplaintResolved(item);
+      } else if (status) {
+        notificationService.broadcastStatusUpdate(item, status);
+      }
+
+      if (assignedOfficial && assignedOfficial.trim()) {
+        notificationService.broadcastOfficialAssigned(item, assignedOfficial.trim());
       }
 
       return res.status(200).json({
         success: true,
-        source: "In-Memory Fallback",
-        message: `Complaint ${complaint.id} status updated to ${status}`,
-        data: {
-          ...complaint,
-          supportersCount: Array.isArray(complaint.supporters) ? complaint.supporters.length : 0,
-          supporters: Array.isArray(complaint.supporters) ? complaint.supporters.length : (complaint.supporters || 0),
-          voteCount: Array.isArray(complaint.supporters) ? complaint.supporters.length : 0
-        }
+        source: "Persistent Store",
+        message: `Complaint ${saved.id} updated successfully`,
+        data: item
       });
     }
   } catch (error) {
@@ -1232,3 +1161,528 @@ exports.updateComplaintStatus = async (req, res) => {
     });
   }
 };
+
+
+/**
+ * 8. PATCH /api/complaints/:id/priority AND /api/admin/complaints/:id/priority
+ * Admin-Only: Updates complaint priority level and/or severity
+ */
+exports.updateComplaintPriority = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { priorityLevel, priorityScore, severity } = req.body;
+
+    if (!priorityLevel && priorityScore === undefined && !severity) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide priorityLevel, priorityScore, or severity to update"
+      });
+    }
+
+    if (mongoose.connection.readyState === 1) {
+      const complaint = await Complaint.findOne({ id: { $regex: new RegExp(`^${id}$`, 'i') } });
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+
+      if (severity) complaint.severity = severity;
+      if (!complaint.priority) complaint.priority = {};
+      if (priorityLevel) complaint.priority.level = priorityLevel;
+      if (priorityScore !== undefined) complaint.priority.score = parseInt(priorityScore, 10);
+      complaint.priority.calculatedAt = new Date();
+      complaint.isReviewed = true;
+      complaint.reviewedAt = new Date();
+
+      await complaint.save();
+
+      // Broadcast real-time priority update to citizen
+      notificationService.broadcastPriorityUpdated(complaint.toObject(), priorityLevel || complaint.priority.level);
+
+      return res.status(200).json({
+        success: true,
+        source: "MongoDB Atlas",
+        message: `Complaint ${complaint.id} priority updated`,
+        data: complaint
+      });
+    } else {
+      const complaint = persistentStore.findComplaintById(id);
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+
+      const updates = {
+        isReviewed: true,
+        reviewedAt: new Date().toISOString()
+      };
+      if (severity) updates.severity = severity;
+      const updatedPriority = { ...(complaint.priority || {}) };
+      if (priorityLevel) updatedPriority.level = priorityLevel;
+      if (priorityScore !== undefined) updatedPriority.score = parseInt(priorityScore, 10);
+      updatedPriority.calculatedAt = new Date();
+      updates.priority = updatedPriority;
+
+      const saved = persistentStore.updateComplaint(id, updates);
+
+      // Broadcast real-time priority update to citizen
+      notificationService.broadcastPriorityUpdated(saved, priorityLevel || (saved.priority && saved.priority.level));
+
+      return res.status(200).json({
+        success: true,
+        source: "Persistent Store",
+        message: `Complaint ${saved.id} priority updated`,
+        data: saved
+      });
+    }
+  } catch (err) {
+    console.error('Error in updateComplaintPriority:', err);
+    res.status(500).json({ success: false, message: "Failed to update priority", error: err.message });
+  }
+};
+
+
+/**
+ * 9. GET /api/admin/complaints
+ * Admin-Only: Retrieve all complaints with full administrative details
+ */
+exports.getAdminComplaints = async (req, res) => {
+  return exports.getAllComplaints(req, res);
+};
+
+
+/**
+ * 10. GET /api/admin/dashboard
+ * Admin-Only: Retrieve real aggregated dashboard statistics from persistent database
+ */
+exports.getAdminDashboardStats = async (req, res) => {
+  try {
+    let complaintsList = [];
+    if (mongoose.connection.readyState === 1) {
+      complaintsList = await Complaint.find({}).lean();
+    } else {
+      complaintsList = persistentStore.getComplaints();
+    }
+
+    const total = complaintsList.length;
+    const underVerification = complaintsList.filter(c => c.status === 'Under Verification' || c.status === 'Reported').length;
+    const verified = complaintsList.filter(c => c.verification === 'Verified').length;
+    const inProgress = complaintsList.filter(c => c.status === 'In Progress').length;
+    const resolved = complaintsList.filter(c => c.status === 'Resolved').length;
+    const rejected = complaintsList.filter(c => c.status === 'Rejected').length;
+    const critical = complaintsList.filter(c => (c.priority && (c.priority.level === 'Critical' || c.priority.level === 'CRITICAL')) || c.severity === 'Critical').length;
+    const high = complaintsList.filter(c => (c.priority && (c.priority.level === 'High' || c.priority.level === 'HIGH')) || c.severity === 'High').length;
+
+    // Registered Users
+    let usersList = [];
+    if (mongoose.connection.readyState === 1) {
+      usersList = await User.find({}, '-password').lean();
+    } else {
+      usersList = persistentStore.getUsers().map(u => ({
+        id: u.id,
+        _id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        rewardTokens: u.rewardTokens || 0,
+        status: u.status || 'Active',
+        flaggedReason: u.flaggedReason || ''
+      }));
+    }
+
+    const userStats = usersList.map(u => {
+      const uId = (u._id || u.id).toString();
+      const uAltId = (u.id || u._id).toString();
+      const userComplaints = complaintsList.filter(c => {
+        const rep = (c.reportedBy && c.reportedBy._id) ? c.reportedBy._id.toString() : (c.reportedBy ? c.reportedBy.toString() : '');
+        return rep === uId || rep === uAltId ||
+               (c.reporters && c.reporters.map(r => r.toString()).some(r => r === uId || r === uAltId));
+      });
+      return {
+        id: u.id || u._id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        tokens: u.rewardTokens || 0,
+        reported: userComplaints.length,
+        resolved: userComplaints.filter(c => c.status === 'Resolved').length,
+        status: u.status || 'Active',
+        flaggedReason: u.flaggedReason || ''
+      };
+    });
+
+    // Category breakdown
+    const categoryCounts = {};
+    complaintsList.forEach(c => {
+      const cat = c.category || 'Other';
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    });
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        total,
+        pending: underVerification,
+        underVerification,
+        verified,
+        inProgress,
+        resolved,
+        rejected,
+        critical,
+        high,
+        categories: categoryCounts
+      },
+      users: userStats
+    });
+  } catch (err) {
+    console.error('Error in getAdminDashboardStats:', err);
+    res.status(500).json({ success: false, message: "Failed to load admin statistics", error: err.message });
+  }
+};
+
+/**
+ * PATCH /api/admin/users/:id/flag
+ * Admin / Municipal Authority flags a citizen account for false/spam complaint
+ */
+exports.flagUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, reason, penaltyTokens } = req.body;
+    let updatedUser = null;
+
+    if (mongoose.connection.readyState === 1) {
+      const u = await User.findById(id);
+      if (!u) {
+        return res.status(404).json({ success: false, message: 'Citizen profile not found' });
+      }
+      u.status = status || (u.status === 'Flagged' ? 'Active' : 'Flagged');
+      if (reason) u.flaggedReason = reason;
+      if (penaltyTokens && u.rewardTokens) {
+        u.rewardTokens = Math.max(0, u.rewardTokens - Number(penaltyTokens));
+      }
+      await u.save();
+      updatedUser = {
+        id: u._id.toString(),
+        name: u.name,
+        email: u.email,
+        status: u.status,
+        tokens: u.rewardTokens,
+        flaggedReason: u.flaggedReason
+      };
+    } else {
+      const u = persistentStore.findUserById(id);
+      if (!u) {
+        return res.status(404).json({ success: false, message: 'Citizen profile not found' });
+      }
+      const newStatus = status || (u.status === 'Flagged' ? 'Active' : 'Flagged');
+      let newTokens = u.rewardTokens || 0;
+      if (penaltyTokens) {
+        newTokens = Math.max(0, newTokens - Number(penaltyTokens));
+      }
+      const updated = persistentStore.updateUser(id, {
+        status: newStatus,
+        flaggedReason: reason || u.flaggedReason || '',
+        rewardTokens: newTokens
+      });
+      updatedUser = {
+        id: updated.id || updated._id,
+        name: updated.name,
+        email: updated.email,
+        status: updated.status,
+        tokens: updated.rewardTokens,
+        flaggedReason: updated.flaggedReason
+      };
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Citizen account updated to ${updatedUser.status}`,
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('Error in flagUser:', err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+/**
+ * 11. POST /api/complaints/:id/reminder
+ * Citizen-Action: Send municipal reminder / escalation for pending complaint
+ */
+exports.sendReminder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason, note } = req.body || {};
+
+    let complaint = null;
+    if (mongoose.connection.readyState === 1) {
+      complaint = await Complaint.findOne({ id: { $regex: new RegExp(`^${id}$`, 'i') } });
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+      complaint.remindersCount = (complaint.remindersCount || 0) + 1;
+      complaint.lastReminderAt = new Date().toISOString();
+      await complaint.save();
+    } else {
+      complaint = persistentStore.findComplaintById(id);
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+      complaint = persistentStore.updateComplaint(complaint.id, {
+        remindersCount: (complaint.remindersCount || 0) + 1,
+        lastReminderAt: new Date().toISOString(),
+        lastReminderReason: reason || 'Municipal follow-up requested by citizen',
+        lastReminderNote: note || ''
+      });
+    }
+
+    const citizenName = (req.user && req.user.name) || complaint.reporterName || 'Citizen';
+    notificationService.broadcastCitizenReminder(complaint, reason, note, citizenName);
+
+    return res.status(200).json({
+      success: true,
+      message: `Municipal reminder sent for ${complaint.id}. Escalated to Ward Public Works supervisor.`,
+      data: {
+        id: complaint.id,
+        remindersCount: complaint.remindersCount,
+        lastReminderAt: complaint.lastReminderAt
+      }
+    });
+  } catch (error) {
+    console.error('Error in sendReminder:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error sending municipal reminder",
+      error: error.message
+    });
+  }
+};
+
+
+/**
+ * 12. POST /api/complaints/:id/feedback
+ * Citizen Rating & Resolution Feedback
+ */
+exports.submitFeedback = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment, category } = req.body || {};
+    const feedbackRecord = {
+      id: id || 'general',
+      rating: Number(rating) || 5,
+      comment: (comment || '').trim(),
+      category: category || 'Overall Service',
+      submittedAt: new Date().toISOString()
+    };
+
+    if (id && id !== 'general') {
+      if (mongoose.connection.readyState === 1) {
+        await Complaint.findOneAndUpdate(
+          { id: { $regex: new RegExp(`^${id}$`, 'i') } },
+          { $push: { feedback: feedbackRecord } }
+        );
+      } else {
+        const c = persistentStore.findComplaintById(id);
+        if (c) {
+          if (!Array.isArray(c.feedback)) c.feedback = [];
+          c.feedback.push(feedbackRecord);
+          if (typeof persistentStore.save === 'function') persistentStore.save();
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Citizen feedback and resolution rating recorded successfully.',
+      data: feedbackRecord
+    });
+  } catch (error) {
+    console.error('Error in submitFeedback:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error saving feedback',
+      error: error.message
+    });
+  }
+};
+
+
+/**
+ * 13. PATCH /api/complaints/:id/verify AND /api/admin/complaints/:id/verify
+ * Municipal Authority Location & Evidence Verification Action
+ */
+exports.verifyComplaint = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { verification, notes, reason, action } = req.body;
+
+    if (!verification) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification status is required (Verified, Needs Inspection, Insufficient Evidence, Rejected)"
+      });
+    }
+
+    // Normalize verification status
+    const normMap = {
+      'verified': 'Verified',
+      'needs inspection': 'Needs Inspection',
+      'needs_inspection': 'Needs Inspection',
+      'insufficient evidence': 'Insufficient Evidence',
+      'insufficient_evidence': 'Insufficient Evidence',
+      'rejected': 'Rejected',
+      'pending': 'Pending'
+    };
+
+    const normalizedVerification = normMap[verification.toString().trim().toLowerCase()] || verification.toString().trim();
+    const VALID_VERIFICATIONS = ['Verified', 'Needs Inspection', 'Insufficient Evidence', 'Rejected', 'Pending'];
+
+    if (!VALID_VERIFICATIONS.includes(normalizedVerification)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid verification status "${verification}". Allowed: Verified, Needs Inspection, Insufficient Evidence, Rejected, Pending`
+      });
+    }
+
+    const reviewNotes = (notes || reason || '').trim();
+
+    // Rejection requires a mandatory reason
+    if (normalizedVerification === 'Rejected' && (!reviewNotes || reviewNotes.length < 5)) {
+      return res.status(400).json({
+        success: false,
+        message: "A mandatory rejection reason (at least 5 characters) is required when rejecting a complaint."
+      });
+    }
+
+    const authorityUser = req.user || {};
+    const authorityName = authorityUser.name || "Municipal Authority";
+    const authorityId = (authorityUser.id || authorityUser._id || '').toString();
+    const authorityRole = authorityUser.role || 'authority';
+
+    let actionLabel = action || '';
+    if (!actionLabel) {
+      if (normalizedVerification === 'Verified') actionLabel = 'Evidence Verified';
+      else if (normalizedVerification === 'Needs Inspection') actionLabel = 'Marked for Field Inspection';
+      else if (normalizedVerification === 'Insufficient Evidence') actionLabel = 'Flagged Insufficient Evidence';
+      else if (normalizedVerification === 'Rejected') actionLabel = 'Complaint Verification Rejected';
+      else actionLabel = `Verification updated to ${normalizedVerification}`;
+    }
+
+    const historyEntry = {
+      action: actionLabel,
+      status: normalizedVerification,
+      authorityId,
+      authorityName,
+      notes: reviewNotes,
+      timestamp: new Date().toISOString()
+    };
+
+    let updatedComplaint = null;
+
+    if (mongoose.connection.readyState === 1) {
+      const complaint = await Complaint.findOne({
+        id: { $regex: new RegExp(`^${id}$`, 'i') }
+      });
+
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+
+      complaint.verification = normalizedVerification;
+      complaint.verificationNotes = reviewNotes;
+      complaint.verifiedAt = new Date();
+      complaint.verifiedBy = `${authorityName} (${authorityRole})`;
+      complaint.isReviewed = true;
+      complaint.reviewedAt = new Date();
+      if (!Array.isArray(complaint.verificationHistory)) {
+        complaint.verificationHistory = [];
+      }
+      complaint.verificationHistory.push(historyEntry);
+
+      await complaint.save();
+      updatedComplaint = complaint.toObject();
+    } else {
+      // Persistent Store
+      const complaint = persistentStore.findComplaintById(id);
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+
+      const existingHistory = Array.isArray(complaint.verificationHistory) ? [...complaint.verificationHistory] : [];
+      existingHistory.push(historyEntry);
+
+      const updates = {
+        verification: normalizedVerification,
+        verificationNotes: reviewNotes,
+        verifiedAt: new Date().toISOString(),
+        verifiedBy: `${authorityName} (${authorityRole})`,
+        isReviewed: true,
+        reviewedAt: new Date().toISOString(),
+        verificationHistory: existingHistory
+      };
+
+      updatedComplaint = persistentStore.updateComplaint(id, updates);
+    }
+
+    // Broadcast real-time verification notification to citizen
+    notificationService.broadcastVerificationUpdate(updatedComplaint, normalizedVerification, reviewNotes);
+
+    return res.status(200).json({
+      success: true,
+      message: `Complaint ${updatedComplaint.id} verification set to ${normalizedVerification}`,
+      data: updatedComplaint
+    });
+  } catch (error) {
+    console.error('Error in verifyComplaint:', error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during complaint verification",
+      error: error.message
+    });
+  }
+};
+
+
+/**
+ * 14. PATCH /api/complaints/:id/review AND /api/admin/complaints/:id/review
+ * Admin-Only: Mark a complaint as reviewed, removing the "NEW" badge
+ */
+exports.markComplaintReviewed = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (mongoose.connection.readyState === 1) {
+      const complaint = await Complaint.findOneAndUpdate(
+        { id: { $regex: new RegExp(`^${id}$`, 'i') } },
+        { isReviewed: true, reviewedAt: new Date() },
+        { new: true }
+      );
+      if (!complaint) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+      return res.status(200).json({
+        success: true,
+        message: `Complaint ${complaint.id} marked as reviewed`,
+        data: complaint
+      });
+    } else {
+      const updated = persistentStore.markComplaintReviewed(id);
+      if (!updated) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+      return res.status(200).json({
+        success: true,
+        message: `Complaint ${updated.id} marked as reviewed`,
+        data: updated
+      });
+    }
+  } catch (err) {
+    console.error('Error in markComplaintReviewed:', err);
+    res.status(500).json({
+      success: false,
+      message: "Server error marking complaint reviewed",
+      error: err.message
+    });
+  }
+};
+
+
+

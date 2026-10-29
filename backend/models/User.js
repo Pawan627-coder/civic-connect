@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: {
-      values: ['user', 'admin'],
+      values: ['user', 'admin', 'authority'],
       message: '{VALUE} is not an authorized role'
     },
     default: 'user'
@@ -50,6 +50,15 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: [0, 'Reward tokens cannot be negative']
+  },
+  status: {
+    type: String,
+    enum: ['Active', 'Flagged', 'Suspended'],
+    default: 'Active'
+  },
+  flaggedReason: {
+    type: String,
+    default: ''
   },
   createdAt: {
     type: Date,

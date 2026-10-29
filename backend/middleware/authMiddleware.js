@@ -51,11 +51,12 @@ const protect = async (req, res, next) => {
     if (mongoose.connection.readyState === 1) {
       user = await User.findById(userId).select('-password');
     } else {
-      const { inMemoryUsers } = require('../controllers/authController');
-      const found = inMemoryUsers ? inMemoryUsers.find(u => (u._id || u.id) === userId) : null;
+      const persistentStore = require('../utils/persistentStore');
+      const found = persistentStore.findUserById(userId);
       if (found) {
         user = {
           _id: found._id || found.id,
+          id: found._id || found.id,
           name: found.name,
           email: found.email,
           role: found.role,
@@ -105,7 +106,16 @@ const requireRole = (...allowedRoles) => {
       });
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    // Treat 'admin' and 'authority' as equivalent municipal authority roles
+    const effectiveRoles = [...allowedRoles];
+    if (effectiveRoles.includes('admin') && !effectiveRoles.includes('authority')) {
+      effectiveRoles.push('authority');
+    }
+    if (effectiveRoles.includes('authority') && !effectiveRoles.includes('admin')) {
+      effectiveRoles.push('admin');
+    }
+
+    if (!effectiveRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied: You do not have permission to perform this action'
@@ -116,7 +126,48 @@ const requireRole = (...allowedRoles) => {
   };
 };
 
+/**
+ * Middleware: optionalAuth
+ * Attaches user if token is present, but allows request if not logged in.
+ */
+const optionalAuth = async (req, res, next) => {
+  let token = null;
+  if (req.cookies && (req.cookies.token || req.cookies.jwt)) {
+    token = req.cookies.token || req.cookies.jwt;
+  } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) return next();
+
+  try {
+    const secret = process.env.JWT_SECRET || 'civic_connect_super_secret_jwt_key_2026_dev';
+    const decoded = jwt.verify(token, secret);
+    const userId = decoded.userId || decoded.id;
+
+    if (mongoose.connection.readyState === 1) {
+      req.user = await User.findById(userId).select('-password');
+    } else {
+      const persistentStore = require('../utils/persistentStore');
+      const found = persistentStore.findUserById(userId);
+      if (found) {
+        req.user = {
+          _id: found._id || found.id,
+          id: found._id || found.id,
+          name: found.name,
+          email: found.email,
+          role: found.role
+        };
+      }
+    }
+  } catch (err) {
+    // Ignore invalid tokens for optional auth
+  }
+  next();
+};
+
 module.exports = {
   protect,
+  optionalAuth,
   requireRole
 };

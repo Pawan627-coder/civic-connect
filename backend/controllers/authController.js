@@ -5,8 +5,8 @@
  * ========================================================
  * 
  * As a beginner in backend authentication:
- * 1. Passwords are salted & hashed with bcrypt before saving to MongoDB.
- * 2. JWTs are signed with JWT_SECRET and dispatched in secure HTTP-only cookies.
+ * 1. Passwords are salted & hashed with bcrypt before saving to MongoDB / persistent store.
+ * 2. JWTs are signed with JWT_SECRET and dispatched in secure HTTP-only cookies and JSON body.
  * 3. Public registration is strictly locked to role: "user".
  * 4. Password hashes are NEVER returned to the client.
  */
@@ -15,20 +15,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const persistentStore = require('../utils/persistentStore');
 
-// In-Memory User Store (Resilient fallback if MongoDB Atlas is in development offline mode)
-const inMemoryUsers = [
-  {
-    _id: "admin_seed_001",
-    name: process.env.ADMIN_NAME || "Civic SuperAdmin",
-    email: (process.env.ADMIN_EMAIL || "admin@civicconnect.org").toLowerCase(),
-    password: bcrypt.hashSync(process.env.ADMIN_PASSWORD || "AdminSecurePass2026!", 10),
-    role: "admin",
-    rewardTokens: 100,
-    createdAt: new Date()
-  }
-];
-exports.inMemoryUsers = inMemoryUsers;
+// Export reference for backwards compatibility
+exports.inMemoryUsers = persistentStore.getUsers();
 
 /**
  * Generate a JWT token with userId and role
@@ -48,13 +38,14 @@ const generateToken = (userId, role) => {
  * Set HTTP-Only Cookie with the JWT token
  */
 const sendTokenResponse = (user, statusCode, res, message) => {
-  const token = generateToken(user._id || user.id, user.role);
+  const userId = user._id || user.id;
+  const token = generateToken(userId, user.role);
 
   // Cookie expiration (1 day default)
   const isProduction = process.env.NODE_ENV === 'production';
   const cookieOptions = {
-    httpOnly: true, // Prevents JavaScript document.cookie access (Cross-Site Scripting defense)
-    sameSite: 'lax', // Protects against CSRF attacks in cross-site navigations
+    httpOnly: true, // Prevents JavaScript document.cookie access
+    sameSite: isProduction ? 'none' : 'lax', // Support cross-origin cookies in production HTTPS
     secure: isProduction, // Uses HTTPS in production
     maxAge: 24 * 60 * 60 * 1000 // 1 day in milliseconds
   };
@@ -64,9 +55,10 @@ const sendTokenResponse = (user, statusCode, res, message) => {
   return res.status(statusCode).json({
     success: true,
     message,
-    token, // Also return in body so standard API clients can read if desired
+    token, // Return in body so client can also use Bearer token (vital for cross-domain Netlify/Render)
     user: {
-      id: user._id || user.id,
+      id: userId,
+      _id: userId,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -125,6 +117,10 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Determine role (Citizen vs Municipal Authority)
+    const requestedRole = (req.body.role === 'authority' || req.body.role === 'admin') ? 'admin' : 'user';
+    const roleLabel = requestedRole === 'admin' ? 'Municipal Authority' : 'Citizen';
+
     if (mongoose.connection.readyState === 1) {
       // Check for duplicate email in MongoDB
       const existingUser = await User.findOne({ email: cleanEmail });
@@ -135,19 +131,19 @@ exports.register = async (req, res) => {
         });
       }
 
-      // Create new citizen user (Role is ALWAYS forced to "user" for public signup)
+      // Create new user with requested role
       const user = await User.create({
         name: cleanName,
         email: cleanEmail,
         password: hashedPassword,
-        role: 'user',
-        rewardTokens: 10 // Welcome bonus for joining Civic Connect
+        role: requestedRole,
+        rewardTokens: requestedRole === 'admin' ? 100 : 10
       });
 
-      return sendTokenResponse(user, 201, res, 'Citizen registration successful! Welcome to Civic Connect.');
+      return sendTokenResponse(user, 201, res, `${roleLabel} registration successful! Welcome to Civic Connect.`);
     } else {
-      // In-Memory Fallback
-      const existing = inMemoryUsers.find(u => u.email === cleanEmail);
+      // Persistent Store Fallback
+      const existing = persistentStore.findUserByEmail(cleanEmail);
       if (existing) {
         return res.status(409).json({
           success: false,
@@ -155,18 +151,15 @@ exports.register = async (req, res) => {
         });
       }
 
-      const mockUser = {
-        _id: `user_${Date.now()}`,
+      const newUser = persistentStore.addUser({
         name: cleanName,
         email: cleanEmail,
         password: hashedPassword,
-        role: 'user',
-        rewardTokens: 10,
-        createdAt: new Date()
-      };
-      inMemoryUsers.push(mockUser);
+        role: requestedRole,
+        rewardTokens: requestedRole === 'admin' ? 100 : 10
+      });
 
-      return sendTokenResponse(mockUser, 201, res, 'Citizen registration successful! (In-memory mode)');
+      return sendTokenResponse(newUser, 201, res, `${roleLabel} registration successful! Welcome to Civic Connect.`);
     }
   } catch (error) {
     console.error('Error during registration:', error);
@@ -181,7 +174,7 @@ exports.register = async (req, res) => {
 
 /**
  * 2. POST /api/auth/login
- * Authenticates citizen or administrator and issues HTTP-only cookie
+ * Authenticates citizen or administrator and issues token
  */
 exports.login = async (req, res) => {
   try {
@@ -198,10 +191,9 @@ exports.login = async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
 
     if (mongoose.connection.readyState === 1) {
-      // Find user in MongoDB (must explicitly select password since it might be excluded by default)
+      // Find user in MongoDB
       const user = await User.findOne({ email: cleanEmail });
 
-      // Generic authentication error prevents account enumeration
       if (!user) {
         return res.status(401).json({
           success: false,
@@ -220,8 +212,8 @@ exports.login = async (req, res) => {
 
       return sendTokenResponse(user, 200, res, 'Login successful');
     } else {
-      // In-Memory Fallback
-      const user = inMemoryUsers.find(u => u.email === cleanEmail);
+      // Persistent Store Fallback
+      const user = persistentStore.findUserByEmail(cleanEmail);
       if (!user) {
         return res.status(401).json({
           success: false,
@@ -237,7 +229,7 @@ exports.login = async (req, res) => {
         });
       }
 
-      return sendTokenResponse(user, 200, res, 'Login successful (In-memory mode)');
+      return sendTokenResponse(user, 200, res, 'Login successful');
     }
   } catch (error) {
     console.error('Error during login:', error);
@@ -255,11 +247,12 @@ exports.login = async (req, res) => {
  * Clears the HTTP-only authentication cookie
  */
 exports.logout = (req, res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
   res.cookie('token', '', {
     httpOnly: true,
     expires: new Date(0),
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production'
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction
   });
 
   return res.status(200).json({

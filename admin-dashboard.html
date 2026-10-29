@@ -17,10 +17,35 @@
   <!-- View Complaints Stylesheet (reusing shared status and severity badge tokens) -->
   <link rel="stylesheet" href="view-complaints.css">
 
+  <!-- Leaflet CSS for Area Heat Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
   <!-- Admin Dashboard Specific Stylesheet -->
   <link rel="stylesheet" href="admin-dashboard.css">
+
+  <!-- Real-time Notifications Stylesheet -->
+  <link rel="stylesheet" href="notifications.css">
+
+  <!-- Immediate Admin Auth Guard -->
+  <style>
+    body.auth-pending-guard {
+      display: none !important;
+    }
+  </style>
+  <script>
+    (function () {
+      var user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('civic_user') || 'null');
+      } catch (e) {}
+      var token = localStorage.getItem('civic_token');
+      if (!user || (user.role !== 'admin' && user.role !== 'authority')) {
+        window.location.replace('login.html?redirect=admin-dashboard.html');
+      }
+    })();
+  </script>
 </head>
-<body>
+<body class="auth-pending-guard">
 
   <!-- ========================================================
        DEVELOPER SECURITY NOTE (Stage 5 Prototype):
@@ -49,7 +74,7 @@
         <div class="brand-text-group">
           <div class="brand-title-row">
             <span class="brand-name">CIVIC CONNECT</span>
-            <span class="admin-nav-pill">Admin Console</span>
+            <span class="admin-nav-pill">Authority Console</span>
           </div>
           <span class="brand-tagline">Municipal Oversight &amp; Ward Action</span>
         </div>
@@ -59,9 +84,11 @@
       <nav class="nav-menu" id="navMenu" aria-label="Admin Navigation">
         <ul class="nav-links">
           <li><a href="#overview" class="nav-link active" aria-current="page">Dashboard</a></li>
+          <li><a href="#alerts-section" class="nav-link">Alerts</a></li>
+          <li><a href="#heatmap-section" class="nav-link">Heat Map</a></li>
           <li><a href="#complaints-section" class="nav-link">Complaints</a></li>
-          <li><a href="#users-section" class="nav-link">Users</a></li>
           <li><a href="#analytics-section" class="nav-link">Analytics</a></li>
+          <li><a href="#users-section" class="nav-link">Citizens</a></li>
         </ul>
         <div class="nav-actions">
           <a href="login.html" class="btn btn-outline-nav" id="adminLogoutBtn" title="Return to portal login">
@@ -99,12 +126,12 @@
     <section class="admin-hero-section">
       <div class="container">
         
-        <!-- Architectural Prototype Alert Banner -->
-        <div class="admin-notice-banner" role="alert">
+        <!-- Security & Administration Status Banner -->
+        <div class="admin-notice-banner" role="alert" style="background: #f0fdf4; border-color: #86efac;">
           <div class="notice-icon-box" aria-hidden="true">🛡️</div>
           <div class="notice-content">
-            <strong>Frontend Demonstration Mode:</strong>
-            <span>Frontend admin controls are for demonstration only. Real authorization and role-based access control must be implemented on the backend.</span>
+            <strong style="color: #166534;">Municipal Role-Based Access Control Active:</strong>
+            <span style="color: #15803d;">Connected to persistent database. Status updates, priority changes, and risk assessments sync live across citizen dashboards and public explorer.</span>
           </div>
         </div>
 
@@ -220,7 +247,90 @@
     </section>
 
     <!-- ========================================================
-         4. COMPLAINT MANAGEMENT SECTION (TABLE, SEARCH, FILTERS)
+         4. HIGH-PRIORITY & OVERDUE ALERTS SECTION
+         ======================================================== -->
+    <section class="admin-section" id="alerts-section" aria-labelledby="headingAlerts">
+      <div class="container">
+        <div class="admin-panel-card" style="border-top: 3.5px solid #dc2626;">
+          <div class="panel-header-row">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 1.3rem;">🚨</span>
+                <h2 class="panel-main-title" id="headingAlerts" style="margin: 0;">Urgent Civic Alerts &amp; Action Queue</h2>
+              </div>
+              <p class="panel-subtitle">Immediate attention queue: High/Critical unresolved public hazards and overdue citizen complaints.</p>
+            </div>
+            <div class="live-counter-badge" id="alertCountBadge" style="background-color: #fee2e2; color: #991b1b; border-color: #fecaca; font-weight: 800;">
+              0 Active Alerts
+            </div>
+          </div>
+
+          <div class="alerts-grid" id="alertsGrid">
+            <!-- Dynamically populated by admin-dashboard.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         5. AREA-WISE COMPLAINT HEAT MAP & GEO-HAZARD CLUSTERS
+         ======================================================== -->
+    <section class="admin-section" id="heatmap-section" aria-labelledby="headingHeatMap">
+      <div class="container">
+        <div class="admin-panel-card heatmap-card">
+          <div class="panel-header-row">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                <span style="font-size: 1.35rem;">🗺️</span>
+                <h2 class="panel-main-title" id="headingHeatMap" style="margin: 0;">Area-Wise Complaint Heat Map &amp; Geo-Clusters</h2>
+              </div>
+              <p class="panel-subtitle">Real-time geographic density visualization of reported civic hazards across municipal wards. Hotspots reflect report volume and hazard priority.</p>
+            </div>
+          </div>
+
+          <!-- Heatmap Toolbar -->
+          <div class="heatmap-toolbar">
+            <div class="heatmap-controls-group">
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--navy-blue);">View Mode:</span>
+              <button type="button" class="heatmap-view-btn active" id="btnViewHeatmap" data-mode="heat">🔥 Heat Map</button>
+              <button type="button" class="heatmap-view-btn" id="btnViewPins" data-mode="pins">📍 Clustered Pins</button>
+              <button type="button" class="heatmap-view-btn" id="btnViewBoth" data-mode="both">🗺️ Combined</button>
+            </div>
+
+            <div class="heatmap-controls-group">
+              <label for="mapLocalityFilter" style="font-size: 0.8rem; font-weight: 700; color: var(--navy-blue);">Locality / Ward:</label>
+              <select id="mapLocalityFilter" class="admin-select-input" style="padding: 0.35rem 0.65rem; font-size: 0.82rem; width: auto; min-width: 170px;">
+                <option value="all">All Municipal Areas</option>
+              </select>
+              <button type="button" class="btn btn-outline" id="btnResetMapView" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" title="Reset map to full overview">
+                Reset View
+              </button>
+            </div>
+
+            <!-- Heat Map Legend -->
+            <div class="heatmap-legend">
+              <span class="heat-legend-item"><span class="heat-dot heat-dot-low"></span> Low Density</span>
+              <span class="heat-legend-item"><span class="heat-dot heat-dot-medium"></span> Moderate</span>
+              <span class="heat-legend-item"><span class="heat-dot heat-dot-high"></span> High</span>
+              <span class="heat-legend-item"><span class="heat-dot heat-dot-critical"></span> Critical Hotspot</span>
+            </div>
+          </div>
+
+          <!-- Leaflet Heat Map Viewport -->
+          <div class="map-container-box">
+            <div id="authorityHeatMap" style="width: 100%; height: 100%;"></div>
+            <div id="mapEmptyOverlay" class="map-empty-overlay" style="display: none;">
+              <span style="font-size: 2.2rem; margin-bottom: 0.5rem;">📍</span>
+              <h3 style="margin: 0 0 0.35rem; color: var(--navy-blue);">No Geotagged Complaints in Selected Area</h3>
+              <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">Select "All Municipal Areas" or report a geotagged hazard to populate map layers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         6. COMPLAINT MANAGEMENT SECTION (TABLE, SEARCH, FILTERS)
          ======================================================== -->
     <section class="admin-section" id="complaints-section" aria-labelledby="headingComplaintsManagement">
       <div class="container">
@@ -324,7 +434,49 @@
                   <option value="all">All Verification</option>
                   <option value="Pending">Pending</option>
                   <option value="Verified">Verified</option>
+                  <option value="Needs Inspection">Needs Inspection</option>
+                  <option value="Insufficient Evidence">Insufficient Evidence</option>
                   <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              <!-- 6. Locality / Ward Filter -->
+              <div class="filter-field-col">
+                <label for="filterLocality" class="filter-col-label">Locality / Area</label>
+                <select id="filterLocality" class="admin-select-input">
+                  <option value="all">All Localities</option>
+                </select>
+              </div>
+
+              <!-- 7. Date Range Filter -->
+              <div class="filter-field-col">
+                <label for="filterDate" class="filter-col-label">Reported Date</label>
+                <select id="filterDate" class="admin-select-input">
+                  <option value="all">All Dates</option>
+                  <option value="today">Today</option>
+                  <option value="week">Past 7 Days</option>
+                  <option value="month">Past 30 Days</option>
+                </select>
+              </div>
+
+              <!-- 8. Sort Ordering -->
+              <div class="filter-field-col">
+                <label for="filterSort" class="filter-col-label">Sort Order</label>
+                <select id="filterSort" class="admin-select-input">
+                  <option value="latest" selected>✨ Newest First (Default)</option>
+                  <option value="priority">🔥 Highest Priority</option>
+                  <option value="reminders">🔔 Most Reminders</option>
+                  <option value="oldest">⏳ Oldest First</option>
+                </select>
+              </div>
+
+              <!-- 9. Review Status (New/Unreviewed Filter) -->
+              <div class="filter-field-col">
+                <label for="filterUnreviewed" class="filter-col-label">Review Status</label>
+                <select id="filterUnreviewed" class="admin-select-input">
+                  <option value="all">All Complaints</option>
+                  <option value="unreviewed">✨ New Only (Unreviewed)</option>
+                  <option value="reviewed">✓ Reviewed Only</option>
                 </select>
               </div>
 
@@ -345,22 +497,18 @@
 
           </div>
 
-          <!-- Dynamic Complaint Table Wrapper (Stage 10 Part 20 Columns) -->
+          <!-- Dynamic Complaint Table Wrapper (Streamlined 7-Column Layout) -->
           <div class="table-responsive-wrapper">
             <table class="admin-data-table" id="complaintsTable">
               <thead>
                 <tr>
                   <th scope="col" style="width: 100px;">Complaint ID</th>
-                  <th scope="col" style="min-width: 180px;">Title</th>
-                  <th scope="col" style="width: 120px;">Category</th>
-                  <th scope="col" style="width: 120px;">AI Danger</th>
-                  <th scope="col" style="width: 75px; text-align: center;">Reports</th>
-                  <th scope="col" style="width: 75px; text-align: center;">Votes</th>
-                  <th scope="col" style="width: 85px; text-align: center;">Community</th>
-                  <th scope="col" style="width: 150px;">Priority (Score &amp; Level)</th>
-                  <th scope="col" style="width: 130px;">Status</th>
-                  <th scope="col" style="width: 120px;">Verification</th>
-                  <th scope="col" style="width: 90px; text-align: center;">Action</th>
+                  <th scope="col" style="min-width: 180px;">Title &amp; Location</th>
+                  <th scope="col" style="width: 105px;">Category</th>
+                  <th scope="col" style="width: 150px;">AI Risk &amp; Priority</th>
+                  <th scope="col" style="width: 95px; text-align: center;">Community</th>
+                  <th scope="col" style="width: 130px;">Current Status</th>
+                  <th scope="col" style="width: 95px; text-align: center;">Action</th>
                 </tr>
               </thead>
               <tbody id="complaintsTableBody">
@@ -375,6 +523,27 @@
             <h3>No complaints match your criteria</h3>
             <p>Try clearing your search keyword or relaxing filter options to view available reports.</p>
             <button type="button" class="btn btn-primary" id="emptyResetFiltersBtn">Reset Filters</button>
+          </div>
+
+          <!-- Pagination Toolbar -->
+          <div class="admin-pagination-bar" id="adminPaginationToolbar">
+            <div class="pagination-info" id="paginationInfoText">
+              Showing 0 to 0 of 0 complaints
+            </div>
+            <div class="pagination-controls">
+              <label for="pageSizeSelect" style="font-size: 0.82rem; font-weight: 600; color: var(--navy-blue);">Per page:</label>
+              <select id="pageSizeSelect" class="admin-select-input" style="padding: 0.25rem 0.5rem; font-size: 0.82rem; width: auto;">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+              <div class="pagination-buttons">
+                <button type="button" class="btn btn-outline" id="btnPrevPage" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;" disabled>← Previous</button>
+                <span id="paginationPageIndicator" style="font-size: 0.85rem; font-weight: 700; color: var(--navy-blue); min-width: 65px; text-align: center;">Page 1 of 1</span>
+                <button type="button" class="btn btn-outline" id="btnNextPage" style="padding: 0.35rem 0.75rem; font-size: 0.82rem;" disabled>Next →</button>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -421,6 +590,23 @@
           </div>
 
         </div>
+
+        <!-- Status Distribution & Resolution Trends Card -->
+        <div class="admin-panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-main-title" style="margin: 0; font-size: 1.15rem;">Status Distribution &amp; Resolution Trends</h2>
+              <p class="panel-subtitle">Lifecycle breakdown across all citizen complaints and resolution momentum.</p>
+            </div>
+            <div class="live-counter-badge" id="analyticsStatusSummaryBadge">
+              Real-time Breakdown
+            </div>
+          </div>
+          <div class="status-distribution-wrapper" id="statusDistributionChart">
+            <!-- Dynamically populated status segmented progress bar + legend -->
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -525,6 +711,7 @@
                   <th scope="col" style="width: 130px; text-align: center;">Resolved</th>
                   <th scope="col" style="width: 140px; text-align: center;">Reward Tokens</th>
                   <th scope="col" style="width: 120px; text-align: center;">Account Status</th>
+                  <th scope="col" style="width: 140px; text-align: center;">Action</th>
                 </tr>
               </thead>
               <tbody id="usersTableBody">
@@ -662,18 +849,24 @@
           <a href="report-problem.html" class="legal-link">Report Problem</a>
           <span class="divider">•</span>
           <a href="view-complaints.html" class="legal-link">View Complaints</a>
-          <span class="divider">•</span>
-          <a href="dashboard.html" class="legal-link">User Dashboard</a>
-          <span class="divider">•</span>
-          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+          <span class="divider auth-only-divider">•</span>
+          <a href="dashboard.html" class="legal-link footer-dashboard-link" data-auth="required">User Dashboard</a>
+          <span class="divider auth-admin-divider">•</span>
+          <a href="admin-dashboard.html" class="legal-link footer-admin-link" data-auth="admin-only">Admin Dashboard</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts: Shared Navigation + Auth Helper + Dedicated Admin Controller -->
+  <!-- Leaflet & Heatmap Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+  <!-- Scripts: API Configuration + Shared Navigation + Auth Helper + Notifications + Dedicated Admin Controller -->
+  <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="auth.js"></script>
+  <script src="notifications.js"></script>
   <script src="admin-dashboard.js"></script>
 </body>
 </html>

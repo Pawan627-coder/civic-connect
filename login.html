@@ -45,9 +45,8 @@
           <li><a href="index.html#hero" class="nav-link">Home</a></li>
           <li><a href="report-problem.html" class="nav-link">Report Problem</a></li>
           <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
-          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-          <li><a href="index.html#how-it-works" class="nav-link">How It Works</a></li>
-          <li><a href="index.html#about" class="nav-link">About Us</a></li>
+          <li><a href="emergency-report.html" class="nav-link" style="color: #dc2626; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;"><span style="width: 7px; height: 7px; background-color: #dc2626; border-radius: 50%; display: inline-block;"></span> Emergency</a></li>
+          <li class="nav-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html" class="nav-link" id="navDashboardLink">Dashboard</a></li>
         </ul>
         <div class="nav-actions">
           <a href="login.html" class="btn btn-outline-nav active" aria-current="page">Login</a>
@@ -77,29 +76,62 @@
   <main class="auth-page-section">
     <div class="container">
       <div class="auth-wrapper">
-        <article class="auth-card">
-          
+          <!-- Role Selection Switcher -->
+          <div class="auth-role-tabs" role="tablist" aria-label="Choose Login Portal">
+            <button 
+              type="button" 
+              class="auth-role-tab active" 
+              id="roleTabCitizen" 
+              role="tab" 
+              aria-selected="true" 
+              data-role="citizen"
+            >
+              <span class="role-tab-icon">👤</span>
+              <span class="role-tab-text">Citizen Portal</span>
+            </button>
+            <button 
+              type="button" 
+              class="auth-role-tab" 
+              id="roleTabAuthority" 
+              role="tab" 
+              aria-selected="false" 
+              data-role="authority"
+            >
+              <span class="role-tab-icon">🏛️</span>
+              <span class="role-tab-text">Authority Portal</span>
+            </button>
+          </div>
+
           <!-- Card Header -->
           <header class="auth-header">
-            <div class="auth-badge">
+            <div class="auth-badge" id="authBadge">
               <span>●</span> Citizen Portal
             </div>
-            <h1 class="auth-title">Welcome Back</h1>
-            <p class="auth-subtitle">
+            <h1 class="auth-title" id="authTitle">Welcome Back</h1>
+            <p class="auth-subtitle" id="authSubtitle">
               Sign in to track your reported road complaints, upvote local hazards, and receive municipal updates.
             </p>
           </header>
+
+          <!-- Authority Security Notice (Shown when Authority tab is selected) -->
+          <div class="authority-security-notice" id="authoritySecurityNotice" style="display: none;">
+            <span class="notice-icon">🛡️</span>
+            <div>
+              <strong>Municipal Authority Authentication</strong>
+              <p>Sign in with your official municipal email. Authority accounts are strictly provisioned by IT Administration.</p>
+            </div>
+          </div>
 
           <!-- Accessible Feedback Banner (Shown on valid frontend submission) -->
           <div class="auth-status-banner" id="loginStatusBanner" role="status" aria-live="polite"></div>
 
           <!-- Login Form with novalidate for custom validation -->
-          <form class="auth-form" id="loginForm" novalidate>
+          <form class="auth-form" id="loginForm" novalidate data-selected-role="citizen">
             
             <!-- 1. Email or Mobile Input -->
             <div class="form-group">
               <label for="loginIdentifier" class="form-label">
-                <span>Email or Mobile Number <span class="required-star">*</span></span>
+                <span id="loginIdentifierLabel">Email or Mobile Number <span class="required-star">*</span></span>
               </label>
               <input 
                 type="text" 
@@ -157,14 +189,14 @@
 
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary btn-auth-submit" id="loginSubmitBtn">
-              Log In
+              Log In as Citizen
             </button>
           </form>
 
-          <!-- Card Footer: Link to Signup -->
-          <footer class="auth-footer">
-            Don't have an account yet? 
-            <a href="signup.html" class="auth-switch-link">Create an Account</a>
+          <!-- Card Footer: Link to Signup or Citizen switch -->
+          <footer class="auth-footer" id="authFooter">
+            <span id="authFooterText">Don't have an account yet?</span> 
+            <a href="signup.html" class="auth-switch-link" id="authSwitchLink">Create an Account</a>
           </footer>
 
         </article>
@@ -199,9 +231,9 @@
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
             <li><a href="index.html#hero">Home</a></li>
-            <li><a href="index.html#features">Features</a></li>
-            <li><a href="index.html#how-it-works">How It Works</a></li>
-            <li><a href="index.html#recent-complaints">Recent Complaints</a></li>
+            <li><a href="report-problem.html">Report Problem</a></li>
+            <li><a href="view-complaints.html">View Complaints</a></li>
+            <li class="footer-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html">Dashboard</a></li>
             <li><a href="index.html#about">About Our Mission</a></li>
           </ul>
         </div>
@@ -250,10 +282,10 @@
           <a href="report-problem.html" class="legal-link">Report Problem</a>
           <span class="divider">•</span>
           <a href="view-complaints.html" class="legal-link">View Complaints</a>
-          <span class="divider">•</span>
-          <a href="dashboard.html" class="legal-link">Dashboard</a>
-          <span class="divider">•</span>
-          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+          <span class="divider auth-only-divider" style="display: none;">•</span>
+          <a href="dashboard.html" class="legal-link footer-dashboard-link" data-auth="required" style="display: none;">Dashboard</a>
+          <span class="divider auth-admin-divider" style="display: none;">•</span>
+          <a href="admin-dashboard.html" class="legal-link footer-admin-link" data-auth="admin-only" style="display: none;">Admin Dashboard</a>
         </div>
       </div>
     </div>
@@ -279,7 +311,8 @@
     </div>
   </div>
 
-  <!-- Scripts: Shared Navigation + Dedicated Authentication Logic -->
+  <!-- Scripts: API Configuration + Shared Navigation + Dedicated Authentication Logic -->
+  <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="auth.js"></script>
 </body>

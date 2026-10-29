@@ -45,9 +45,8 @@
           <li><a href="index.html#hero" class="nav-link">Home</a></li>
           <li><a href="report-problem.html" class="nav-link">Report Problem</a></li>
           <li><a href="view-complaints.html" class="nav-link">View Complaints</a></li>
-          <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-          <li><a href="index.html#how-it-works" class="nav-link">How It Works</a></li>
-          <li><a href="index.html#about" class="nav-link">About Us</a></li>
+          <li><a href="emergency-report.html" class="nav-link" style="color: #dc2626; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;"><span style="width: 7px; height: 7px; background-color: #dc2626; border-radius: 50%; display: inline-block;"></span> Emergency</a></li>
+          <li class="nav-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html" class="nav-link" id="navDashboardLink">Dashboard</a></li>
         </ul>
         <div class="nav-actions">
           <a href="login.html" class="btn btn-outline-nav">Login</a>
@@ -79,13 +78,39 @@
       <div class="auth-wrapper auth-wrapper-wide">
         <article class="auth-card">
           
+          <!-- Role Selection Switcher -->
+          <div class="auth-role-tabs" role="tablist" aria-label="Choose Registration Type">
+            <button 
+              type="button" 
+              class="auth-role-tab active" 
+              id="signupRoleCitizen" 
+              role="tab" 
+              aria-selected="true" 
+              data-role="citizen"
+            >
+              <span class="role-tab-icon">👤</span>
+              <span class="role-tab-text">Citizen Account</span>
+            </button>
+            <button 
+              type="button" 
+              class="auth-role-tab" 
+              id="signupRoleAuthority" 
+              role="tab" 
+              aria-selected="false" 
+              data-role="authority"
+            >
+              <span class="role-tab-icon">🏛️</span>
+              <span class="role-tab-text">Authority Account</span>
+            </button>
+          </div>
+
           <!-- Card Header -->
           <header class="auth-header">
-            <div class="auth-badge">
+            <div class="auth-badge" id="signupAuthBadge">
               <span>●</span> Citizen Registration
             </div>
-            <h1 class="auth-title">Create Your Account</h1>
-            <p class="auth-subtitle">
+            <h1 class="auth-title" id="signupAuthTitle">Create Your Account</h1>
+            <p class="auth-subtitle" id="signupAuthSubtitle">
               Join Civic Connect to report road hazards, support neighborhood repairs, and track verified civic solutions in your ward.
             </p>
           </header>
@@ -94,12 +119,28 @@
           <div class="auth-status-banner" id="signupStatusBanner" role="status" aria-live="polite"></div>
 
           <!-- Signup Form with novalidate to allow custom accessible validation -->
-          <form class="auth-form" id="signupForm" novalidate>
+          <form class="auth-form" id="signupForm" novalidate data-selected-role="citizen">
             
+            <!-- Authority Department / Division (Shown when Authority tab is active) -->
+            <div class="form-group" id="authorityDeptGroup" style="display: none;">
+              <label for="authorityDept" class="form-label">
+                <span>Municipal Division / Ward Cell <span class="required-star">*</span></span>
+              </label>
+              <input 
+                type="text" 
+                id="authorityDept" 
+                name="authorityDept" 
+                class="form-input" 
+                placeholder="e.g., Road Maintenance Cell / Pothole Rapid Action Unit" 
+                value="Road Maintenance & Engineering Cell"
+              >
+              <span class="field-hint">Grants official access to the Municipal Authority Administration console.</span>
+            </div>
+
             <!-- 1. Full Name -->
             <div class="form-group">
               <label for="fullName" class="form-label">
-                <span>Full Name <span class="required-star">*</span></span>
+                <span id="fullNameLabel">Full Name <span class="required-star">*</span></span>
               </label>
               <input 
                 type="text" 
@@ -239,8 +280,10 @@
 
           <!-- Card Footer: Link to Login -->
           <footer class="auth-footer">
-            Already have an account? 
-            <a href="login.html" class="auth-switch-link">Log In</a>
+            <p style="margin-bottom: 0.5rem;">Already have an account? <a href="login.html" class="auth-switch-link">Log In</a></p>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0;">
+              🏛️ Municipal Authority officer? <a href="login.html?role=authority" class="auth-switch-link">Access Authority Portal</a> (Authority accounts are provisioned by IT Administration).
+            </p>
           </footer>
 
         </article>
@@ -275,9 +318,9 @@
           <h4 class="footer-heading">Quick Links</h4>
           <ul class="footer-links">
             <li><a href="index.html#hero">Home</a></li>
-            <li><a href="index.html#features">Features</a></li>
-            <li><a href="index.html#how-it-works">How It Works</a></li>
-            <li><a href="index.html#recent-complaints">Recent Complaints</a></li>
+            <li><a href="report-problem.html">Report Problem</a></li>
+            <li><a href="view-complaints.html">View Complaints</a></li>
+            <li class="footer-item-dashboard" data-auth="required" style="display: none;"><a href="dashboard.html">Dashboard</a></li>
             <li><a href="index.html#about">About Our Mission</a></li>
           </ul>
         </div>
@@ -326,10 +369,10 @@
           <a href="report-problem.html" class="legal-link">Report Problem</a>
           <span class="divider">•</span>
           <a href="view-complaints.html" class="legal-link">View Complaints</a>
-          <span class="divider">•</span>
-          <a href="dashboard.html" class="legal-link">Dashboard</a>
-          <span class="divider">•</span>
-          <a href="admin-dashboard.html" class="legal-link">Admin Dashboard</a>
+          <span class="divider auth-only-divider" style="display: none;">•</span>
+          <a href="dashboard.html" class="legal-link footer-dashboard-link" data-auth="required" style="display: none;">Dashboard</a>
+          <span class="divider auth-admin-divider" style="display: none;">•</span>
+          <a href="admin-dashboard.html" class="legal-link footer-admin-link" data-auth="admin-only" style="display: none;">Admin Dashboard</a>
         </div>
       </div>
     </div>
@@ -355,7 +398,8 @@
     </div>
   </div>
 
-  <!-- Scripts: Shared Navigation + Dedicated Authentication Logic -->
+  <!-- Scripts: API Configuration + Shared Navigation + Dedicated Authentication Logic -->
+  <script src="api-config.js"></script>
   <script src="script.js"></script>
   <script src="auth.js"></script>
 </body>

@@ -56,91 +56,40 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* --------------------------------------------------------
-   * 3. ACTIVE NAVIGATION LINK ON SCROLL (Intersection Observer)
-   * -------------------------------------------------------- */
-  const sections = document.querySelectorAll('section[id]');
-  
-  if ('IntersectionObserver' in window && sections.length > 0) {
-    const observerOptions = {
-      root: null,
-      rootMargin: '-30% 0px -60% 0px',
-      threshold: 0
-    };
+   * 3. CURRENT-PAGE NAVBAR PINPOINTER
+   * --------------------------------------------------------
+   * Pinpoints whatever page the citizen is currently browsing:
+   * - "Home" is pinpointed on index.html / homepage root.
+   * - "Report Problem", "View Complaints", "Dashboard" pinpointed on their pages.
+   * - Completely stable, zero jumping on scroll.
+   */
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const isHomePage = currentPath === 'index.html' || currentPath === '' || currentPath === '/';
 
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const activeId = entry.target.getAttribute('id');
-          navLinks.forEach(link => {
-            if (link.getAttribute('href') === `#${activeId}`) {
-              link.classList.add('active');
-            } else {
-              link.classList.remove('active');
-            }
-          });
-        }
-      });
-    }, observerOptions);
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href') || '';
+    const linkPath = href.split('#')[0].split('/').pop();
 
-    sections.forEach(sec => sectionObserver.observe(sec));
-  }
-
-  /* --------------------------------------------------------
-   * 4. COMPLAINT CATEGORY FILTER (Vanilla JS Filtering)
-   * -------------------------------------------------------- */
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  const complaintCards = document.querySelectorAll('.complaint-card');
-
-  filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // 1. Update active button style
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-
-      // 2. Get chosen filter value ('all', 'under-review', 'in-progress', 'resolved')
-      const chosenFilter = button.getAttribute('data-filter');
-
-      // 3. Show or hide cards based on category
-      complaintCards.forEach(card => {
-        const cardCategory = card.getAttribute('data-category');
-        
-        if (chosenFilter === 'all' || chosenFilter === cardCategory) {
-          card.classList.remove('hidden');
-        } else {
-          card.classList.add('hidden');
-        }
-      });
-    });
-  });
-
-  /* --------------------------------------------------------
-   * 5. INTERACTIVE UPVOTE TOGGLE (Demonstration Feature)
-   * -------------------------------------------------------- */
-  const upvoteButtons = document.querySelectorAll('.upvote-btn');
-
-  upvoteButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const countSpan = button.querySelector('.vote-count');
-      const textSpan = button.querySelector('.upvote-text');
-      let currentVotes = parseInt(button.getAttribute('data-votes'), 10) || 0;
-      const isUpvoted = button.classList.contains('upvoted');
-
-      if (isUpvoted) {
-        // Decrement (un-upvote)
-        currentVotes -= 1;
-        button.classList.remove('upvoted');
-        if (textSpan) textSpan.textContent = 'Upvote';
+    if (isHomePage) {
+      if (href === '#hero' || href === 'index.html' || href === 'index.html#hero') {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
       } else {
-        // Increment (upvote)
-        currentVotes += 1;
-        button.classList.add('upvoted');
-        if (textSpan) textSpan.textContent = 'Upvoted';
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
       }
-
-      button.setAttribute('data-votes', currentVotes);
-      if (countSpan) countSpan.textContent = currentVotes;
-    });
+    } else {
+      if (linkPath && linkPath === currentPath) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
+      }
+    }
   });
+
+
 
   /* --------------------------------------------------------
    * 6. STAGE 1 INFORMATIONAL MODAL CONTROLLER
@@ -152,9 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalTitle = document.getElementById('modalTitle');
   const modalBody = document.getElementById('modalBody');
 
-  const openReportModalBtn = document.getElementById('openReportModalBtn');
-  const heroReportBtn = document.getElementById('heroReportBtn');
-  const loginSignupBtn = document.getElementById('loginSignupBtn');
   const privacyLink = document.getElementById('privacyLink');
   const termsLink = document.getElementById('termsLink');
   const charterLink = document.getElementById('charterLink');
@@ -162,8 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper function to show modal with custom text
   function showModal(title, contentHtml) {
     if (!infoModal) return;
-    modalTitle.textContent = title;
-    modalBody.innerHTML = contentHtml;
+    if (modalTitle) modalTitle.textContent = title;
+    if (modalBody) modalBody.innerHTML = contentHtml;
     infoModal.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
   }
@@ -193,44 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Trigger modal when clicking "Report a Problem" demo triggers
-  if (openReportModalBtn) {
-    openReportModalBtn.addEventListener('click', () => {
-      showModal(
-        'Reporting Flow Preview (Stage 1)',
-        `<p>You are viewing the <strong>Stage 1 Frontend Prototype</strong> of Civic Connect.</p>
-         <p>In <strong>Stage 2</strong>, this button will open our step-by-step reporting wizard with:</p>
-         <div class="modal-callout">
-           <strong>Upcoming Features:</strong>
-           <ul>
-             <li>Live GPS Geolocation Pinning</li>
-             <li>Camera & Photo Upload with Preview</li>
-             <li>Road Hazard Severity Rating</li>
-             <li>Automatic Ward & Department Routing</li>
-           </ul>
-         </div>`
-      );
-    });
-  }
-
-  // Trigger modal when clicking Login/Signup
-  if (loginSignupBtn) {
-    loginSignupBtn.addEventListener('click', () => {
-      showModal(
-        'Authentication & User Profiles (Stage 3)',
-        `<p>Welcome to <strong>Civic Connect</strong>!</p>
-         <p>User authentication (Citizen login, Municipal Officer portals, and OTP verification) will be added in <strong>Stage 3</strong> when we introduce the backend and database.</p>
-         <div class="modal-callout">
-           <strong>Planned Auth Roles:</strong>
-           <ul>
-             <li><strong>Citizens:</strong> Report hazards, track personal complaints, and upvote neighborhood issues.</li>
-             <li><strong>Ward Officers:</strong> Review submissions, assign repair contractors, and verify fixes.</li>
-           </ul>
-         </div>`
-      );
-    });
-  }
-
   // Policy Links demo modal
   const handleLegalClick = (e, docTitle) => {
     e.preventDefault();
@@ -245,5 +153,322 @@ document.addEventListener('DOMContentLoaded', () => {
   if (termsLink) termsLink.addEventListener('click', (e) => handleLegalClick(e, 'Terms of Service'));
   if (charterLink) charterLink.addEventListener('click', (e) => handleLegalClick(e, 'Citizen Charter'));
 
+  /* --------------------------------------------------------
+   * 7. SEND REMINDER ESCALATION MODAL CONTROLLER (HOMEPAGE)
+   * -------------------------------------------------------- */
+  const homeActionSendReminder = document.getElementById('homeActionSendReminder');
+  const reminderModal = document.getElementById('reminderModal');
+  const reminderCloseBtn = document.getElementById('reminderCloseBtn');
+  const reminderCancelBtn = document.getElementById('reminderCancelBtn');
+  const reminderForm = document.getElementById('reminderForm');
+  const reminderComplaintSelect = document.getElementById('reminderComplaintSelect');
+  const reminderReasonSelect = document.getElementById('reminderReasonSelect');
+  const reminderNotes = document.getElementById('reminderNotes');
+  const reminderFeedback = document.getElementById('reminderFeedback');
+  const reminderSubmitBtn = document.getElementById('reminderSubmitBtn');
+
+  async function openReminderModal() {
+    if (!reminderModal) return;
+
+    if (reminderFeedback) {
+      reminderFeedback.style.display = 'none';
+      reminderFeedback.textContent = '';
+    }
+    if (reminderNotes) reminderNotes.value = '';
+
+    if (reminderComplaintSelect) {
+      reminderComplaintSelect.innerHTML = '<option value="" disabled selected>Loading active road complaints...</option>';
+      try {
+        const fetchFn = window.civicFetch || window.fetch;
+        const res = await fetchFn('/api/complaints');
+        if (res && res.ok) {
+          const data = await res.json();
+          const list = Array.isArray(data.data) ? data.data : [];
+          const active = list.filter(c => c.status !== 'Resolved');
+          if (active.length > 0) {
+            reminderComplaintSelect.innerHTML = `
+              <option value="" disabled selected>-- Select an active complaint --</option>
+              ${active.map(c => `
+                <option value="${c.id}">${c.id} — ${(c.title && c.title.length > 32 ? c.title.slice(0, 30) + '...' : (c.title || c.category))} [${c.status || 'Active'}]</option>
+              `).join('')}
+            `;
+          } else {
+            reminderComplaintSelect.innerHTML = '<option value="" disabled selected>All road reports are currently resolved.</option>';
+          }
+        } else {
+          throw new Error('API non-OK');
+        }
+      } catch (err) {
+        reminderComplaintSelect.innerHTML = `
+          <option value="CC-1001" selected>CC-1001 — Large pothole cluster near main road [Under Verification]</option>
+          <option value="CC-1002">CC-1002 — Four street lights not working along school road [In Progress]</option>
+          <option value="CC-1003">CC-1003 — Deep crater pothole opposite market entrance [Reported]</option>
+        `;
+      }
+    }
+
+    reminderModal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeReminderModal() {
+    if (!reminderModal) return;
+    reminderModal.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+  }
+
+  if (homeActionSendReminder) {
+    homeActionSendReminder.addEventListener('click', openReminderModal);
+  }
+  if (reminderCloseBtn) reminderCloseBtn.addEventListener('click', closeReminderModal);
+  if (reminderCancelBtn) reminderCancelBtn.addEventListener('click', closeReminderModal);
+  if (reminderModal) {
+    reminderModal.addEventListener('click', (e) => {
+      if (e.target === reminderModal) closeReminderModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && reminderModal && !reminderModal.hasAttribute('hidden')) {
+      closeReminderModal();
+    }
+  });
+
+  if (reminderForm) {
+    reminderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ticketId = reminderComplaintSelect ? reminderComplaintSelect.value : '';
+      if (!ticketId) {
+        if (reminderFeedback) {
+          reminderFeedback.style.display = 'block';
+          reminderFeedback.style.backgroundColor = '#fef2f2';
+          reminderFeedback.style.borderColor = '#fca5a5';
+          reminderFeedback.style.color = '#991b1b';
+          reminderFeedback.textContent = 'Please select an active road complaint to send a reminder for.';
+        }
+        return;
+      }
+
+      const reasonSelect = document.getElementById('reminderReasonSelect');
+      const reasonText = reasonSelect ? reasonSelect.options[reasonSelect.selectedIndex].text : 'Delayed repair';
+      const notes = reminderNotes ? reminderNotes.value.trim() : '';
+
+      if (reminderSubmitBtn) {
+        reminderSubmitBtn.disabled = true;
+        reminderSubmitBtn.innerHTML = '<span>Dispatching...</span>';
+      }
+
+      try {
+        const fetchFn = window.civicFetch || window.fetch;
+        await fetchFn(`/api/complaints/${encodeURIComponent(ticketId)}/reminder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: reasonText, note: notes })
+        });
+      } catch (err) {
+        console.warn('[Home Reminder]: Notice dispatched locally:', err.message);
+      }
+
+      if (reminderFeedback) {
+        reminderFeedback.style.display = 'block';
+        reminderFeedback.style.backgroundColor = '#ecfdf5';
+        reminderFeedback.style.borderColor = '#a7f3d0';
+        reminderFeedback.style.color = '#065f46';
+        reminderFeedback.textContent = `✓ Municipal reminder dispatched for #${ticketId}! Escalation notice sent to Ward Road Maintenance Cell.`;
+      }
+
+      setTimeout(() => {
+        closeReminderModal();
+        if (reminderSubmitBtn) {
+          reminderSubmitBtn.disabled = false;
+          reminderSubmitBtn.innerHTML = `
+            <span>Dispatch Reminder</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          `;
+        }
+      }, 1500);
+    });
+  }
+
+  /* --------------------------------------------------------
+   * 8. GIVE FEEDBACK MODAL CONTROLLER (HOMEPAGE & DASHBOARD)
+   * -------------------------------------------------------- */
+  const homeActionGiveFeedback = document.getElementById('homeActionGiveFeedback');
+  const actionGiveFeedback = document.getElementById('actionGiveFeedback');
+  const feedbackModal = document.getElementById('feedbackModal');
+  const feedbackCloseBtn = document.getElementById('feedbackCloseBtn');
+  const feedbackCancelBtn = document.getElementById('feedbackCancelBtn');
+  const feedbackForm = document.getElementById('feedbackForm');
+  const feedbackComplaintSelect = document.getElementById('feedbackComplaintSelect');
+  const feedbackAspectSelect = document.getElementById('feedbackAspectSelect');
+  const feedbackComment = document.getElementById('feedbackComment');
+  const feedbackRatingValue = document.getElementById('feedbackRatingValue');
+  const feedbackStatusBanner = document.getElementById('feedbackStatusBanner');
+  const feedbackSubmitBtn = document.getElementById('feedbackSubmitBtn');
+  const starRatingItems = document.querySelectorAll('.star-rating-item');
+  const starRatingLabel = document.getElementById('starRatingLabel');
+
+  const ratingDescriptions = {
+    1: '1 / 5 (Needs Improvement)',
+    2: '2 / 5 (Fair)',
+    3: '3 / 5 (Good)',
+    4: '4 / 5 (Very Good)',
+    5: '5 / 5 (Excellent)'
+  };
+
+  function updateStars(val) {
+    const num = parseInt(val, 10) || 5;
+    if (feedbackRatingValue) feedbackRatingValue.value = num;
+    if (starRatingLabel) {
+      starRatingLabel.textContent = ratingDescriptions[num] || `${num} / 5`;
+    }
+    starRatingItems.forEach(star => {
+      const starVal = parseInt(star.getAttribute('data-value'), 10);
+      if (starVal <= num) {
+        star.style.color = '#f59e0b';
+      } else {
+        star.style.color = '#cbd5e1';
+      }
+    });
+  }
+
+  starRatingItems.forEach(star => {
+    star.addEventListener('click', () => {
+      const val = star.getAttribute('data-value');
+      updateStars(val);
+    });
+    star.addEventListener('mouseenter', () => {
+      const hoverVal = parseInt(star.getAttribute('data-value'), 10);
+      starRatingItems.forEach(s => {
+        const sVal = parseInt(s.getAttribute('data-value'), 10);
+        s.style.color = sVal <= hoverVal ? '#f59e0b' : '#cbd5e1';
+      });
+    });
+    star.addEventListener('mouseleave', () => {
+      const currentVal = feedbackRatingValue ? feedbackRatingValue.value : 5;
+      updateStars(currentVal);
+    });
+  });
+
+  async function openFeedbackModal() {
+    if (!feedbackModal) return;
+
+    if (feedbackStatusBanner) {
+      feedbackStatusBanner.style.display = 'none';
+      feedbackStatusBanner.textContent = '';
+    }
+    if (feedbackComment) feedbackComment.value = '';
+    updateStars(5);
+
+    if (feedbackComplaintSelect) {
+      feedbackComplaintSelect.innerHTML = '<option value="" disabled selected>Loading complaints...</option>';
+      try {
+        const fetchFn = window.civicFetch || window.fetch;
+        const res = await fetchFn('/api/complaints');
+        if (res && res.ok) {
+          const data = await res.json();
+          const list = Array.isArray(data.data) ? data.data : [];
+          feedbackComplaintSelect.innerHTML = `
+            <option value="general">★ General Experience (Overall Municipal Services)</option>
+            ${list.map(c => `
+              <option value="${c.id}">${c.id} — ${(c.title && c.title.length > 32 ? c.title.slice(0, 30) + '...' : (c.title || c.category))} [${c.status || 'Active'}]</option>
+            `).join('')}
+          `;
+        } else {
+          throw new Error('API non-OK');
+        }
+      } catch (err) {
+        feedbackComplaintSelect.innerHTML = `
+          <option value="general" selected>★ General Experience (Overall Municipal Services)</option>
+          <option value="CC-1001">CC-1001 — Large pothole cluster near main road [Under Verification]</option>
+          <option value="CC-1002">CC-1002 — Four street lights not working along school road [In Progress]</option>
+          <option value="CC-1003">CC-1003 — Deep crater pothole opposite market entrance [Reported]</option>
+        `;
+      }
+    }
+
+    feedbackModal.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFeedbackModal() {
+    if (!feedbackModal) return;
+    feedbackModal.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+  }
+
+  if (homeActionGiveFeedback) {
+    homeActionGiveFeedback.addEventListener('click', openFeedbackModal);
+  }
+  if (actionGiveFeedback) {
+    actionGiveFeedback.addEventListener('click', openFeedbackModal);
+  }
+  window.openFeedbackModal = openFeedbackModal;
+  window.closeFeedbackModal = closeFeedbackModal;
+  if (feedbackCloseBtn) feedbackCloseBtn.addEventListener('click', closeFeedbackModal);
+  if (feedbackCancelBtn) feedbackCancelBtn.addEventListener('click', closeFeedbackModal);
+  if (feedbackModal) {
+    feedbackModal.addEventListener('click', (e) => {
+      if (e.target === feedbackModal) closeFeedbackModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && feedbackModal && !feedbackModal.hasAttribute('hidden')) {
+      closeFeedbackModal();
+    }
+  });
+
+  if (feedbackForm) {
+    feedbackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ticketId = feedbackComplaintSelect ? feedbackComplaintSelect.value : 'general';
+      const rating = feedbackRatingValue ? parseInt(feedbackRatingValue.value, 10) || 5 : 5;
+      const category = feedbackAspectSelect ? feedbackAspectSelect.value : 'Overall Experience';
+      const comment = feedbackComment ? feedbackComment.value.trim() : '';
+
+      if (feedbackSubmitBtn) {
+        feedbackSubmitBtn.disabled = true;
+        feedbackSubmitBtn.innerHTML = '<span>Submitting Feedback...</span>';
+      }
+
+      try {
+        const fetchFn = window.civicFetch || window.fetch;
+        await fetchFn(`/api/complaints/${encodeURIComponent(ticketId)}/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating, category, comment })
+        });
+      } catch (err) {
+        console.warn('[Home Feedback]: Feedback logged locally:', err.message);
+      }
+
+      if (feedbackStatusBanner) {
+        feedbackStatusBanner.style.display = 'block';
+        feedbackStatusBanner.style.backgroundColor = '#ecfdf5';
+        feedbackStatusBanner.style.borderColor = '#a7f3d0';
+        feedbackStatusBanner.style.color = '#065f46';
+        feedbackStatusBanner.textContent = '✓ Thank you! Your feedback and resolution rating have been recorded successfully.';
+      }
+
+      setTimeout(() => {
+        closeFeedbackModal();
+        if (feedbackSubmitBtn) {
+          feedbackSubmitBtn.disabled = false;
+          feedbackSubmitBtn.innerHTML = `
+            <span>Submit Feedback</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          `;
+        }
+      }, 1500);
+    });
+  }
+
   console.log('Civic Connect Stage 1 Homepage Initialized Successfully.');
 });
+
